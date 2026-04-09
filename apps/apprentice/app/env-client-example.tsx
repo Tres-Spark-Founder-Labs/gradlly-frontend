@@ -1,6 +1,6 @@
 'use client';
 
-import { clientEnv } from '@env';
+import { clientEnv } from '@/config/env/client';
 
 export function EnvClientExample() {
   return (

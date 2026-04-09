@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   // Transpile shared workspace packages
-  transpilePackages: ['@gradlly/ui', '@gradlly/utils', '@gradlly/env'],
+  transpilePackages: ['@gradlly/ui', '@gradlly/utils'],
   experimental: {
     // React 19 server actions
     // serverActions: { allowedOrigins: ['employer.gradlly.com'] },

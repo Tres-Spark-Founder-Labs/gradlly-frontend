@@ -4,13 +4,15 @@ import { useMemo, useState } from 'react';
 
 import { Content } from '@/components/Content';
 import { Sidebar } from '@/components/Sidebar';
-import { docsSections } from '@/data/docs';
+import { appLinks, docsPages } from '@/data/docs';
+
+const allSections = docsPages.flatMap((page) => page.sections);
 
 export default function MainDocsPage() {
-  const [activeSectionId, setActiveSectionId] = useState(docsSections[0]?.id ?? '');
+  const [activeSectionId, setActiveSectionId] = useState(allSections[0]?.id ?? '');
 
   const activeSection = useMemo(
-    () => docsSections.find((section) => section.id === activeSectionId) ?? null,
+    () => allSections.find((section) => section.id === activeSectionId) ?? null,
     [activeSectionId],
   );
 
@@ -26,8 +28,9 @@ export default function MainDocsPage() {
     <main className="min-h-screen md:flex">
       <Sidebar
         activeSectionId={activeSection.id}
+        appLinks={appLinks}
         onSelect={setActiveSectionId}
-        sections={docsSections}
+        sections={allSections}
       />
       <Content section={activeSection} />
     </main>

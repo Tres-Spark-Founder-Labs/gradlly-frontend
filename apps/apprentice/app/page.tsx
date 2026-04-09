@@ -1,4 +1,4 @@
-import { serverEnv } from '@env';
+import { serverEnv } from '@/config/env/server';
 
 import { EnvClientExample } from './env-client-example';
 
