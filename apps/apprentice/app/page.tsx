@@ -1,7 +1,5 @@
 import { serverEnv } from '@/config/env/server';
 
-import { EnvClientExample } from './env-client-example';
-
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-surface font-sans">
@@ -32,7 +30,6 @@ export default function Home() {
               <span className="text-sm font-medium text-text-primary">{item.value}</span>
             </div>
           ))}
-          <EnvClientExample />
         </div>
       </main>
     </div>
