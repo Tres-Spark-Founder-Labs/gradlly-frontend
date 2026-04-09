@@ -91,6 +91,7 @@ npx turbo build --filter=@gradlly/employer
 ```sh
 npm run lint          # ESLint across all workspaces
 npm run lint:fix      # ESLint with auto-fix
+npm run lint:format   # Prettier — check only (lint-friendly alias)
 npm run typecheck     # TypeScript strict check across all workspaces
 npm run format        # Prettier — write
 npm run format:check  # Prettier — check only (used in CI)
