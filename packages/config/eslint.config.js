@@ -6,6 +6,15 @@ const reactPlugin = require('eslint-plugin-react');
 const reactHooksPlugin = require('eslint-plugin-react-hooks');
 const nextPlugin = require('@next/eslint-plugin-next');
 
+const hasTypeScriptImportResolver = (() => {
+  try {
+    require.resolve('eslint-import-resolver-typescript');
+    return true;
+  } catch {
+    return false;
+  }
+})();
+
 const baseRules = {
   'no-console': ['warn', { allow: ['error'] }],
   eqeqeq: ['error', 'always'],
@@ -106,9 +115,13 @@ module.exports = [
       react: {
         version: 'detect',
       },
-      'import/resolver': {
-        typescript: true,
-      },
+      ...(hasTypeScriptImportResolver
+        ? {
+            'import/resolver': {
+              typescript: true,
+            },
+          }
+        : {}),
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
