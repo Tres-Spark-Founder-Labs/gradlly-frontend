@@ -15,7 +15,8 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json,css}\"",
     "clean": "turbo run clean && rm -rf node_modules",
     "prepare": "husky install",
-    "dev:main": "turbo run dev --filter=@gradlly/main"
+    "dev:main": "turbo run dev --filter=@gradlly/main",
+    "dead-code": "ts-prune"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
