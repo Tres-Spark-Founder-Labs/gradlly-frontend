@@ -19,8 +19,11 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
-    }
+      "@/*": ["./*"],
+      "@env": ["../../packages/env/index.ts"],
+      "@env/*": ["../../packages/env/*"]
+    },
+    "baseUrl": "."
   },
   "include": [
     "next-env.d.ts",

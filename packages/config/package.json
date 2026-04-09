@@ -2,13 +2,12 @@
   "name": "@gradlly/config",
   "version": "0.0.1",
   "private": true,
-  "main": "./index.ts",
+  "main": "./index.js",
   "files": [
     "eslint.config.js",
     "prettier.js",
     "tsconfig",
-    "index.ts",
-    "env.ts"
+    "index.js"
   ],
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.46.1",
@@ -19,9 +18,5 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.0",
     "typescript": "5.9.2"
-  },
-  "dependencies": {
-    "zod": "^4.1.11"
-  },
-  "types": "./index.ts"
+  }
 }

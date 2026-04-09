@@ -1,4 +1,4 @@
-import { serverEnv } from '@gradlly/config';
+import { serverEnv } from '@env';
 
 import { EnvClientExample } from './env-client-example';
 

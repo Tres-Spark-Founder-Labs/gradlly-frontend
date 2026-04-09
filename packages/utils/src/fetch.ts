@@ -1,4 +1,4 @@
-import { clientEnv, serverEnv } from '@gradlly/config';
+import { clientEnv, serverEnv } from '@gradlly/env';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 

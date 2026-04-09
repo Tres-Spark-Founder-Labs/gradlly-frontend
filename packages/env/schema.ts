@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const clientEnvSchema = z.object({
+export const clientEnvSchema = z.object({
   NEXT_PUBLIC_APP_ENV: z.enum(['development', 'staging', 'production']),
   NEXT_PUBLIC_API_BASE_URL: z.url(),
   NEXT_PUBLIC_EMPLOYER_URL: z.url(),
@@ -9,7 +9,7 @@ const clientEnvSchema = z.object({
   NEXT_PUBLIC_FLOW_URL: z.url(),
 });
 
-const serverOnlyEnvSchema = z.object({
+export const serverEnvSchema = z.object({
   JWT_ACCESS_TOKEN_NAME: z.string().min(1),
   JWT_REFRESH_TOKEN_NAME: z.string().min(1),
   COOKIE_DOMAIN: z.string().min(1),
@@ -20,15 +20,16 @@ const serverOnlyEnvSchema = z.object({
   SENTRY_DSN: z.string().min(1),
 });
 
-const formatErrors = (error: z.ZodError, scope: 'client' | 'server'): never => {
-  const fields = error.issues.map((issue) => issue.path.join('.')).filter(Boolean);
-  const uniqueFields = [...new Set(fields)].join(', ');
-  throw new Error(`Invalid ${scope} environment variables: ${uniqueFields}`);
-};
-
 export type ClientEnv = z.infer<typeof clientEnvSchema>;
-export type ServerOnlyEnv = z.infer<typeof serverOnlyEnvSchema>;
+export type ServerOnlyEnv = z.infer<typeof serverEnvSchema>;
 export type ServerEnv = ClientEnv & ServerOnlyEnv;
+
+const formatValidationError = (scope: 'client' | 'server', error: z.ZodError): never => {
+  const fields = [...new Set(error.issues.map((issue) => issue.path.join('.')).filter(Boolean))];
+  throw new Error(
+    `Invalid ${scope} environment variables: ${fields.join(', ') || 'unknown validation error'}`,
+  );
+};
 
 export const parseClientEnv = (env: NodeJS.ProcessEnv): ClientEnv => {
   try {
@@ -42,7 +43,7 @@ export const parseClientEnv = (env: NodeJS.ProcessEnv): ClientEnv => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      formatErrors(error, 'client');
+      formatValidationError('client', error);
     }
 
     throw error;
@@ -51,7 +52,7 @@ export const parseClientEnv = (env: NodeJS.ProcessEnv): ClientEnv => {
 
 export const parseServerEnv = (env: NodeJS.ProcessEnv): ServerOnlyEnv => {
   try {
-    return serverOnlyEnvSchema.parse({
+    return serverEnvSchema.parse({
       JWT_ACCESS_TOKEN_NAME: env['JWT_ACCESS_TOKEN_NAME'],
       JWT_REFRESH_TOKEN_NAME: env['JWT_REFRESH_TOKEN_NAME'],
       COOKIE_DOMAIN: env['COOKIE_DOMAIN'],
@@ -63,7 +64,7 @@ export const parseServerEnv = (env: NodeJS.ProcessEnv): ServerOnlyEnv => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      formatErrors(error, 'server');
+      formatValidationError('server', error);
     }
 
     throw error;
