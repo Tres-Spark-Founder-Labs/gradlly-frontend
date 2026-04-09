@@ -1,6 +1,15 @@
-export type DocContentSection = {
-  content: string[];
+export type DocRule = {
+  badExample: string;
+  enforces: string;
+  goodExample: string;
   id: string;
+  name: string;
+};
+
+export type DocContentSection = {
+  content?: string[];
+  id: string;
+  rules?: DocRule[];
   title: string;
 };
 
