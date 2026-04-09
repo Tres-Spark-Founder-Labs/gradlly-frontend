@@ -70,9 +70,9 @@ export function Button({
           className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
           aria-hidden="true"
         />
-      ) : (
-        leftIcon !== null && leftIcon !== undefined ? <span aria-hidden="true">{leftIcon}</span> : null
-      )}
+      ) : leftIcon !== null && leftIcon !== undefined ? (
+        <span aria-hidden="true">{leftIcon}</span>
+      ) : null}
       {children}
       {!loading && rightIcon !== null && rightIcon !== undefined ? (
         <span aria-hidden="true">{rightIcon}</span>
