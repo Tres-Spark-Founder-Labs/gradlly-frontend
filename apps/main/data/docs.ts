@@ -11,7 +11,7 @@ export const docsPages: DocsPage[] = [
         title: 'Per-app ownership',
         content: [
           'Each application owns its own environment schema, client parser, and server parser under config/env.',
-          'Only clientEnv is exported by config/env/index.ts to prevent serverEnv leaks into client components.',
+          'Use explicit module boundaries: import client values from config/env/client and server values from config/env/server.',
         ],
       },
       {
@@ -20,7 +20,7 @@ export const docsPages: DocsPage[] = [
         content: [
           'Environment values are validated with strict Zod schemas for both server and client scopes.',
           'Client variables must use the NEXT_PUBLIC_ prefix and are safe to consume in client code.',
-          'Server variables are parsed only from server files and never re-exported through index.ts.',
+          'Server variables are parsed only in config/env/server and cannot be consumed from client modules.',
         ],
       },
       {
