@@ -1,11 +1,20 @@
 import type { NextConfig } from 'next';
 
+import { loadEnvConfig } from '@next/env';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const appDirectory = dirname(fileURLToPath(import.meta.url));
+const workspaceRoot = join(appDirectory, '../..');
+
+loadEnvConfig(workspaceRoot);
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
   // Transpile shared workspace packages
-  transpilePackages: ['@gradlly/ui', '@gradlly/utils'],
+  transpilePackages: ['@gradlly/ui', '@gradlly/utils', '@gradlly/env'],
   experimental: {
     // React 19 server actions
     // serverActions: { allowedOrigins: ['employer.gradlly.com'] },

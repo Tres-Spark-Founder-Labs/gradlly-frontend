@@ -32,14 +32,34 @@ const formatValidationError = (scope: 'client' | 'server', error: z.ZodError): n
 };
 
 export const parseClientEnv = (env: NodeJS.ProcessEnv): ClientEnv => {
+  const isProduction = env['NODE_ENV'] === 'production';
+  const defaults: ClientEnv = {
+    NEXT_PUBLIC_APP_ENV: 'development',
+    NEXT_PUBLIC_API_BASE_URL: 'http://localhost:4000',
+    NEXT_PUBLIC_EMPLOYER_URL: 'http://localhost:3000',
+    NEXT_PUBLIC_PROVIDER_URL: 'http://localhost:3001',
+    NEXT_PUBLIC_APPRENTICE_URL: 'http://localhost:3002',
+    NEXT_PUBLIC_FLOW_URL: 'http://localhost:3003',
+  };
+
   try {
     return clientEnvSchema.parse({
-      NEXT_PUBLIC_APP_ENV: env['NEXT_PUBLIC_APP_ENV'],
-      NEXT_PUBLIC_API_BASE_URL: env['NEXT_PUBLIC_API_BASE_URL'],
-      NEXT_PUBLIC_EMPLOYER_URL: env['NEXT_PUBLIC_EMPLOYER_URL'],
-      NEXT_PUBLIC_PROVIDER_URL: env['NEXT_PUBLIC_PROVIDER_URL'],
-      NEXT_PUBLIC_APPRENTICE_URL: env['NEXT_PUBLIC_APPRENTICE_URL'],
-      NEXT_PUBLIC_FLOW_URL: env['NEXT_PUBLIC_FLOW_URL'],
+      NEXT_PUBLIC_APP_ENV:
+        env['NEXT_PUBLIC_APP_ENV'] ?? (isProduction ? undefined : defaults.NEXT_PUBLIC_APP_ENV),
+      NEXT_PUBLIC_API_BASE_URL:
+        env['NEXT_PUBLIC_API_BASE_URL'] ??
+        (isProduction ? undefined : defaults.NEXT_PUBLIC_API_BASE_URL),
+      NEXT_PUBLIC_EMPLOYER_URL:
+        env['NEXT_PUBLIC_EMPLOYER_URL'] ??
+        (isProduction ? undefined : defaults.NEXT_PUBLIC_EMPLOYER_URL),
+      NEXT_PUBLIC_PROVIDER_URL:
+        env['NEXT_PUBLIC_PROVIDER_URL'] ??
+        (isProduction ? undefined : defaults.NEXT_PUBLIC_PROVIDER_URL),
+      NEXT_PUBLIC_APPRENTICE_URL:
+        env['NEXT_PUBLIC_APPRENTICE_URL'] ??
+        (isProduction ? undefined : defaults.NEXT_PUBLIC_APPRENTICE_URL),
+      NEXT_PUBLIC_FLOW_URL:
+        env['NEXT_PUBLIC_FLOW_URL'] ?? (isProduction ? undefined : defaults.NEXT_PUBLIC_FLOW_URL),
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

@@ -7,6 +7,8 @@ export const docsSections: DocSection[] = [
     content: [
       'Overview',
       'The environment system is centralized in packages/env with strict server and client separation.',
+      'All apps read from the workspace root .env file so each portal shares one source of truth.',
+      'Local development falls back to safe localhost defaults for required NEXT_PUBLIC variables.',
       'File structure',
       'packages/env/index.ts',
       'packages/env/client.ts',
@@ -25,6 +27,14 @@ export const docsSections: DocSection[] = [
       'Client usage example (NEXT_PUBLIC only)',
       "import { clientEnv } from '@env';",
       'const apiBaseUrl = clientEnv.NEXT_PUBLIC_API_BASE_URL;',
+      'Quick links',
+      'Use the domain links above to open each portal in a new tab.',
+    ],
+    links: [
+      { label: 'Employer', href: process.env['NEXT_PUBLIC_EMPLOYER_URL'] ?? '#' },
+      { label: 'Provider', href: process.env['NEXT_PUBLIC_PROVIDER_URL'] ?? '#' },
+      { label: 'Apprentice', href: process.env['NEXT_PUBLIC_APPRENTICE_URL'] ?? '#' },
+      { label: 'Flow', href: process.env['NEXT_PUBLIC_FLOW_URL'] ?? '#' },
     ],
   },
   {
