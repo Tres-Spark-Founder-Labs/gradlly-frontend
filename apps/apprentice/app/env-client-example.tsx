@@ -1,6 +1,6 @@
 'use client';
 
-import { clientEnv } from '@gradlly/config';
+import { clientEnv } from '@env';
 
 export function EnvClientExample() {
   return (

@@ -1,11 +1,11 @@
 {
-  "name": "@gradlly/apprentice",
+  "name": "@gradlly/main",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3000",
+    "dev": "next dev --port 3004",
     "build": "next build",
-    "start": "next start --port 3000",
+    "start": "next start --port 3004",
     "lint": "eslint . --max-warnings 0",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf .next dist"
@@ -14,7 +14,7 @@
     "next": "16.2.2",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "@gradlly/env": "*"
+    "@gradlly/config": "*"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
