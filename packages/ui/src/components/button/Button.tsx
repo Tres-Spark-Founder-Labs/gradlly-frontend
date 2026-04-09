@@ -71,10 +71,12 @@ export function Button({
           aria-hidden="true"
         />
       ) : (
-        leftIcon && <span aria-hidden="true">{leftIcon}</span>
+        leftIcon !== null && leftIcon !== undefined ? <span aria-hidden="true">{leftIcon}</span> : null
       )}
       {children}
-      {!loading && rightIcon && <span aria-hidden="true">{rightIcon}</span>}
+      {!loading && rightIcon !== null && rightIcon !== undefined ? (
+        <span aria-hidden="true">{rightIcon}</span>
+      ) : null}
     </button>
   );
 }
