@@ -1,3 +1,7 @@
+import { serverEnv } from '@gradlly/config';
+
+import { EnvClientExample } from './env-client-example';
+
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-surface font-sans">
@@ -16,17 +20,19 @@ export default function Home() {
 
         <div className="h-px w-full bg-border" />
 
-        <div className="flex flex-col gap-4 w-full">
+        <div className="flex w-full flex-col gap-4">
           {[
-            { label: "Portal", value: "P3 — Apprentice" },
-            { label: "Domain", value: "apprentice.gradlly.com" },
-            { label: "Environment", value: process.env.NODE_ENV },
+            { label: 'Portal', value: 'P3 — Apprentice' },
+            { label: 'Domain', value: serverEnv.NEXT_PUBLIC_APPRENTICE_URL },
+            { label: 'Environment', value: serverEnv.NEXT_PUBLIC_APP_ENV },
+            { label: 'Cookie Domain', value: serverEnv.COOKIE_DOMAIN },
           ].map((item) => (
             <div key={item.label} className="flex items-center justify-between">
               <span className="text-xs text-text-muted">{item.label}</span>
               <span className="text-sm font-medium text-text-primary">{item.value}</span>
             </div>
           ))}
+          <EnvClientExample />
         </div>
       </main>
     </div>
