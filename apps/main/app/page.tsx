@@ -30,7 +30,7 @@ export default function MainDocsPage() {
         activeSectionId={activeSection.id}
         appLinks={appLinks}
         onSelect={setActiveSectionId}
-        sections={allSections}
+        pages={docsPages}
       />
       <Content section={activeSection} />
     </main>
