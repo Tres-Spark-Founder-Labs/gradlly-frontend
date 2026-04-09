@@ -18,9 +18,9 @@ export default function Home() {
 
         <div className="grid grid-cols-3 gap-6 w-full">
           {[
-            { label: "Portal", value: "P2 — Provider" },
-            { label: "Domain", value: "provider.gradlly.com" },
-            { label: "Environment", value: process.env.NODE_ENV },
+            { label: 'Portal', value: 'P2 — Provider' },
+            { label: 'Domain', value: 'provider.gradlly.com' },
+            { label: 'Environment', value: process.env.NODE_ENV },
           ].map((item) => (
             <div key={item.label} className="flex flex-col gap-1">
               <span className="text-xs text-text-muted">{item.label}</span>

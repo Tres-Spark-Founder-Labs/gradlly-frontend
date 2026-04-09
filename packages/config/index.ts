@@ -1,4 +1,4 @@
-import { parseClientEnv, parseServerEnv, type ServerEnv } from './env';
+import { type ServerEnv, parseClientEnv, parseServerEnv } from './env';
 
 export const clientEnv = parseClientEnv(process.env);
 
@@ -9,8 +9,6 @@ const serverEnvProxy = new Proxy({} as ServerEnv, {
 });
 
 export const serverEnv =
-  typeof window === 'undefined'
-    ? { ...clientEnv, ...parseServerEnv(process.env) }
-    : serverEnvProxy;
+  typeof window === 'undefined' ? { ...clientEnv, ...parseServerEnv(process.env) } : serverEnvProxy;
 
 export type { ClientEnv, ServerEnv, ServerOnlyEnv } from './env';

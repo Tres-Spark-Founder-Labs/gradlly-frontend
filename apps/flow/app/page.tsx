@@ -6,9 +6,7 @@ export default function Home() {
           <span className="text-xs font-medium uppercase tracking-widest text-text-muted">
             Gradlly
           </span>
-          <h1 className="text-4xl font-semibold tracking-tight text-red-600">
-            FlowPortal
-          </h1>
+          <h1 className="text-4xl font-semibold tracking-tight text-red-600">FlowPortal</h1>
           <p className="text-base text-text-secondary">
             Levy exchange · SME matching · AI programme delivery
           </p>
@@ -18,9 +16,9 @@ export default function Home() {
 
         <div className="grid grid-cols-3 gap-6 w-full">
           {[
-            { label: "Portal", value: "P4 — FlowPortal" },
-            { label: "Domain", value: "flow.gradlly.com" },
-            { label: "Environment", value: process.env.NODE_ENV },
+            { label: 'Portal', value: 'P4 — FlowPortal' },
+            { label: 'Domain', value: 'flow.gradlly.com' },
+            { label: 'Environment', value: process.env.NODE_ENV },
           ].map((item) => (
             <div key={item.label} className="flex flex-col gap-1">
               <span className="text-xs text-text-muted">{item.label}</span>

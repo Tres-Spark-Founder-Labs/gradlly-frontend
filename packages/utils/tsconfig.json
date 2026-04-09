@@ -1,8 +1,9 @@
 {
   "extends": "@gradlly/config/tsconfig/base.json",
   "compilerOptions": {
-    "outDir": "dist"
+    "outDir": "dist",
+    "rootDir": "src"
   },
-  "include": ["."],
+  "include": ["src"],
   "exclude": ["dist", "build", "node_modules"]
 }
