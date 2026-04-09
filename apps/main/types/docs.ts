@@ -1,9 +1,17 @@
-export type DocSection = {
+export type DocContentSection = {
+  content: string[];
   id: string;
   title: string;
-  content: string[];
-  links?: Array<{
-    label: string;
-    href: string;
-  }>;
+};
+
+export type DocsPage = {
+  id: string;
+  sections: DocContentSection[];
+  title: string;
+};
+
+export type AppLink = {
+  href: string;
+  id: string;
+  label: string;
 };

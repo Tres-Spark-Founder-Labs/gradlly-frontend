@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
-  transpilePackages: ['@gradlly/ui', '@gradlly/utils', '@gradlly/env'],
+  transpilePackages: ['@gradlly/ui', '@gradlly/utils'],
 };
 
 export default nextConfig;

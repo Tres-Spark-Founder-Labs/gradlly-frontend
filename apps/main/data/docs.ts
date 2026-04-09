@@ -1,49 +1,45 @@
-import type { DocSection } from '@/types/docs';
+import { clientEnv } from '@/config/env/client';
+import type { AppLink, DocsPage } from '@/types/docs';
 
-export const docsSections: DocSection[] = [
+export const docsPages: DocsPage[] = [
   {
-    id: 'environment',
+    id: 'env',
     title: 'Environment',
-    content: [
-      'Overview',
-      'The environment system is centralized in packages/env with strict server and client separation.',
-      'All apps read from the workspace root .env file so each portal shares one source of truth.',
-      'Local development falls back to safe localhost defaults for required NEXT_PUBLIC variables.',
-      'File structure',
-      'packages/env/index.ts',
-      'packages/env/client.ts',
-      'packages/env/server.ts',
-      'packages/env/schema.ts',
-      'Naming rules',
-      'Client variables must start with NEXT_PUBLIC_.',
-      'Server variables must never be exposed in client code.',
-      'Env guide',
-      '1. Add the variable to .env.example.',
-      '2. Add it to the zod schema in packages/env/schema.ts.',
-      '3. Access values through serverEnv or clientEnv exports.',
-      'Server usage example',
-      "import { serverEnv } from '@env';",
-      'const tokenName = serverEnv.JWT_ACCESS_TOKEN_NAME;',
-      'Client usage example (NEXT_PUBLIC only)',
-      "import { clientEnv } from '@env';",
-      'const apiBaseUrl = clientEnv.NEXT_PUBLIC_API_BASE_URL;',
-      'Quick links',
-      'Use the domain links above to open each portal in a new tab.',
-    ],
-    links: [
-      { label: 'Employer', href: process.env['NEXT_PUBLIC_EMPLOYER_URL'] ?? '#' },
-      { label: 'Provider', href: process.env['NEXT_PUBLIC_PROVIDER_URL'] ?? '#' },
-      { label: 'Apprentice', href: process.env['NEXT_PUBLIC_APPRENTICE_URL'] ?? '#' },
-      { label: 'Flow', href: process.env['NEXT_PUBLIC_FLOW_URL'] ?? '#' },
+    sections: [
+      {
+        id: 'ownership',
+        title: 'Per-app ownership',
+        content: [
+          'Each application owns its own environment schema, client parser, and server parser under config/env.',
+          'Only clientEnv is exported by config/env/index.ts to prevent serverEnv leaks into client components.',
+        ],
+      },
+      {
+        id: 'validation',
+        title: 'Validation workflow',
+        content: [
+          'Environment values are validated with strict Zod schemas for both server and client scopes.',
+          'Client variables must use the NEXT_PUBLIC_ prefix and are safe to consume in client code.',
+          'Server variables are parsed only from server files and never re-exported through index.ts.',
+        ],
+      },
+      {
+        id: 'usage',
+        title: 'Usage patterns',
+        content: [
+          "Server usage: import { serverEnv } from '@/config/env/server'",
+          "Client usage: import { clientEnv } from '@/config/env/client'",
+          'Use NEXT_PUBLIC_* URLs for cross-app links and navigation.',
+        ],
+      },
     ],
   },
-  {
-    id: 'architecture',
-    title: 'Architecture',
-    content: [
-      'This monorepo uses Turborepo with modular applications and shared packages.',
-      'Shared packages: config, env, ui, utils, and types.',
-      'Applications are isolated but can consume shared workspace libraries.',
-    ],
-  },
+];
+
+export const appLinks: AppLink[] = [
+  { id: 'employer', label: 'Employer', href: clientEnv.NEXT_PUBLIC_EMPLOYER_URL },
+  { id: 'provider', label: 'Provider', href: clientEnv.NEXT_PUBLIC_PROVIDER_URL },
+  { id: 'apprentice', label: 'Apprentice', href: clientEnv.NEXT_PUBLIC_APPRENTICE_URL },
+  { id: 'flow', label: 'Flow', href: clientEnv.NEXT_PUBLIC_FLOW_URL },
+  { id: 'main', label: 'Main', href: clientEnv.NEXT_PUBLIC_MAIN_URL },
 ];

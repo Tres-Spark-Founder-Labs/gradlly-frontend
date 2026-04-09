@@ -9,10 +9,7 @@
     "lint": "eslint src/"
   },
   "devDependencies": {
-    "typescript": "^5.5.0",
-    "@gradlly/env": "*"
+    "typescript": "^5.5.0"
   },
-  "dependencies": {
-    "@gradlly/env": "*"
-  }
+  "dependencies": {}
 }
