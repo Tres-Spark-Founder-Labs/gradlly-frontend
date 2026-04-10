@@ -44,7 +44,7 @@
   "workspaces": [
     "apps/*",
     "packages/api",
-    "packages/features/auth",
+    "packages/feature/*",
     "packages/lib",
     "packages/ui",
     "packages/utils",

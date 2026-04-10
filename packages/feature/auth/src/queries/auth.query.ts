@@ -1,11 +1,11 @@
 /**
  * Global TanStack Query hooks for authentication.
  * All auth queries AND mutations live in this single file.
- * Import from @gradlly/auth/queries in any portal.
+ * Import from @gradlly/feature-auth in any portal.
  */
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { getBrowserQueryClient } from "@gradlly/lib/react-query";
+import { getBrowserQueryClient } from "@gradlly/lib";
 
 import { authKeys } from "../querykeys";
 import {

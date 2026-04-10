@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@gradlly/api": "*",
-    "@gradlly/auth": "*",
+    "@gradlly/feature-auth": "*",
     "@gradlly/lib": "*",
     "@gradlly/types": "*",
     "@gradlly/ui": "*",

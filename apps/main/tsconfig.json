@@ -1,26 +1,16 @@
 {
+  "extends": "@gradlly/config/typescript/next.json",
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "react-jsx",
-    "incremental": true,
     "baseUrl": ".",
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
+    "noEmit": true,
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@gradlly/ui": ["../../packages/ui/src/index.ts"],
+      "@gradlly/utils": ["../../packages/utils/src/index.ts"],
+      "@gradlly/api": ["../../packages/api/src/index.ts"],
+      "@gradlly/types": ["../../packages/types/src/index.ts"],
+      "@gradlly/lib": ["../../packages/lib/src/index.ts"],
+      "@gradlly/feature-auth": ["../../packages/feature/auth/src/index.ts"]
     }
   },
   "include": [

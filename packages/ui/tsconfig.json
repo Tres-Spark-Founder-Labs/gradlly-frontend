@@ -1,10 +1,35 @@
 {
-  "extends": "@gradlly/config/tsconfig/base.json",
+  "extends": "@gradlly/config/typescript/base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
     "outDir": "dist",
-    "rootDir": "src"
+    "baseUrl": ".",
+    "paths": {
+      "@gradlly/ui": [
+        "../ui/src/index.ts"
+      ],
+      "@gradlly/utils": [
+        "../utils/src/index.ts"
+      ],
+      "@gradlly/api": [
+        "../api/src/index.ts"
+      ],
+      "@gradlly/types": [
+        "../types/src/index.ts"
+      ],
+      "@gradlly/lib": [
+        "../lib/src/index.ts"
+      ],
+      "@gradlly/feature-auth": [
+        "../feature/auth/src/index.ts"
+      ]
+    }
   },
-  "include": ["src"],
-  "exclude": ["dist", "build", "node_modules"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

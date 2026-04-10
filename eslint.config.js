@@ -1,1 +1,3 @@
-module.exports = require('./packages/config/eslint.config.js');
+import sharedConfig from "./packages/config/eslint.config.js";
+
+export default sharedConfig;
