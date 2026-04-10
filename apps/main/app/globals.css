@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+@config '../tailwind.config.ts';
+@source '../../../packages/ui/**/*.{ts,tsx}';
+@source '../../../packages/**/*.{ts,tsx}';
 
 :root {
   --background: #f8fafc;
