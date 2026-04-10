@@ -3,19 +3,21 @@
   "private": true,
   "scripts": {
     "dev": "turbo run dev --filter=./apps/* --output-logs=full",
+    "dev:clean": "npm run clean && npm run dev",
     "dev:employer": "turbo run dev --filter=@gradlly/employer",
     "dev:provider": "turbo run dev --filter=@gradlly/provider",
     "dev:apprentice": "turbo run dev --filter=@gradlly/apprentice",
     "dev:flow": "turbo run dev --filter=@gradlly/flow",
+    "dev:main": "turbo run dev --filter=@gradlly/main",
+    "clean": "turbo run clean && rm -rf .turbo **/.next **/node_modules/.cache",
+    "clean:full": "rm -rf node_modules",
     "check-types": "turbo run check-types",
     "build": "turbo run build",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix --max-warnings 0",
     "format": "prettier --write \"**/*.{ts,tsx,md,json,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json,css}\"",
-    "clean": "turbo run clean && rm -rf node_modules",
     "prepare": "husky",
-    "dev:main": "turbo run dev --filter=@gradlly/main",
     "dead-code": "ts-prune"
   },
   "devDependencies": {
