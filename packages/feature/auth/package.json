@@ -1,5 +1,5 @@
 {
-  "name": "@gradlly/lib",
+  "name": "@gradlly/feature-auth",
   "version": "0.0.0",
   "private": true,
   "type": "module",
