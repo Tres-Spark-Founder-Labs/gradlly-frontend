@@ -1,0 +1,26 @@
+{
+  "name": "@gradlly/auth",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./queries": "./queries/index.ts",
+    "./services": "./services/index.ts",
+    "./types": "./types/index.ts",
+    "./querykeys": "./querykeys/index.ts",
+    "./hooks": "./hooks/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "@tanstack/react-query": "^5.0.0"
+  },
+  "devDependencies": {
+    "@gradlly/tsconfig": "*",
+    "@gradlly/types": "*",
+    "@gradlly/api": "*",
+    "@gradlly/lib": "*",
+    "@types/react": "^19.0.0",
+    "typescript": "^5.4.5"
+  }
+}
