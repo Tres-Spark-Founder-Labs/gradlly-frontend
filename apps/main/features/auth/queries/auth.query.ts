@@ -81,6 +81,7 @@ export const useSessions = (): {
 
 export const useSignIn = (): {
   signIn: (payload: SignInPayload) => void;
+  signInAsync: (payload: SignInPayload) => Promise<Awaited<ReturnType<typeof signIn>>>;
   isPending: boolean;
   isError: boolean;
   error: Error | null;
@@ -99,6 +100,7 @@ export const useSignIn = (): {
 
   return {
     signIn: mutation.mutate,
+    signInAsync: mutation.mutateAsync,
     isPending: mutation.isPending,
     isError: mutation.isError,
     error: mutation.error as Error | null, // mutation.error is unknown by default.
