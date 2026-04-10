@@ -5,7 +5,7 @@
  */
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { getBrowserQueryClient } from "@gradlly/lib/react-query";
+import { getBrowserQueryClient } from "@gradlly/lib";
 
 import { todoKeys } from "../querykeys";
 import { createTodo, deleteTodo, fetchTodoById, fetchTodos, updateTodo } from "../services/todo.service";

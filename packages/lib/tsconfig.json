@@ -1,10 +1,13 @@
 {
-  "extends": "@gradlly/tsconfig/base.json",
+  "extends": "@gradlly/config/typescript/base.json",
+  "compilerOptions": {
+    "outDir": "dist"
+  },
   "include": [
-    "**/*.ts",
-    "**/*.tsx"
+    "src"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 }
