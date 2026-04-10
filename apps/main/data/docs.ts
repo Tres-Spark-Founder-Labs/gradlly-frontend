@@ -1,6 +1,98 @@
-import type { DocsPage } from "@/types/docs";
+import type { AppLink, DocsPage } from "@/types/docs";
+
+export const docsNavigation: AppLink[] = [
+  { id: "toast", label: "Toast", href: "#toast" },
+  { id: "forms", label: "Forms", href: "#forms" },
+  { id: "zod", label: "Zod", href: "#zod" },
+  { id: "react-hook-form", label: "React Hook Form", href: "#react-hook-form" },
+  { id: "eslint", label: "ESLint rules", href: "#eslint" },
+  { id: "architecture", label: "Project architecture", href: "#architecture" },
+];
 
 export const docsPages: DocsPage[] = [
+  {
+    id: "toast",
+    title: "Toast (react-hot-toast)",
+    summary: "Shared, typed toast API from @gradlly/hooks used across applications.",
+    sections: [
+      {
+        id: "toast-usage",
+        title: "How to import and use",
+        content: [
+          "Use the shared useToast hook to keep UX and configuration consistent across apps.",
+          "All variants (success, error, loading, default) accept message and optional react-hot-toast options.",
+        ],
+        examples: [
+          {
+            id: "toast-import",
+            title: "Toast usage",
+            language: "ts",
+            code: 'import { useToast } from "@gradlly/hooks";\n\nconst toast = useToast();\ntoast.success("Logged in");\ntoast.error("Invalid credentials");\ntoast.loading("Signing in...");',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "forms",
+    title: "Forms (React Hook Form + Zod)",
+    summary: "Use useAppForm to centralize schema-based validation and typing.",
+    sections: [
+      {
+        id: "forms-pattern",
+        title: "Form architecture",
+        content: [
+          "UI components should be presentational and receive register/errors/onSubmit/loading from a feature hook.",
+          "Feature hooks hold submission logic, side effects, and routing decisions.",
+        ],
+        examples: [
+          {
+            id: "forms-login-hook",
+            title: "Login hook pattern",
+            language: "ts",
+            code: 'const { register, handleSubmit, formState } = useAppForm(loginSchema);\n\nconst onSubmit = handleSubmit(async (values) => {\n  await signInAsync(values);\n  toast.success("Signed in successfully.");\n});',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "zod",
+    title: "Zod",
+    sections: [
+      {
+        id: "zod-schema",
+        title: "Schema definition and inference",
+        content: [
+          "Define schemas next to feature use-cases (e.g., auth/schemas/login.schema.ts).",
+          "Use z.infer<typeof schema> for exact TypeScript form values and payload typing.",
+          "Keep validation rules explicit (email format, min length, required fields).",
+        ],
+        examples: [
+          {
+            id: "zod-login",
+            title: "Login schema",
+            language: "ts",
+            code: 'export const loginSchema = z.object({\n  email: z.email("Please enter a valid email address."),\n  password: z.string().min(8, "Password must be at least 8 characters."),\n  rememberMe: z.boolean().optional(),\n});',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "react-hook-form",
+    title: "React Hook Form",
+    sections: [
+      {
+        id: "rhf-integration",
+        title: "Integration with Zod",
+        content: [
+          "useAppForm wraps useForm and applies zodResolver internally.",
+          "Consumers call useAppForm(schema) rather than repeating resolver setup in UI files.",
+        ],
+      },
+    ],
+  },
   {
     id: "eslint",
     title: "ESLint setup",
@@ -13,71 +105,19 @@ export const docsPages: DocsPage[] = [
           "Type-aware linting is enabled through project tsconfig references, so architectural and TypeScript checks run together.",
         ],
       },
-      {
-        id: "lint-rules",
-        title: "Core lint rules",
-        rules: [
-          {
-            id: "no-duplicate-imports",
-            name: "no-duplicate-imports",
-            enforces:
-              "Keeps imports normalized and prevents repeated imports from the same module.",
-            badExample: "import { a } from './x';\nimport { b } from './x';",
-            goodExample: "import { a, b } from './x';",
-          },
-          {
-            id: "consistent-type-imports",
-            name: "@typescript-eslint/consistent-type-imports",
-            enforces: "Requires type-only symbols to use import type syntax.",
-            badExample: "import { User } from '@/types/user';",
-            goodExample: "import type { User } from '@/types/user';",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: "imports",
-    title: "Import rules",
-    sections: [
-      {
-        id: "boundaries",
-        title: "Dependency boundaries",
-        content: [
-          "Import from workspace package roots (for example, @gradlly/ui) instead of internal deep paths.",
-          "In apps/main, localized modules should be imported through @/features/* and @/lib/* aliases.",
-          "Cross-app imports are disallowed; shared code must live under packages/*.",
-        ],
-      },
     ],
   },
   {
     id: "architecture",
-    title: "Dependency boundaries",
-    sections: [
-      {
-        id: "ui-feature",
-        title: "Layering rules",
-        content: [
-          "ui cannot import feature modules.",
-          "feature modules cannot import other feature modules.",
-          "utility packages must remain dependency-light and avoid feature/UI coupling.",
-        ],
-      },
-    ],
-  },
-  {
-    id: "structure",
-    title: "Folder structure",
+    title: "Project architecture",
     sections: [
       {
         id: "main-layout",
         title: "apps/main localized structure",
         content: [
-          "apps/main/features/auth contains auth feature logic (services, queries, hooks, types, constants, querykeys).",
-          "apps/main/lib/api contains the app-local API client layer.",
-          "apps/main/lib/react-query contains query client, provider, and hydration helpers.",
-          "packages/hooks is the new lightweight shared hooks package for non-feature-specific hooks.",
+          "apps/main/features/auth now separates schemas, hooks, and services so UI and business logic remain decoupled.",
+          "apps/main/lib/form provides a reusable app-level form abstraction.",
+          "packages/hooks contains shared, reusable hooks including the toast system.",
         ],
       },
     ],

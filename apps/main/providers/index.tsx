@@ -1,5 +1,8 @@
 "use client";
 
+import { toasterConfig } from "@gradlly/hooks";
+import { Toaster } from "react-hot-toast";
+
 import type { ReactNode } from "react";
 
 import { QueryProvider } from "@/lib/react-query";
@@ -14,6 +17,9 @@ export default function Providers({
   dehydratedState,
 }: ProvidersProps): ReactNode {
   return (
-    <QueryProvider dehydratedState={dehydratedState}>{children}</QueryProvider>
+    <QueryProvider dehydratedState={dehydratedState}>
+      {children}
+      <Toaster {...toasterConfig} />
+    </QueryProvider>
   );
 }

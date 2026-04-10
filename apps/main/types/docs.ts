@@ -6,8 +6,16 @@ export type DocRule = {
   name: string;
 };
 
+export type DocExample = {
+  code: string;
+  id: string;
+  language: "ts" | "tsx" | "bash";
+  title: string;
+};
+
 export type DocContentSection = {
   content?: string[];
+  examples?: DocExample[];
   id: string;
   rules?: DocRule[];
   title: string;
@@ -16,6 +24,7 @@ export type DocContentSection = {
 export type DocsPage = {
   id: string;
   sections: DocContentSection[];
+  summary?: string;
   title: string;
 };
 
