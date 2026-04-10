@@ -9,18 +9,6 @@
       ],
       "@gradlly/utils": [
         "../utils/src/index.ts"
-      ],
-      "@gradlly/api": [
-        "../api/src/index.ts"
-      ],
-      "@gradlly/types": [
-        "../types/src/index.ts"
-      ],
-      "@gradlly/lib": [
-        "../lib/src/index.ts"
-      ],
-      "@gradlly/feature-auth": [
-        "../feature/auth/src/index.ts"
       ]
     }
   },

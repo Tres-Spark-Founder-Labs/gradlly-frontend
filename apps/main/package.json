@@ -10,10 +10,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@gradlly/api": "*",
-    "@gradlly/feature-auth": "*",
-    "@gradlly/lib": "*",
-    "@gradlly/types": "*",
     "@gradlly/ui": "*",
     "@gradlly/utils": "*",
     "@gradlly/config": "*",
