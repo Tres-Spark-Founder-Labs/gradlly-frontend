@@ -15,20 +15,6 @@ export default function Home() {
         </div>
 
         <div className="h-px w-full bg-border" />
-
-        {/* <div className="flex w-full flex-col gap-4">
-          {[
-            { label: 'Portal', value: 'P3 — Apprentice' },
-            { label: 'Domain', value: serverEnv.NEXT_PUBLIC_APPRENTICE_URL },
-            { label: 'Environment', value: serverEnv.NEXT_PUBLIC_APP_ENV },
-            { label: 'Cookie Domain', value: serverEnv.COOKIE_DOMAIN },
-          ].map((item) => (
-            <div key={item.label} className="flex items-center justify-between">
-              <span className="text-xs text-text-muted">{item.label}</span>
-              <span className="text-sm font-medium text-text-primary">{item.value}</span>
-            </div>
-          ))} */}
-        {/* </div> */}
       </main>
     </div>
   );

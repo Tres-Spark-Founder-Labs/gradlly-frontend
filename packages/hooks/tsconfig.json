@@ -1,12 +1,12 @@
 {
   "extends": "@gradlly/config/typescript/base.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
+    "rootDir": "src",
     "outDir": "dist",
-    "baseUrl": ".",
     "paths": {
+      "@gradlly/utils": ["../utils/src/index.ts"],
       "@gradlly/ui": ["../ui/src/index.ts"],
-      "@gradlly/utils": ["../utils/src/index.ts"]
+      "@gradlly/hooks": ["./src/index.ts"]
     }
   },
   "include": ["src"],

@@ -1,8 +1,8 @@
 "use client";
 
-import QueryProvider from "./query-provider";
-
 import type { ReactNode } from "react";
+
+import { QueryProvider } from "@/lib/react-query";
 
 interface ProvidersProps {
   children: ReactNode;
