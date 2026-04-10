@@ -1,7 +1,7 @@
 /**
  * Global auth service — used across all Gradlly portals.
  * All functions are plain async — no React, no TanStack Query.
- * Imported by auth queries in packages/features/auth/queries/
+ * Imported by auth queries in packages/feature/auth/src/queries/
  */
 import { $api } from "@gradlly/api";
 

@@ -159,4 +159,94 @@ module.exports = [
       '@typescript-eslint/no-floating-promises': 'error',
     },
   },
+  {
+    files: ['**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@gradlly/ui/*', '@gradlly/utils/*', '@gradlly/api/*', '@gradlly/types/*', '@gradlly/lib/*', '@gradlly/feature-*/*'],
+              message: 'Import from package roots only (e.g. @gradlly/ui).',
+            },
+            {
+              group: ['**/packages/**'],
+              message: 'Do not import using package filesystem paths. Use workspace package aliases.',
+            },
+          ],
+          paths: [
+            {
+              name: '@gradlly/lib/react-query',
+              message: 'Import from @gradlly/lib only.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['packages/ui/src/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@gradlly/feature-*'],
+              message: 'UI package must not depend on feature packages.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['packages/feature/*/src/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@gradlly/feature-*'],
+              message: 'Feature packages must not depend on other feature packages.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['packages/api/src/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@gradlly/feature-*'],
+              message: 'API package must not depend on feature packages.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['packages/utils/src/**/*.{ts,tsx}', 'packages/types/src/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@gradlly/feature-*', '@gradlly/ui'],
+              message: 'Utility/type packages must remain dependency-light.',
+            },
+          ],
+        },
+      ],
+    },
+  }
 ];

@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { HydrationBoundary, QueryClientProvider } from "@tanstack/react-query";
 
-import { getBrowserQueryClient } from "@gradlly/lib/react-query";
+import { getBrowserQueryClient } from "@gradlly/lib";
 
 interface QueryProviderProps {
   children: ReactNode;
