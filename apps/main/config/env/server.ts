@@ -1,6 +1,22 @@
-import { z } from 'zod';
+// config/env/server.ts
+import { z } from "zod";
 
-import { type ClientEnv, clientEnv } from './client';
+// ---------------------------------------------------------------------------
+// Browser guard
+// ---------------------------------------------------------------------------
+if (typeof window !== "undefined") {
+  throw new Error(
+    [
+      "❌ config/env/server.ts was imported in a browser context.",
+      "Server-only env variables must never be accessed on the client.",
+      "Find the client component that is importing this file and fix it.",
+    ].join("\n"),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Schema — server-only variables
+// ---------------------------------------------------------------------------
 
 const serverSchema = z
   .object({
@@ -10,47 +26,71 @@ const serverSchema = z
     SENDGRID_API_KEY: z.string().min(1),
     AWS_REGION: z.string().min(1),
     AWS_S3_BUCKET: z.string().min(1),
-    ESFA_API_BASE_URL: z.url(),
+    ESFA_API_BASE_URL: z.string().url(),
     SENTRY_DSN: z.string().min(1),
   })
   .strict();
 
 type ServerOnlyEnv = z.infer<typeof serverSchema>;
-export type ServerEnv = ServerOnlyEnv & ClientEnv;
+export type ServerEnv = ServerOnlyEnv;
 
-const formatServerValidationError = (error: z.ZodError): never => {
-  const fields = [...new Set(error.issues.map((issue) => issue.path.join('.')).filter(Boolean))];
-  throw new Error(
-    `Invalid server environment variables: ${fields.join(', ') || 'unknown validation error'}`,
-  );
-};
+// ---------------------------------------------------------------------------
+// Destructure from process.env
+// ---------------------------------------------------------------------------
 
-const parseServerEnv = (env: NodeJS.ProcessEnv): ServerOnlyEnv => {
-  try {
-    return serverSchema.parse({
-      JWT_ACCESS_TOKEN_NAME: env.JWT_ACCESS_TOKEN_NAME,
-      JWT_REFRESH_TOKEN_NAME: env.JWT_REFRESH_TOKEN_NAME,
-      COOKIE_DOMAIN: env.COOKIE_DOMAIN,
-      SENDGRID_API_KEY: env.SENDGRID_API_KEY,
-      AWS_REGION: env.AWS_REGION,
-      AWS_S3_BUCKET: env.AWS_S3_BUCKET,
-      ESFA_API_BASE_URL: env.ESFA_API_BASE_URL,
-      SENTRY_DSN: env.SENTRY_DSN,
-    });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      formatServerValidationError(error);
-    }
+const {
+  JWT_ACCESS_TOKEN_NAME,
+  JWT_REFRESH_TOKEN_NAME,
+  COOKIE_DOMAIN,
+  SENDGRID_API_KEY,
+  AWS_REGION,
+  AWS_S3_BUCKET,
+  ESFA_API_BASE_URL,
+  SENTRY_DSN,
+} = process.env;
 
-    throw error;
+// ---------------------------------------------------------------------------
+// Parser
+// ---------------------------------------------------------------------------
+
+function parseServerEnv(env: unknown): ServerOnlyEnv {
+  const result = serverSchema.safeParse(env);
+
+  if (!result.success) {
+    const fields = [
+      ...new Set(
+        result.error.issues
+          .map((issue) => issue.path.join("."))
+          .filter(Boolean),
+      ),
+    ];
+
+    throw new Error(
+      [
+        "❌ Invalid server environment variables:",
+        ...fields.map((f) => `  • ${f}`),
+        "",
+        "Ensure these are set in your .env.local or CI secrets.",
+      ].join("\n"),
+    );
   }
+
+  return result.data;
+}
+
+// ---------------------------------------------------------------------------
+// Validated export
+// ---------------------------------------------------------------------------
+
+export const serverEnv: ServerEnv = {
+  ...parseServerEnv({
+    JWT_ACCESS_TOKEN_NAME,
+    JWT_REFRESH_TOKEN_NAME,
+    COOKIE_DOMAIN,
+    SENDGRID_API_KEY,
+    AWS_REGION,
+    AWS_S3_BUCKET,
+    ESFA_API_BASE_URL,
+    SENTRY_DSN,
+  }),
 };
-
-const serverEnvProxy = new Proxy({} as ServerEnv, {
-  get() {
-    throw new Error('serverEnv cannot be accessed in the browser.');
-  },
-});
-
-export const serverEnv: ServerEnv =
-  typeof window === 'undefined' ? { ...clientEnv, ...parseServerEnv(process.env) } : serverEnvProxy;
