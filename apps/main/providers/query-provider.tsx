@@ -2,9 +2,10 @@
 
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
+import { useState } from "react";
 import { HydrationBoundary, QueryClientProvider } from "@tanstack/react-query";
 
-import { getBrowserQueryClient } from "@gradlly/lib";
+import { makeQueryClient } from "@gradlly/lib";
 
 interface QueryProviderProps {
   children: ReactNode;
@@ -28,7 +29,7 @@ function ReactQueryDevtoolsWrapper(): ReactNode {
 }
 
 export default function QueryProvider({ children, dehydratedState }: QueryProviderProps): ReactNode {
-  const queryClient = getBrowserQueryClient();
+  const [queryClient] = useState(() => makeQueryClient());
 
   return (
     <QueryClientProvider client={queryClient}>
