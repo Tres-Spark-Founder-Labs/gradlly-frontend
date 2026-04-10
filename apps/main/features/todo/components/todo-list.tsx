@@ -2,6 +2,7 @@
 
 import { TodoItem } from "./todo-item";
 import { useTodos } from "../queries";
+
 import type { TodoFilters } from "../types/todo.types";
 
 interface TodoListProps {
@@ -9,14 +10,21 @@ interface TodoListProps {
   onDelete: (id: number) => void;
 }
 
-export function TodoList({ filters, onDelete }: TodoListProps): React.ReactNode {
-  const { todos, isLoading, isError, error, refetch, isFetching } = useTodos(filters);
+export function TodoList({
+  filters,
+  onDelete,
+}: TodoListProps): React.ReactNode {
+  const { todos, isLoading, isError, error, refetch, isFetching } =
+    useTodos(filters);
 
   if (isLoading) {
     return (
       <div className="space-y-2">
         {[1, 2, 3].map((row) => (
-          <div key={row} className="h-14 animate-pulse rounded-md bg-gray-100" />
+          <div
+            key={row}
+            className="h-14 animate-pulse rounded-md bg-gray-100"
+          />
         ))}
       </div>
     );
@@ -25,7 +33,9 @@ export function TodoList({ filters, onDelete }: TodoListProps): React.ReactNode 
   if (isError) {
     return (
       <div className="rounded-md border border-red-200 bg-red-50 p-4 text-red-700">
-        <p className="mb-2">Failed to load todos: {error?.message ?? "Unknown error"}</p>
+        <p className="mb-2">
+          Failed to load todos: {error?.message ?? "Unknown error"}
+        </p>
         <button
           type="button"
           onClick={refetch}
@@ -47,7 +57,9 @@ export function TodoList({ filters, onDelete }: TodoListProps): React.ReactNode 
 
   return (
     <div className="space-y-2">
-      {isFetching && !isLoading ? <p className="text-sm text-blue-600">Refreshing...</p> : null}
+      {isFetching && !isLoading ? (
+        <p className="text-sm text-blue-600">Refreshing...</p>
+      ) : null}
       <ul className="space-y-2">
         {todos.map((todo) => (
           <TodoItem key={todo.id} todo={todo} onDelete={onDelete} />

@@ -3,15 +3,28 @@
  * Queries AND mutations are combined in this single file following
  * the one-file-per-feature pattern. All hooks are scoped to apps/main.
  */
+import { getBrowserQueryClient } from "@gradlly/lib";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { getBrowserQueryClient } from "@gradlly/lib";
-
 import { todoKeys } from "../querykeys";
-import { createTodo, deleteTodo, fetchTodoById, fetchTodos, updateTodo } from "../services/todo.service";
-import type { CreateTodoPayload, Todo, TodoFilters, UpdateTodoPayload } from "../types/todo.types";
+import {
+  createTodo,
+  deleteTodo,
+  fetchTodoById,
+  fetchTodos,
+  updateTodo,
+} from "../services/todo.service";
 
-export const useTodos = (filters?: TodoFilters): {
+import type {
+  CreateTodoPayload,
+  Todo,
+  TodoFilters,
+  UpdateTodoPayload,
+} from "../types/todo.types";
+
+export const useTodos = (
+  filters?: TodoFilters,
+): {
   todos: Todo[];
   isLoading: boolean;
   isError: boolean;
@@ -35,7 +48,7 @@ export const useTodos = (filters?: TodoFilters): {
     todos: query.data ?? [],
     isLoading: query.isLoading,
     isError: query.isError,
-    error: (query.error as Error | null), // query.error is unknown by default.
+    error: query.error as Error | null, // query.error is unknown by default.
     refetch: () => {
       void query.refetch();
     },
@@ -43,7 +56,9 @@ export const useTodos = (filters?: TodoFilters): {
   };
 };
 
-export const useTodo = (id: number): {
+export const useTodo = (
+  id: number,
+): {
   todo: Todo | undefined;
   isLoading: boolean;
   isError: boolean;
@@ -60,7 +75,7 @@ export const useTodo = (id: number): {
     todo: query.data,
     isLoading: query.isLoading,
     isError: query.isError,
-    error: (query.error as Error | null), // query.error is unknown by default.
+    error: query.error as Error | null, // query.error is unknown by default.
   };
 };
 
@@ -98,11 +113,16 @@ export const useUpdateTodo = () => {
     },
     onError: (_error, variables, context) => {
       if (typeof context?.previousTodo !== "undefined") {
-        queryClient.setQueryData(todoKeys.detail(variables.id), context.previousTodo);
+        queryClient.setQueryData(
+          todoKeys.detail(variables.id),
+          context.previousTodo,
+        );
       }
     },
     onSettled: async (_data, _error, variables) => {
-      await queryClient.invalidateQueries({ queryKey: todoKeys.detail(variables.id) });
+      await queryClient.invalidateQueries({
+        queryKey: todoKeys.detail(variables.id),
+      });
       await queryClient.invalidateQueries({ queryKey: todoKeys.lists() });
     },
   });
@@ -111,23 +131,34 @@ export const useUpdateTodo = () => {
 export const useDeleteTodo = () => {
   const queryClient = getBrowserQueryClient();
 
-  return useMutation<void, Error, { id: number }, { previousLists: Array<[unknown, Todo[] | undefined]> }>({
+  return useMutation<
+    void,
+    Error,
+    { id: number },
+    { previousLists: Array<[unknown, Todo[] | undefined]> }
+  >({
     mutationFn: ({ id }) => deleteTodo(id),
     onMutate: async ({ id }) => {
       await queryClient.cancelQueries({ queryKey: todoKeys.lists() });
 
-      const queryCache = queryClient.getQueryCache().findAll({ queryKey: todoKeys.lists() });
-      const previousLists: Array<[unknown, Todo[] | undefined]> = queryCache.map((query) => [
-        query.queryKey,
-        queryClient.getQueryData<Todo[]>(query.queryKey),
-      ]);
+      const queryCache = queryClient
+        .getQueryCache()
+        .findAll({ queryKey: todoKeys.lists() });
+      const previousLists: Array<[unknown, Todo[] | undefined]> =
+        queryCache.map((query) => [
+          query.queryKey,
+          queryClient.getQueryData<Todo[]>(query.queryKey),
+        ]);
 
-      queryClient.setQueriesData<Todo[]>({ queryKey: todoKeys.lists() }, (oldTodos) => {
-        if (typeof oldTodos === "undefined") {
-          return oldTodos;
-        }
-        return oldTodos.filter((todo) => todo.id !== id);
-      });
+      queryClient.setQueriesData<Todo[]>(
+        { queryKey: todoKeys.lists() },
+        (oldTodos) => {
+          if (typeof oldTodos === "undefined") {
+            return oldTodos;
+          }
+          return oldTodos.filter((todo) => todo.id !== id);
+        },
+      );
 
       return { previousLists };
     },

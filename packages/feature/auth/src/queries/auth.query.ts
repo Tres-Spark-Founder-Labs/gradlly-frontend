@@ -3,9 +3,8 @@
  * All auth queries AND mutations live in this single file.
  * Import from @gradlly/feature-auth in any portal.
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
-
 import { getBrowserQueryClient } from "@gradlly/lib";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { authKeys } from "../querykeys";
 import {
@@ -25,6 +24,7 @@ import {
   verifyEmail,
   verifyMFA,
 } from "../services";
+
 import type {
   ChangePasswordPayload,
   ForgotPasswordPayload,
@@ -54,7 +54,7 @@ export const useCurrentUser = (): {
     isLoading,
     isAuthenticated: data !== undefined,
     isError,
-    error: (error as Error | null), // react-query unknown error narrowed for consumer ergonomics.
+    error: error as Error | null, // react-query unknown error narrowed for consumer ergonomics.
   };
 };
 
@@ -100,7 +100,7 @@ export const useSignIn = (): {
     signIn: mutation.mutate,
     isPending: mutation.isPending,
     isError: mutation.isError,
-    error: (mutation.error as Error | null), // mutation.error is unknown by default.
+    error: mutation.error as Error | null, // mutation.error is unknown by default.
     isSuccess: mutation.isSuccess,
   };
 };
@@ -136,7 +136,7 @@ export const useSignUp = (): {
     signUp: mutation.mutate,
     isPending: mutation.isPending,
     isError: mutation.isError,
-    error: (mutation.error as Error | null), // mutation.error is unknown by default.
+    error: mutation.error as Error | null, // mutation.error is unknown by default.
     isSuccess: mutation.isSuccess,
   };
 };
@@ -148,14 +148,16 @@ export const useForgotPassword = (): {
   isError: boolean;
   error: Error | null;
 } => {
-  const mutation = useMutation({ mutationFn: (payload: ForgotPasswordPayload) => forgotPassword(payload) });
+  const mutation = useMutation({
+    mutationFn: (payload: ForgotPasswordPayload) => forgotPassword(payload),
+  });
 
   return {
     forgotPassword: mutation.mutate,
     isPending: mutation.isPending,
     isSuccess: mutation.isSuccess,
     isError: mutation.isError,
-    error: (mutation.error as Error | null), // mutation.error is unknown by default.
+    error: mutation.error as Error | null, // mutation.error is unknown by default.
   };
 };
 
@@ -165,7 +167,9 @@ export const useResetPassword = (): {
   isSuccess: boolean;
   isError: boolean;
 } => {
-  const mutation = useMutation({ mutationFn: (payload: ResetPasswordPayload) => resetPassword(payload) });
+  const mutation = useMutation({
+    mutationFn: (payload: ResetPasswordPayload) => resetPassword(payload),
+  });
 
   return {
     resetPassword: mutation.mutate,
@@ -181,7 +185,9 @@ export const useChangePassword = (): {
   isSuccess: boolean;
   isError: boolean;
 } => {
-  const mutation = useMutation({ mutationFn: (payload: ChangePasswordPayload) => changePassword(payload) });
+  const mutation = useMutation({
+    mutationFn: (payload: ChangePasswordPayload) => changePassword(payload),
+  });
 
   return {
     changePassword: mutation.mutate,
@@ -288,7 +294,9 @@ export const useDisableMFA = (): {
   const mutation = useMutation({
     mutationFn: (code: string) => disableMFA(code),
     onSuccess: () => {
-      const user = queryClient.getQueryData<Awaited<ReturnType<typeof getMe>>>(authKeys.me());
+      const user = queryClient.getQueryData<Awaited<ReturnType<typeof getMe>>>(
+        authKeys.me(),
+      );
       if (user) {
         queryClient.setQueryData(authKeys.me(), { ...user, mfaEnabled: false });
       }

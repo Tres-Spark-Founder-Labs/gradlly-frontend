@@ -2,33 +2,16 @@
   "extends": "@gradlly/config/typescript/base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "baseUrl": ".",
+    "rootDir": "src",
     "paths": {
-      "@gradlly/ui": [
-        "../ui/src/index.ts"
-      ],
-      "@gradlly/utils": [
-        "../utils/src/index.ts"
-      ],
-      "@gradlly/api": [
-        "../api/src/index.ts"
-      ],
-      "@gradlly/types": [
-        "../types/src/index.ts"
-      ],
-      "@gradlly/lib": [
-        "../lib/src/index.ts"
-      ],
-      "@gradlly/feature-auth": [
-        "../feature/auth/src/index.ts"
-      ]
+      "@gradlly/ui": ["../ui/src/index.ts"],
+      "@gradlly/utils": ["../utils/src/index.ts"],
+      "@gradlly/api": ["../api/src/index.ts"],
+      "@gradlly/types": ["../types/src/index.ts"],
+      "@gradlly/lib": ["../lib/src/index.ts"],
+      "@gradlly/feature-auth": ["../feature/auth/src/index.ts"]
     }
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }

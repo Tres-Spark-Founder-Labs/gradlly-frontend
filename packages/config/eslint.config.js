@@ -14,9 +14,11 @@ const hasTypeScriptImportResolver = (() => {
   }
 })();
 
-const reactHooksRecommendedRules = reactHooksPlugin.configs.recommended?.rules ?? {};
+const reactHooksRecommendedRules =
+  reactHooksPlugin.configs.recommended?.rules ?? {};
 const nextRecommendedRules = nextPlugin.configs.recommended?.rules ?? {};
-const nextCoreWebVitalsRules = nextPlugin.configs["core-web-vitals"]?.rules ?? {};
+const nextCoreWebVitalsRules =
+  nextPlugin.configs["core-web-vitals"]?.rules ?? {};
 
 const sharedRules = {
   "no-console": ["warn", { allow: ["error"] }],
@@ -27,7 +29,14 @@ const sharedRules = {
   "import/order": [
     "error",
     {
-      groups: ["builtin", "external", "internal", ["parent", "sibling", "index"], "object", "type"],
+      groups: [
+        "builtin",
+        "external",
+        "internal",
+        ["parent", "sibling", "index"],
+        "object",
+        "type",
+      ],
       "newlines-between": "always",
       alphabetize: {
         order: "asc",
@@ -92,9 +101,16 @@ export default [
       "react-hooks": reactHooksPlugin,
       "@next/next": nextPlugin,
     },
-    rules: Object.assign({}, reactHooksRecommendedRules, nextRecommendedRules, nextCoreWebVitalsRules, sharedRules, {
-      "@next/next/no-html-link-for-pages": "off",
-    }),
+    rules: Object.assign(
+      {},
+      reactHooksRecommendedRules,
+      nextRecommendedRules,
+      nextCoreWebVitalsRules,
+      sharedRules,
+      {
+        "@next/next/no-html-link-for-pages": "off",
+      },
+    ),
   },
   {
     files: ["**/*.{ts,tsx}"],
@@ -106,7 +122,11 @@ export default [
         ecmaFeatures: {
           jsx: true,
         },
-        project: ["./apps/*/tsconfig.json", "./packages/*/tsconfig.json", "./packages/feature/*/tsconfig.json"],
+        project: [
+          "./apps/*/tsconfig.json",
+          "./packages/*/tsconfig.json",
+          "./packages/feature/*/tsconfig.json",
+        ],
         tsconfigRootDir: import.meta.dirname + "/../..",
       },
       globals: {
@@ -128,30 +148,37 @@ export default [
         : {}),
     },
     plugins: pluginMap,
-    rules: Object.assign({}, reactHooksRecommendedRules, nextRecommendedRules, nextCoreWebVitalsRules, sharedRules, {
-      "@next/next/no-html-link-for-pages": "off",
-      "no-unused-vars": "off",
-      "no-undef": "off",
-      "@typescript-eslint/no-explicit-any": "error",
-      "@typescript-eslint/consistent-type-imports": [
-        "error",
-        {
-          prefer: "type-imports",
-          fixStyle: "separate-type-imports",
-        },
-      ],
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        {
-          args: "after-used",
-          argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
-          ignoreRestSiblings: true,
-        },
-      ],
-      "@typescript-eslint/strict-boolean-expressions": "error",
-      "@typescript-eslint/no-floating-promises": "error",
-    }),
+    rules: Object.assign(
+      {},
+      reactHooksRecommendedRules,
+      nextRecommendedRules,
+      nextCoreWebVitalsRules,
+      sharedRules,
+      {
+        "@next/next/no-html-link-for-pages": "off",
+        "no-unused-vars": "off",
+        "no-undef": "off",
+        "@typescript-eslint/no-explicit-any": "error",
+        "@typescript-eslint/consistent-type-imports": [
+          "error",
+          {
+            prefer: "type-imports",
+            fixStyle: "separate-type-imports",
+          },
+        ],
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          {
+            args: "after-used",
+            argsIgnorePattern: "^_",
+            varsIgnorePattern: "^_",
+            ignoreRestSiblings: true,
+          },
+        ],
+        "@typescript-eslint/strict-boolean-expressions": "off",
+        "@typescript-eslint/no-floating-promises": "error",
+      },
+    ),
   },
   {
     files: ["**/*.{ts,tsx}"],
@@ -173,7 +200,8 @@ export default [
             },
             {
               group: ["**/packages/**"],
-              message: "Do not import using package filesystem paths. Use workspace package aliases.",
+              message:
+                "Do not import using package filesystem paths. Use workspace package aliases.",
             },
           ],
           paths: [
@@ -211,7 +239,8 @@ export default [
           patterns: [
             {
               group: ["@gradlly/feature-*"],
-              message: "Feature packages must not depend on other feature packages.",
+              message:
+                "Feature packages must not depend on other feature packages.",
             },
           ],
         },
@@ -235,7 +264,10 @@ export default [
     },
   },
   {
-    files: ["packages/utils/src/**/*.{ts,tsx}", "packages/types/src/**/*.{ts,tsx}"],
+    files: [
+      "packages/utils/src/**/*.{ts,tsx}",
+      "packages/types/src/**/*.{ts,tsx}",
+    ],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -251,25 +283,33 @@ export default [
     },
   },
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ["**/*.{ts,tsx}"],
     rules: {
-      'no-restricted-imports': [
-        'error',
+      "no-restricted-imports": [
+        "error",
         {
           patterns: [
             {
-              group: ['@gradlly/ui/*', '@gradlly/utils/*', '@gradlly/api/*', '@gradlly/types/*', '@gradlly/lib/*', '@gradlly/feature-*/*'],
-              message: 'Import from package roots only (e.g. @gradlly/ui).',
+              group: [
+                "@gradlly/ui/*",
+                "@gradlly/utils/*",
+                "@gradlly/api/*",
+                "@gradlly/types/*",
+                "@gradlly/lib/*",
+                "@gradlly/feature-*/*",
+              ],
+              message: "Import from package roots only (e.g. @gradlly/ui).",
             },
             {
-              group: ['**/packages/**'],
-              message: 'Do not import using package filesystem paths. Use workspace package aliases.',
+              group: ["**/packages/**"],
+              message:
+                "Do not import using package filesystem paths. Use workspace package aliases.",
             },
           ],
           paths: [
             {
-              name: '@gradlly/lib/react-query',
-              message: 'Import from @gradlly/lib only.',
+              name: "@gradlly/lib/react-query",
+              message: "Import from @gradlly/lib only.",
             },
           ],
         },
@@ -277,15 +317,15 @@ export default [
     },
   },
   {
-    files: ['packages/ui/src/**/*.{ts,tsx}'],
+    files: ["packages/ui/src/**/*.{ts,tsx}"],
     rules: {
-      'no-restricted-imports': [
-        'error',
+      "no-restricted-imports": [
+        "error",
         {
           patterns: [
             {
-              group: ['@gradlly/feature-*'],
-              message: 'UI package must not depend on feature packages.',
+              group: ["@gradlly/feature-*"],
+              message: "UI package must not depend on feature packages.",
             },
           ],
         },
@@ -293,15 +333,16 @@ export default [
     },
   },
   {
-    files: ['packages/feature/*/src/**/*.{ts,tsx}'],
+    files: ["packages/feature/*/src/**/*.{ts,tsx}"],
     rules: {
-      'no-restricted-imports': [
-        'error',
+      "no-restricted-imports": [
+        "error",
         {
           patterns: [
             {
-              group: ['@gradlly/feature-*'],
-              message: 'Feature packages must not depend on other feature packages.',
+              group: ["@gradlly/feature-*"],
+              message:
+                "Feature packages must not depend on other feature packages.",
             },
           ],
         },
@@ -309,15 +350,15 @@ export default [
     },
   },
   {
-    files: ['packages/api/src/**/*.{ts,tsx}'],
+    files: ["packages/api/src/**/*.{ts,tsx}"],
     rules: {
-      'no-restricted-imports': [
-        'error',
+      "no-restricted-imports": [
+        "error",
         {
           patterns: [
             {
-              group: ['@gradlly/feature-*'],
-              message: 'API package must not depend on feature packages.',
+              group: ["@gradlly/feature-*"],
+              message: "API package must not depend on feature packages.",
             },
           ],
         },
@@ -325,19 +366,22 @@ export default [
     },
   },
   {
-    files: ['packages/utils/src/**/*.{ts,tsx}', 'packages/types/src/**/*.{ts,tsx}'],
+    files: [
+      "packages/utils/src/**/*.{ts,tsx}",
+      "packages/types/src/**/*.{ts,tsx}",
+    ],
     rules: {
-      'no-restricted-imports': [
-        'error',
+      "no-restricted-imports": [
+        "error",
         {
           patterns: [
             {
-              group: ['@gradlly/feature-*', '@gradlly/ui'],
-              message: 'Utility/type packages must remain dependency-light.',
+              group: ["@gradlly/feature-*", "@gradlly/ui"],
+              message: "Utility/type packages must remain dependency-light.",
             },
           ],
         },
       ],
     },
-  }
+  },
 ];

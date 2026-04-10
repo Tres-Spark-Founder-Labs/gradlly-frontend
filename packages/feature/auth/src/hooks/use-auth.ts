@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import { useCurrentUser } from "../queries";
+
 import type { AuthUser, UserRole } from "../types";
 
 /**

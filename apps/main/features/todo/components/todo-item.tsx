@@ -1,6 +1,7 @@
 "use client";
 
 import { useUpdateTodo } from "../queries";
+
 import type { Todo } from "../types/todo.types";
 
 interface TodoItemProps {
@@ -19,13 +20,24 @@ export function TodoItem({ todo, onDelete }: TodoItemProps): React.ReactNode {
           checked={todo.completed}
           disabled={updateTodoMutation.isPending}
           onChange={() => {
-            updateTodoMutation.mutate({ id: todo.id, completed: !todo.completed });
+            updateTodoMutation.mutate({
+              id: todo.id,
+              completed: !todo.completed,
+            });
           }}
           className="h-4 w-4"
         />
         <div>
-          <p className={todo.completed ? "text-gray-500 line-through" : "text-gray-900"}>{todo.title}</p>
-          <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">User {todo.userId}</span>
+          <p
+            className={
+              todo.completed ? "text-gray-500 line-through" : "text-gray-900"
+            }
+          >
+            {todo.title}
+          </p>
+          <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+            User {todo.userId}
+          </span>
         </div>
       </div>
 

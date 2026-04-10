@@ -1,6 +1,7 @@
 {
   "name": "gradlly",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "turbo run dev --filter=./apps/* --output-logs=full",
     "dev:clean": "npm run clean && npm run dev",

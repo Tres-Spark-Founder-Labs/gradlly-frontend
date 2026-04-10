@@ -61,15 +61,19 @@ export const $api = async <TResponse>(
     baseUrl = process.env.NEXT_PUBLIC_API_URL,
   } = config;
 
-  if (!baseUrl) {
+  if (baseUrl) {
     throw new Error(
       "$api configuration error: baseUrl is undefined. Set NEXT_PUBLIC_API_URL or pass baseUrl explicitly.",
     );
   }
 
   const queryString = buildQueryString(params);
-  const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
-  const normalizedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const normalizedBaseUrl = baseUrl.endsWith("/")
+    ? baseUrl.slice(0, -1)
+    : baseUrl;
+  const normalizedEndpoint = endpoint.startsWith("/")
+    ? endpoint
+    : `/${endpoint}`;
   const url = `${normalizedBaseUrl}${normalizedEndpoint}${queryString}`;
 
   const requestHeaders: Record<string, string> = {
@@ -87,7 +91,10 @@ export const $api = async <TResponse>(
   });
 
   if (!response.ok) {
-    let parsedError: { message?: string; errors?: Record<string, string[]> } | null = null;
+    let parsedError: {
+      message?: string;
+      errors?: Record<string, string[]>;
+    } | null = null;
 
     try {
       parsedError = (await response.json()) as {
@@ -101,8 +108,9 @@ export const $api = async <TResponse>(
     const fallbackText = await response.text().catch(() => "");
     const message =
       parsedError?.message ??
-      fallbackText ||
-      `Request failed with status ${response.status}`;
+      (fallbackText !== ""
+        ? fallbackText
+        : `Request failed with status ${response.status}`);
 
     throw new ApiRequestError(response.status, message, parsedError?.errors);
   }
