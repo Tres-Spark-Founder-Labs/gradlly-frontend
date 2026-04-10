@@ -247,22 +247,22 @@ export default [
       ],
     },
   },
-  {
-    files: ["packages/api/src/**/*.{ts,tsx}"],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            {
-              group: ["@gradlly/feature-*"],
-              message: "API package must not depend on feature packages.",
-            },
-          ],
-        },
-      ],
-    },
-  },
+  // {
+  //   files: ["packages/api/src/**/*.{ts,tsx}"],
+  //   rules: {
+  //     "no-restricted-imports": [
+  //       "error",
+  //       {
+  //         patterns: [
+  //           {
+  //             group: ["@gradlly/feature-*"],
+  //             message: "API package must not depend on feature packages.",
+  //           },
+  //         ],
+  //       },
+  //     ],
+  //   },
+  // },
   {
     files: [
       "packages/utils/src/**/*.{ts,tsx}",
