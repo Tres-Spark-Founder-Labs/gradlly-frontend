@@ -1,2 +1,2 @@
-export type { ApiConfig } from "../client/$api";
+export type { ApiConfig, ApiErrorPayload } from "./api.types";
 export { ApiRequestError } from "../client/$api";

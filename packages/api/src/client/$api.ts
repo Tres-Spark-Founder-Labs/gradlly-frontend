@@ -5,23 +5,16 @@
  * Do not add feature logic, auth logic, or domain types here.
  * This file is intentionally minimal and concern-free.
  */
-export interface ApiConfig {
-  endpoint: string;
-  method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
-  body?: unknown;
-  params?: Record<string, string | number | boolean | undefined>;
-  headers?: Record<string, string>;
-  baseUrl?: string;
-}
+import type { ApiConfig, ApiErrorPayload } from "../types/api.types";
 
 export class ApiRequestError extends Error {
   public readonly statusCode: number;
-  public readonly errors?: Record<string, string[]>;
+  public readonly errors: Record<string, string[]> | undefined;
 
   public constructor(
     statusCode: number,
     message: string,
-    errors?: Record<string, string[]>,
+    errors: Record<string, string[]> | undefined,
   ) {
     super(message);
     this.name = "ApiRequestError";
@@ -49,6 +42,10 @@ export const buildQueryString = (
   return query.length > 0 ? `?${query}` : "";
 };
 
+const runtimeEnv = (
+  globalThis as { process?: { env?: Record<string, string | undefined> } }
+).process?.env;
+
 export const $api = async <TResponse>(
   config: ApiConfig,
 ): Promise<TResponse> => {
@@ -58,7 +55,7 @@ export const $api = async <TResponse>(
     body,
     params,
     headers,
-    baseUrl = process.env.NEXT_PUBLIC_API_URL,
+    baseUrl = runtimeEnv?.NEXT_PUBLIC_API_URL,
   } = config;
 
   if (baseUrl) {
@@ -84,23 +81,22 @@ export const $api = async <TResponse>(
     requestHeaders["Content-Type"] = "application/json";
   }
 
-  const response = await fetch(url, {
+  const requestInit: RequestInit = {
     method,
     headers: requestHeaders,
-    body: typeof body !== "undefined" ? JSON.stringify(body) : undefined,
-  });
+  };
+
+  if (typeof body !== "undefined") {
+    requestInit.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(url, requestInit);
 
   if (!response.ok) {
-    let parsedError: {
-      message?: string;
-      errors?: Record<string, string[]>;
-    } | null = null;
+    let parsedError: ApiErrorPayload | null = null;
 
     try {
-      parsedError = (await response.json()) as {
-        message?: string;
-        errors?: Record<string, string[]>;
-      };
+      parsedError = (await response.json()) as ApiErrorPayload;
     } catch {
       parsedError = null;
     }
@@ -108,9 +104,7 @@ export const $api = async <TResponse>(
     const fallbackText = await response.text().catch(() => "");
     const message =
       parsedError?.message ??
-      (fallbackText !== ""
-        ? fallbackText
-        : `Request failed with status ${response.status}`);
+      (fallbackText || `Request failed with status ${response.status}`);
 
     throw new ApiRequestError(response.status, message, parsedError?.errors);
   }
