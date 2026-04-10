@@ -1,13 +1,17 @@
 "use client";
 
 import { makeQueryClient } from "@gradlly/lib";
-import { HydrationBoundary, QueryClientProvider } from "@tanstack/react-query";
+import {
+  HydrationBoundary,
+  QueryClientProvider,
+  type DehydratedState,
+} from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import { useState, type ReactNode } from "react";
 
 interface QueryProviderProps {
   children: ReactNode;
-  dehydratedState?: unknown;
+  dehydratedState?: DehydratedState | null;
 }
 
 const ReactQueryDevtools = dynamic(
