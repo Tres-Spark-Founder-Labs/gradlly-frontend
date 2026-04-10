@@ -1,3 +1,3 @@
-import sharedConfig from "./packages/config/eslint.config.js";
+import sharedConfig from "./packages/config/eslint/eslint.config.js";
 
 export default sharedConfig;

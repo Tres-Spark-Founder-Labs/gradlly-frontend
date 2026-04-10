@@ -24,7 +24,7 @@
   "type": "module",
   "exports": {
     ".": "./index.js",
-    "./eslint": "./eslint.config.js",
+    "./eslint": "./eslint/eslint.config.js",
     "./tailwind/base": "./tailwind/base.ts",
     "./typescript/base.json": "./typescript/base.json",
     "./typescript/next.json": "./typescript/next.json"

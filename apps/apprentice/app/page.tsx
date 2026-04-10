@@ -1,5 +1,3 @@
-import { serverEnv } from '@/config/env/server';
-
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-surface font-sans">
@@ -18,7 +16,7 @@ export default function Home() {
 
         <div className="h-px w-full bg-border" />
 
-        <div className="flex w-full flex-col gap-4">
+        {/* <div className="flex w-full flex-col gap-4">
           {[
             { label: 'Portal', value: 'P3 — Apprentice' },
             { label: 'Domain', value: serverEnv.NEXT_PUBLIC_APPRENTICE_URL },
@@ -29,8 +27,8 @@ export default function Home() {
               <span className="text-xs text-text-muted">{item.label}</span>
               <span className="text-sm font-medium text-text-primary">{item.value}</span>
             </div>
-          ))}
-        </div>
+          ))} */}
+        {/* </div> */}
       </main>
     </div>
   );

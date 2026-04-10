@@ -24,7 +24,8 @@ export const makeQueryClient = (): QueryClient => {
 
           return failureCount < 3;
         },
-        retryDelay: (attempt: number): number => Math.min(1000 * 2 ** attempt, 30000),
+        retryDelay: (attempt: number): number =>
+          Math.min(1000 * 2 ** attempt, 30000),
         throwOnError: false,
       },
       mutations: {
@@ -35,9 +36,12 @@ export const makeQueryClient = (): QueryClient => {
       onError: (error: unknown, query: Query): void => {
         if (typeof window !== "undefined") {
           window.dispatchEvent(
-            new CustomEvent<{ error: unknown; query: Query }>("gradlly:query-error", {
-              detail: { error, query },
-            }),
+            new CustomEvent<{ error: unknown; query: Query }>(
+              "gradlly:query-error",
+              {
+                detail: { error, query },
+              },
+            ),
           );
         }
       },

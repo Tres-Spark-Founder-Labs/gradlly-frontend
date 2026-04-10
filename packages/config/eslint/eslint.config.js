@@ -127,7 +127,7 @@ export default [
           "./packages/*/tsconfig.json",
           "./packages/feature/*/tsconfig.json",
         ],
-        tsconfigRootDir: import.meta.dirname + "/../..",
+        tsconfigRootDir: import.meta.dirname + "/../../..",
       },
       globals: {
         console: "readonly",
