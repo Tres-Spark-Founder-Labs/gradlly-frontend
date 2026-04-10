@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "paths": {
-      "@gradlly/ui": ["./packages/ui/src/index.ts"],
-      "@gradlly/utils": ["./packages/utils/src/index.ts"],
-      "@gradlly/api": ["./packages/api/src/index.ts"],
-      "@gradlly/types": ["./packages/types/src/index.ts"],
-      "@gradlly/lib": ["./packages/lib/src/index.ts"],
-      "@gradlly/feature-auth": ["./packages/feature/auth/src/index.ts"]
+      "@gradlly/ui": [
+        "./packages/ui/src/index.ts"
+      ],
+      "@gradlly/utils": [
+        "./packages/utils/src/index.ts"
+      ]
     }
   }
 }

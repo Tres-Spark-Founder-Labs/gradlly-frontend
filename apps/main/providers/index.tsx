@@ -1,6 +1,6 @@
 "use client";
 
-import QueryProvider from "./query-provider";
+import { QueryProvider } from "@/lib/react-query";
 
 import type { ReactNode } from "react";
 

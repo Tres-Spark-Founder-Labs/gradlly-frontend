@@ -46,12 +46,9 @@
   "packageManager": "npm@11.12.1",
   "workspaces": [
     "apps/*",
-    "packages/api",
-    "packages/feature/*",
-    "packages/lib",
     "packages/ui",
     "packages/utils",
-    "packages/types",
-    "packages/config"
+    "packages/config",
+    "packages/hooks"
   ]
 }
