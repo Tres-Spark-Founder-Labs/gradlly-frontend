@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prepare": "husky || true",
     "dev": "turbo run dev --filter=./apps/* --output-logs=full",
     "dev:clean": "npm run clean && npm run dev",
     "dev:employer": "turbo run dev --filter=@gradlly/employer",
@@ -18,7 +19,6 @@
     "lint:fix": "eslint . --fix --max-warnings 0",
     "format": "prettier --write \"**/*.{ts,tsx,md,json,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json,css}\"",
-    "prepare": "husky || true",
     "dead-code": "ts-prune",
     "docker:down": "docker compose down",
     "docker:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up",
