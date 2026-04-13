@@ -1,0 +1,76 @@
+# docker-compose.dev.yml
+services:
+
+  main-app:
+    build:
+      target: dev-deps
+    volumes:
+      - .:/app
+      # Anonymous volumes prevent the host mount from overwriting the
+      # container's node_modules and .next. This is critical — without
+      # /app/node_modules the volume mount would wipe all @gradlly/*
+      # symlinks that were created during the dev-deps build stage.
+      - /app/node_modules
+      - /app/apps/main/.next
+    command: npm run dev --workspace=apps/main
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+
+  employer-app:
+    build:
+      target: dev-deps
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/employer/.next
+    command: npm run dev --workspace=apps/employer
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+
+  provider-app:
+    build:
+      target: dev-deps
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/provider/.next
+    command: npm run dev --workspace=apps/provider
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+
+  apprentice-app:
+    build:
+      target: dev-deps
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/apprentice/.next
+    command: npm run dev --workspace=apps/apprentice
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+
+  flow-app:
+    build:
+      target: dev-deps
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/flow/.next
+    command: npm run dev --workspace=apps/flow
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true

@@ -1,0 +1,122 @@
+# docker-compose.yml
+# version: "3.9"
+
+networks:
+  gradlly-network:
+    driver: bridge
+    name: gradlly-network
+
+services:
+  # ─── Nginx reverse proxy ────────────────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: gradlly-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - main-app
+      - employer-app
+      - provider-app
+      - apprentice-app
+      - flow-app
+    networks:
+      - gradlly-network
+    restart: unless-stopped
+
+  # ─── apps/main ──────────────────────────────────────────────────────────────
+  main-app:
+    build:
+      context: .
+      dockerfile: apps/main/Dockerfile
+      args:
+        APP_NAME: main
+        PORT: 3000
+    container_name: gradlly-main
+    env_file:
+      - .env.docker
+    environment:
+      - PORT=3000
+    expose:
+      - "3000"
+    networks:
+      - gradlly-network
+    restart: unless-stopped
+
+  # ─── apps/employer ──────────────────────────────────────────────────────────
+  employer-app:
+    build:
+      context: .
+      dockerfile: apps/employer/Dockerfile
+      args:
+        APP_NAME: employer
+        PORT: 3002
+    container_name: gradlly-employer
+    env_file:
+      - .env.docker
+    environment:
+      - PORT=3002
+    expose:
+      - "3002"
+    networks:
+      - gradlly-network
+    restart: unless-stopped
+
+  # ─── apps/provider ──────────────────────────────────────────────────────────
+  provider-app:
+    build:
+      context: .
+      dockerfile: apps/provider/Dockerfile
+      args:
+        APP_NAME: provider
+        PORT: 3004
+    container_name: gradlly-provider
+    env_file:
+      - .env.docker
+    environment:
+      - PORT=3004
+    expose:
+      - "3004"
+    networks:
+      - gradlly-network
+    restart: unless-stopped
+
+  # ─── apps/apprentice ────────────────────────────────────────────────────────
+  apprentice-app:
+    build:
+      context: .
+      dockerfile: apps/apprentice/Dockerfile
+      args:
+        APP_NAME: apprentice
+        PORT: 3001
+    container_name: gradlly-apprentice
+    env_file:
+      - .env.docker
+    environment:
+      - PORT=3001
+    expose:
+      - "3001"
+    networks:
+      - gradlly-network
+    restart: unless-stopped
+
+  # ─── apps/flow ──────────────────────────────────────────────────────────────
+  flow-app:
+    build:
+      context: .
+      dockerfile: apps/flow/Dockerfile
+      args:
+        APP_NAME: flow
+        PORT: 3003
+    container_name: gradlly-flow
+    env_file:
+      - .env.docker
+    environment:
+      - PORT=3003
+    expose:
+      - "3003"
+    networks:
+      - gradlly-network
+    restart: unless-stopped

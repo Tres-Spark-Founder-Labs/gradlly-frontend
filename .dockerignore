@@ -1,0 +1,35 @@
+# .dockerignore
+
+# Never send node_modules into the build context.
+# The Dockerfile runs npm ci inside the container to install fresh.
+# Sending the host node_modules would overwrite the container install.
+node_modules
+**/node_modules
+
+# Never send .next build output — the container builds its own.
+**/.next
+
+# Never send other build outputs
+**/dist
+.turbo
+**/.turbo
+
+# Never send git history — irrelevant to the build
+.git
+.gitignore
+
+# Never send log files
+**/*.log
+**/npm-debug.log*
+
+# Never send local env files — these contain secrets.
+# .env.docker is intentionally NOT listed here because it is safe
+# and needs to be available for docker compose env_file.
+.env.local
+**/.env.local
+**/.env*.local
+
+# Never send editor config — irrelevant to the build
+README.md
+.vscode
+coverage
