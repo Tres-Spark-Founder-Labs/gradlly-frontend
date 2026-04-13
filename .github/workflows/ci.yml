@@ -24,13 +24,8 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
 
-      - name: Cache npm dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
+      - name: Upgrade npm
+        run: npm install -g npm@11
 
       - name: Install dependencies
         run: npm ci
@@ -58,3 +53,63 @@ jobs:
 
       - name: Dead code check
         run: npm run dead-code
+# name: CI
+
+# on:
+#   pull_request:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   ci:
+#     runs-on: ubuntu-latest
+#     env:
+#       CI: true
+#       SKIP_ENV_VALIDATION: true
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
+
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version-file: .nvmrc
+#           cache: npm
+
+#       - name: Cache npm dependencies
+#         uses: actions/cache@v4
+#         with:
+#           path: ~/.npm
+#           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+#           restore-keys: |
+#             ${{ runner.os }}-npm-
+
+#       - name: Install dependencies
+#         run: npm ci
+
+#       - name: Restore turbo cache
+#         uses: actions/cache@v4
+#         with:
+#           path: .turbo
+#           key: ${{ runner.os }}-turbo-${{ github.ref_name }}-${{ github.sha }}
+#           restore-keys: |
+#             ${{ runner.os }}-turbo-${{ github.ref_name }}-
+#             ${{ runner.os }}-turbo-
+
+#       - name: Lint
+#         run: npm run lint
+
+#       - name: Typecheck
+#         run: npm run check-types
+
+#       - name: Build (affected only)
+#         run: npm run build -- --filter=...[origin/main] --parallel
+
+#       - name: Security audit
+#         run: npm audit --audit-level=high
+
+#       - name: Dead code check
+#         run: npm run dead-code
