@@ -2,7 +2,8 @@
   "compilerOptions": {
     "paths": {
       "@gradlly/ui": ["./packages/ui/src/index.ts"],
-      "@gradlly/utils": ["./packages/utils/src/index.ts"]
+      "@gradlly/utils": ["./packages/utils/src/index.ts"],
+      "@gradlly/hooks": ["./packages/hooks/src/index.ts"]
     }
   }
 }

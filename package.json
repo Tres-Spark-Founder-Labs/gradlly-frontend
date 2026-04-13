@@ -19,7 +19,25 @@
     "format": "prettier --write \"**/*.{ts,tsx,md,json,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json,css}\"",
     "prepare": "husky",
-    "dead-code": "ts-prune"
+    "dead-code": "ts-prune",
+    "docker:down": "docker compose down",
+    "docker:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up",
+    "docker:dev:build": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build",
+    "docker:prod": "docker compose up",
+    "docker:prod:build": "docker compose up --build",
+    "docker:logs": "docker compose logs -f",
+    "docker:logs:nginx": "docker compose logs -f nginx",
+    "docker:logs:main": "docker compose logs -f main-app",
+    "docker:logs:employer": "docker compose logs -f employer-app",
+    "docker:logs:provider": "docker compose logs -f provider-app",
+    "docker:logs:apprentice": "docker compose logs -f apprentice-app",
+    "docker:logs:flow": "docker compose logs -f flow-app",
+    "docker:ps": "docker compose ps",
+    "docker:rebuild:main": "docker compose build main-app",
+    "docker:rebuild:employer": "docker compose build employer-app",
+    "docker:shell:main": "docker compose exec main-app sh",
+    "docker:shell:employer": "docker compose exec employer-app sh",
+    "docker:reset": "docker compose down --remove-orphans && docker compose up --build"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
@@ -44,7 +62,7 @@
   },
   "engines": {
     "node": ">=20",
-    "npm": ">=9"
+    "npm": ">=11"
   },
   "packageManager": "npm@11.12.1",
   "workspaces": [

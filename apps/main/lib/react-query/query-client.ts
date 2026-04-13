@@ -1,15 +1,7 @@
-import { QueryCache, QueryClient, type Query } from "@tanstack/react-query";
+import { QueryCache, QueryClient } from "@tanstack/react-query";
 
-import { ApiRequestError } from "@/lib/api";
+import { ApiRequestError } from "../api/types";
 
-/**
- * makeQueryClient factory — called once per render context.
- * Next.js 16 App Router requires a factory instead of a singleton
- * because module-level singletons are shared across all RSC requests
- * on the server, causing cross-request state contamination. A factory
- * ensures each server request gets a fresh QueryClient instance while
- * the browser reuses a single instance per tab via getBrowserQueryClient.
- */
 export const makeQueryClient = (): QueryClient => {
   return new QueryClient({
     defaultOptions: {
@@ -34,18 +26,18 @@ export const makeQueryClient = (): QueryClient => {
       },
     },
     queryCache: new QueryCache({
-      onError: (error: unknown, query: Query): void => {
+      onError: (error, query): void => {
         if (typeof window !== "undefined") {
           window.dispatchEvent(
-            new CustomEvent<{ error: unknown; query: Query }>(
-              "gradlly:query-error",
-              {
-                detail: { error, query },
-              },
-            ),
+            new CustomEvent("gradlly:query-error", {
+              detail: { error, query } as { error: Error; query: unknown },
+            }),
           );
         }
       },
     }),
   });
 };
+// window.addEventListener("gradlly:query-error", (e) => {
+//   const { error, query } = (e as CustomEvent<{ error: Error; query: Query<unknown, Error> }>).detail;
+// });

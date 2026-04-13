@@ -42,9 +42,9 @@ export const buildQueryString = (
   return query.length > 0 ? `?${query}` : "";
 };
 
-const runtimeEnv = (
-  globalThis as { process?: { env?: Record<string, string | undefined> } }
-).process?.env;
+// const runtimeEnv = (
+//   globalThis as { process?: { env?: Record<string, string | undefined> } }
+// ).process?.env;
 
 export const $api = async <TResponse>(
   config: ApiConfig,
@@ -55,7 +55,7 @@ export const $api = async <TResponse>(
     body,
     params,
     headers,
-    baseUrl = runtimeEnv?.NEXT_PUBLIC_API_URL,
+    baseUrl = "runtimeEnv?.NEXT_PUBLIC_API_URL",
   } = config;
 
   if (!baseUrl) {
