@@ -3,13 +3,14 @@
 import { toasterConfig } from "@gradlly/hooks";
 import { Toaster } from "react-hot-toast";
 
+import type { DehydratedState } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 
 import { QueryProvider } from "@/lib/react-query";
 
 interface ProvidersProps {
   children: ReactNode;
-  dehydratedState?: unknown;
+  dehydratedState?: DehydratedState | null;
 }
 
 export default function Providers({
@@ -17,7 +18,7 @@ export default function Providers({
   dehydratedState,
 }: ProvidersProps): ReactNode {
   return (
-    <QueryProvider dehydratedState={dehydratedState}>
+    <QueryProvider {...(dehydratedState !== undefined && { dehydratedState })}>
       {children}
       <Toaster {...toasterConfig} />
     </QueryProvider>
