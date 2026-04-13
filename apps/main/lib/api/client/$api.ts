@@ -1,10 +1,3 @@
-/**
- * Base fetch client for the Gradlly platform.
- * This is the ONLY file in the codebase that calls fetch() directly.
- * Import this in service files to make API calls.
- * Do not add feature logic, auth logic, or domain types here.
- * This file is intentionally minimal and concern-free.
- */
 import type { ApiConfig, ApiErrorPayload } from "../types/api.types";
 
 export class ApiRequestError extends Error {
