@@ -1,1 +1,2 @@
-export const GRADLLY_APP_NAME = "Gradlly";
+// export * from './domains.constant';
+// export * from './app.constant';

@@ -12,10 +12,13 @@
     "clean": "rm -rf .next dist"
   },
   "dependencies": {
+    "@gradlly/hooks": "*",
+    "@gradlly/ui": "*",
+    "@gradlly/utils": "*",
+    "@gradlly/config": "*",
     "next": "16.2.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "@gradlly/config": "*",
     "zod": "^4.1.11"
   },
   "devDependencies": {

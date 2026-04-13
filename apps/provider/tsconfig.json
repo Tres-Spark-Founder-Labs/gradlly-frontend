@@ -1,7 +1,6 @@
 {
   "extends": "@gradlly/config/typescript/next.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "noEmit": true,
     "paths": {
       "@/*": ["./*"],
