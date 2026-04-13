@@ -1,8 +1,6 @@
 {
   "extends": "@gradlly/config/typescript/next.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
     "noEmit": true,
     "paths": {
       "@/*": ["./*"],
