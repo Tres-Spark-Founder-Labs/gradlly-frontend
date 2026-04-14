@@ -11,6 +11,7 @@ const WORKSPACE_PACKAGES = [
   "@gradlly/ui",
   "@gradlly/utils",
   "@gradlly/hooks",
+  "@gradlly/config",
 ] as const;
 
 const DEV_ORIGINS = [
@@ -22,7 +23,7 @@ const DEV_ORIGINS = [
   "main.gradlly.local",
 ] as const;
 
-const IMAGE_HOSTS = ["**.gradlly.com", "**.account.gov.uk"] as const;
+const IMAGE_HOSTS = ["**.gradlly.com"] as const;
 
 // ─────────────────────────────────────────────────────────────────
 

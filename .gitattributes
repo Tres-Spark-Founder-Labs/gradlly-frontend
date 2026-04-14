@@ -1,11 +1,55 @@
-# .gitattributes
-* text=auto
-*.sh text eol=lf
-.husky/* text eol=lf
-Dockerfile text eol=lf
-docker-compose*.yml text eol=lf
-*.ts text eol=lf
-*.tsx text eol=lf
-*.json text eol=lf
-*.css text eol=lf
-*.md text eol=lf
+# =============================================================================
+# GRADLLY — .gitattributes
+# Forces LF line endings across the entire monorepo regardless of OS
+# =============================================================================
+
+# Default — all text files use LF
+* text=auto eol=lf
+
+# Explicitly LF — these must never have CRLF
+*.ts        text eol=lf
+*.tsx       text eol=lf
+*.js        text eol=lf
+*.mjs       text eol=lf
+*.cjs       text eol=lf
+*.json      text eol=lf
+*.jsonc     text eol=lf
+*.css       text eol=lf
+*.md        text eol=lf
+*.mdx       text eol=lf
+*.yaml      text eol=lf
+*.yml       text eol=lf
+*.env       text eol=lf
+*.env.*     text eol=lf
+*.sh        text eol=lf
+*.bash      text eol=lf
+Dockerfile  text eol=lf
+Dockerfile.* text eol=lf
+.gitignore  text eol=lf
+.gitattributes text eol=lf
+.dockerignore  text eol=lf
+.npmrc      text eol=lf
+.nvmrc      text eol=lf
+*.config.js text eol=lf
+*.config.ts text eol=lf
+*.config.mjs text eol=lf
+vercel.json text eol=lf
+turbo.json  text eol=lf
+
+# Binary — never touch line endings on these
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.svg   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.eot   binary
+*.pdf   binary
+*.zip   binary
+*.gz    binary
+*.tar   binary

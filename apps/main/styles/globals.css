@@ -1,0 +1,14 @@
+@import "@gradlly/config/tailwind/base";
+
+/* ============================================================
+   MAIN APP — PORTAL THEME
+   ============================================================ */
+
+:root {
+}
+
+@layer utilities {
+  .main-font {
+    color: red;
+  }
+}

@@ -71,5 +71,8 @@
     "packages/utils",
     "packages/config",
     "packages/hooks"
-  ]
+  ],
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.2.2"
+  }
 }

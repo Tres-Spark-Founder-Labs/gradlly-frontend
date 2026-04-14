@@ -1,0 +1,572 @@
+@import "tailwindcss";
+
+/* ============================================================
+   GRADLLY — BASE CSS
+   Production-grade shared foundation.
+   Imported by every portal. Zero portal-specific styles here.
+   ============================================================ */
+
+@theme {
+  /* ── Fonts ─────────────────────────────────────────────── */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-display: "Cal Sans", "Inter", ui-sans-serif, sans-serif;
+
+  /* ── Type scale ────────────────────────────────────────── */
+  --text-2xs: 0.625rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+
+  /* ── Leading ───────────────────────────────────────────── */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 1.75;
+  --leading-prose: 1.7;
+
+  /* ── Tracking ──────────────────────────────────────────── */
+  --tracking-tighter: -0.05em;
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-widest: 0.1em;
+
+  /* ── Brand ─────────────────────────────────────────────── */
+  --color-brand-50: #f0f4ff;
+  --color-brand-100: #dce5ff;
+  --color-brand-200: #bacaff;
+  --color-brand-300: #85a0fd;
+  --color-brand-400: #6481fb;
+  --color-brand-500: #3b62f6;
+  --color-brand-600: #2d52e8;
+  --color-brand-700: #1e3ecc;
+  --color-brand-800: #1530a3;
+  --color-brand-900: #0d1f6e;
+  --color-brand-950: #070f3d;
+
+  /* ── Semantic ──────────────────────────────────────────── */
+  --color-success: #16a34a;
+  --color-success-subtle: #dcfce7;
+  --color-success-fg: #14532d;
+
+  --color-warning: #d97706;
+  --color-warning-subtle: #fef3c7;
+  --color-warning-fg: #78350f;
+
+  --color-error: #dc2626;
+  --color-error-subtle: #fee2e2;
+  --color-error-fg: #7f1d1d;
+
+  --color-info: #0284c7;
+  --color-info-subtle: #e0f2fe;
+  --color-info-fg: #0c4a6e;
+
+  /* ── Surfaces ──────────────────────────────────────────── */
+  --color-surface-0: #ffffff;
+  --color-surface-1: #f8fafc;
+  --color-surface-2: #f1f5f9;
+  --color-surface-3: #e2e8f0;
+  --color-surface-4: #cbd5e1;
+
+  /* ── Text ──────────────────────────────────────────────── */
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #94a3b8;
+  --color-text-disabled: #cbd5e1;
+  --color-text-inverse: #ffffff;
+  --color-text-on-accent: #ffffff;
+
+  /* ── Borders ───────────────────────────────────────────── */
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+
+  /* ── Portal theme slots — overridden per portal ─────────── */
+  --portal-accent: #3b62f6;
+  --portal-accent-subtle: #dce5ff;
+  --portal-accent-fg: #ffffff;
+  --portal-header-bg: #0d1f6e;
+  --portal-sidebar-bg: #1e3ecc;
+
+  /* ── Radius ────────────────────────────────────────────── */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* ── Shadows ───────────────────────────────────────────── */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  --shadow-md:
+    0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-xl:
+    0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.08);
+  --shadow-inset: inset 0 2px 4px 0 rgb(0 0 0 / 0.06);
+
+  /* ── Transitions ───────────────────────────────────────── */
+  --duration-fast: 100ms;
+  --duration-base: 150ms;
+  --duration-slow: 250ms;
+  --duration-slower: 350ms;
+  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Spacing extras ────────────────────────────────────── */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+
+  /* ── Z-index ───────────────────────────────────────────── */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-tooltip: 600;
+}
+
+/* ============================================================
+   RESETS
+   ============================================================ */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid var(--color-border);
+  }
+
+  html {
+    font-size: 16px;
+    line-height: var(--leading-normal);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable;
+    hanging-punctuation: first last;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--text-md);
+    line-height: var(--leading-normal);
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-1);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    min-height: 100dvh;
+    /* Mobile notch/home indicator */
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* ── Headings ──────────────────────────────────────────── */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    color: var(--color-text-primary);
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--text-4xl);
+    letter-spacing: var(--tracking-tighter);
+  }
+  h2 {
+    font-size: var(--text-3xl);
+  }
+  h3 {
+    font-size: var(--text-2xl);
+  }
+  h4 {
+    font-size: var(--text-xl);
+  }
+  h5 {
+    font-size: var(--text-lg);
+  }
+  h6 {
+    font-size: var(--text-md);
+  }
+
+  /* ── Body copy ─────────────────────────────────────────── */
+  p {
+    line-height: var(--leading-prose);
+    color: var(--color-text-secondary);
+    max-width: 68ch;
+    text-wrap: pretty;
+  }
+
+  p + p {
+    margin-top: 1em;
+  }
+
+  /* ── Inline ────────────────────────────────────────────── */
+  strong,
+  b {
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  em,
+  i {
+    font-style: italic;
+  }
+  small {
+    font-size: var(--text-xs);
+  }
+  mark {
+    background: var(--portal-accent-subtle);
+    color: var(--portal-accent);
+    padding: 0 0.2em;
+    border-radius: var(--radius-xs);
+  }
+  del {
+    color: var(--color-text-tertiary);
+  }
+  abbr[title] {
+    text-decoration: underline dotted;
+    cursor: help;
+  }
+  sup,
+  sub {
+    font-size: 0.75em;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+  sup {
+    top: -0.5em;
+  }
+  sub {
+    bottom: -0.25em;
+  }
+
+  /* ── Links ─────────────────────────────────────────────── */
+  a {
+    color: var(--portal-accent);
+    text-decoration: none;
+    transition:
+      color var(--duration-base) var(--ease-default),
+      opacity var(--duration-base) var(--ease-default);
+  }
+
+  a:hover {
+    opacity: 0.8;
+  }
+  a:active {
+    opacity: 0.65;
+  }
+
+  /* ── Lists ─────────────────────────────────────────────── */
+  ul,
+  ol {
+    list-style: none;
+  }
+
+  /* ── Media ─────────────────────────────────────────────── */
+  img,
+  svg,
+  video,
+  canvas,
+  audio,
+  iframe,
+  embed,
+  object {
+    display: block;
+    max-width: 100%;
+  }
+
+  img,
+  video {
+    height: auto;
+  }
+
+  /* Prevent svg from being selectable */
+  svg {
+    pointer-events: none;
+    flex-shrink: 0;
+  }
+
+  /* ── Forms ─────────────────────────────────────────────── */
+  button,
+  input,
+  optgroup,
+  select,
+  textarea {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+  }
+
+  button {
+    cursor: pointer;
+    background: transparent;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  input,
+  textarea,
+  select {
+    background: var(--color-surface-0);
+    color: var(--color-text-primary);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-text-tertiary);
+    opacity: 1;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  /* Prevent iOS zoom on focus */
+  @media (max-width: 768px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"],
+    input[type="number"],
+    input[type="search"],
+    input[type="url"],
+    textarea,
+    select {
+      font-size: max(16px, 1em);
+    }
+  }
+
+  /* Minimum accessible tap target */
+  button,
+  [role="button"],
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+
+  /* Icon buttons — allow smaller when explicitly set */
+  [data-icon-button] {
+    min-height: unset;
+  }
+
+  /* ── Tables ────────────────────────────────────────────── */
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+  }
+  th {
+    font-weight: 600;
+    text-align: left;
+  }
+
+  /* ── Code ──────────────────────────────────────────────── */
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+
+  code {
+    background: var(--color-surface-2);
+    padding: 0.15em 0.4em;
+    border-radius: var(--radius-xs);
+    color: var(--color-text-primary);
+  }
+
+  pre {
+    overflow-x: auto;
+    background: var(--color-surface-2);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.5rem;
+    tab-size: 2;
+  }
+
+  pre code {
+    background: transparent;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  kbd {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border-strong);
+    border-bottom-width: 2px;
+    border-radius: var(--radius-xs);
+    padding: 0.1em 0.45em;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+  }
+
+  /* ── Blockquote ────────────────────────────────────────── */
+  blockquote {
+    border-left: 3px solid var(--portal-accent);
+    padding-left: 1rem;
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
+
+  /* ── HR ────────────────────────────────────────────────── */
+  hr {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin-block: 1.5rem;
+  }
+
+  /* ── Dialog ────────────────────────────────────────────── */
+  dialog {
+    background: var(--color-surface-0);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-xl);
+    max-width: min(90vw, 560px);
+    width: 100%;
+  }
+
+  dialog::backdrop {
+    background: rgb(0 0 0 / 0.4);
+    backdrop-filter: blur(2px);
+  }
+}
+
+/* ============================================================
+   FOCUS RING
+   ============================================================ */
+
+@layer base {
+  :focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--portal-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  a:focus-visible {
+    outline-offset: 3px;
+  }
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-surface-4) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-surface-4);
+    border-radius: var(--radius-full);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-tertiary);
+  }
+}
+
+/* ============================================================
+   SELECTION
+   ============================================================ */
+
+@layer base {
+  ::selection {
+    background: var(--portal-accent-subtle);
+    color: var(--portal-accent);
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@layer base {
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ============================================================
+   PRINT
+   ============================================================ */
+
+@layer base {
+  @media print {
+    * {
+      box-shadow: none !important;
+    }
+    body {
+      background: #fff;
+      color: #000;
+    }
+    a[href]::after {
+      content: " (" attr(href) ")";
+    }
+    @page {
+      margin: 1.5cm;
+    }
+  }
+}
