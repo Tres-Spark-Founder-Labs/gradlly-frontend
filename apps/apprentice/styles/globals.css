@@ -1,0 +1,14 @@
+@import "@gradlly/config/tailwind/base";
+
+/* ============================================================
+   APPRENTICE APP — PORTAL THEME
+   ============================================================ */
+
+:root {
+}
+
+@layer utilities {
+  .apprentice-font {
+    color: blue;
+  }
+}

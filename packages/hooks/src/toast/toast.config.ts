@@ -2,14 +2,12 @@ import type { DefaultToastOptions, ToasterProps } from "react-hot-toast";
 
 export const DEFAULT_TOAST_DURATION = 3500;
 
-export const TOAST_POSITION: ToasterProps["position"] = "top-right";
+export const TOAST_POSITION: ToasterProps["position"] = "top-center";
 
 export const toastOptions: DefaultToastOptions = {
   duration: DEFAULT_TOAST_DURATION,
   style: {
     borderRadius: "10px",
-    background: "#0f172a",
-    color: "#f8fafc",
     fontSize: "14px",
     padding: "12px 14px",
   },

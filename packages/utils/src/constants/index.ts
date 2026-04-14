@@ -1,2 +1,1 @@
-// export * from './domains.constant';
-// export * from './app.constant';
+export * from "./domains.constant";

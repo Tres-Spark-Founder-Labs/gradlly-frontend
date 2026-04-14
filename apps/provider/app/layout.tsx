@@ -1,14 +1,7 @@
 import type { Metadata } from "next";
 
-import "./globals.css";
-
-const portalLinks = [
-  { label: "Main", href: "http://main.gradlly.local/" },
-  { label: "Flow", href: "http://flow.gradlly.local/" },
-  { label: "Provider", href: "http://provider.gradlly.local/" },
-  { label: "Employer", href: "http://employer.gradlly.local/" },
-  { label: "Apprentice", href: "http://apprentice.gradlly.local/" },
-] as const;
+import "@/styles/globals.css";
+import { AppProvider } from "@/providers";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,22 +15,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">
-        <nav className="border-b border-border bg-white/90 px-4 py-3 backdrop-blur">
-          <ul className="mx-auto flex w-full max-w-5xl flex-wrap items-center gap-2">
-            {portalLinks.map((link) => (
-              <li key={link.label}>
-                <a
-                  href={link.href}
-                  className="inline-flex rounded-md border border-border px-3 py-1.5 text-sm text-text-primary transition-colors hover:bg-surface"
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        {children}
+      <body>
+        <AppProvider>{children}</AppProvider>
       </body>
     </html>
   );
