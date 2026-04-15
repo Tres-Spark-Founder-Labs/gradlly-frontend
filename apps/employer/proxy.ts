@@ -6,7 +6,9 @@ import { createProxy } from "@gradlly/config/next/proxy";
 
 export const proxy = createProxy({
   portalId: "employer",
+  extraPublicRoutes: ["/", "/docs"],
   allowedRoles: [
+    "/",
     // 'employer_admin',
     // 'employer_ld_manager',
     // 'employer_line_manager',

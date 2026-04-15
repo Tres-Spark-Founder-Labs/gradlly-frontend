@@ -4,8 +4,10 @@ import { createProxy } from "@gradlly/config/next/proxy";
 
 export const proxy = createProxy({
   portalId: "provider",
+  extraPublicRoutes: ["/", "/docs"],
   allowedRoles: [
-    // 'provider_programme_manager',
+    "/",
+    "provider_programme_manager",
     // 'provider_tutor',
     // 'provider_compliance',
     // 'provider_quality',

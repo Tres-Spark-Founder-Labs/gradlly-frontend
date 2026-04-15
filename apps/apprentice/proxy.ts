@@ -4,7 +4,7 @@ import { createProxy } from "@gradlly/config/next/proxy";
 
 export const proxy = createProxy({
   portalId: "apprentice",
-  // allowedRoles: ['apprentice'],
+  extraPublicRoutes: ["/", "/docs"],
   // // OTJ quick-log is accessible from a shared link sent via SMS
   // extraPublicRoutes: ['/quick-log/'],
 });

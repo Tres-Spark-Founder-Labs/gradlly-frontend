@@ -4,8 +4,9 @@ import { createProxy } from "@gradlly/config/next/proxy";
 
 export const proxy = createProxy({
   portalId: "flow",
+  extraPublicRoutes: ["/", "/docs"],
   allowedRoles: [
-    // 'flow_sme_owner',
+    "/",
     // 'flow_levy_donor',
   ],
 });
