@@ -1,21 +1,14 @@
-export default function Home() {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-surface font-sans">
-      <main className="flex w-full max-w-sm flex-col items-center gap-10 px-6 py-16 text-center">
-        <div className="flex flex-col gap-2">
-          <span className="text-xs font-medium uppercase tracking-widest text-text-muted">
-            Gradlly
-          </span>
-          <h1 className="text-4xl font-semibold tracking-tight text-text-primary">
-            Apprentice Portal
-          </h1>
-          <p className="text-base text-text-secondary">
-            OTJ tracking · KSB portfolio · EPA readiness
-          </p>
-        </div>
+import { DashboardLayout, StatCard } from "@gradlly/ui";
 
-        <div className="h-px w-full bg-border" />
-      </main>
-    </div>
+export default function HomePage(): React.ReactNode {
+  return (
+    <DashboardLayout appName="apprentice">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard label="Learning paths" value="42" hint="6 added recently" />
+        <StatCard label="Assessments" value="314" hint="Due this week" />
+        <StatCard label="Mentor sessions" value="88" hint="Scheduled today" />
+        <StatCard label="Completion rate" value="91%" hint="Cohort average" />
+      </div>
+    </DashboardLayout>
   );
 }

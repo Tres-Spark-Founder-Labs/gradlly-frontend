@@ -1,34 +1,14 @@
-export default function Home() {
+import { DashboardLayout, StatCard } from "@gradlly/ui";
+
+export default function HomePage(): React.ReactNode {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-surface font-sans">
-      <main className="flex w-full max-w-3xl flex-col items-start gap-10 px-16 py-32">
-        <div className="flex flex-col gap-2">
-          <span className="text-xs font-medium uppercase tracking-widest text-text-muted">
-            Gradlly
-          </span>
-          <h1 className="text-4xl font-semibold tracking-tight text-text-primary">
-            Employer Portal
-          </h1>
-          <p className="text-base text-text-secondary">
-            Levy management · Apprentice tracking · Compliance reporting
-          </p>
-        </div>
-
-        <div className="h-px w-full bg-border" />
-
-        <div className="grid grid-cols-3 gap-6 w-full">
-          {[
-            { label: 'Portal', value: 'P1 — Employer' },
-            { label: 'Domain', value: 'employer.gradlly.com' },
-            { label: 'Environment', value: process.env.NODE_ENV },
-          ].map((item) => (
-            <div key={item.label} className="flex flex-col gap-1">
-              <span className="text-xs text-text-muted">{item.label}</span>
-              <span className="text-sm font-medium text-text-primary">{item.value}</span>
-            </div>
-          ))}
-        </div>
-      </main>
-    </div>
+    <DashboardLayout appName="employer">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard label="Open vacancies" value="57" hint="Across all regions" />
+        <StatCard label="Interviews" value="129" hint="This sprint" />
+        <StatCard label="Offers sent" value="23" hint="Awaiting response" />
+        <StatCard label="Time to hire" value="18 days" hint="Median value" />
+      </div>
+    </DashboardLayout>
   );
 }

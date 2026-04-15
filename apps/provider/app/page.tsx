@@ -1,19 +1,14 @@
+import { DashboardLayout, StatCard } from "@gradlly/ui";
+
 export default function HomePage(): React.ReactNode {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-white p-8 text-slate-900">
-      <div className="space-y-4 text-center">
-        <h1 className="text-3xl font-bold">Gradlly Provider</h1>
-        <p className="text-slate-600">
-          Internal portal for engineering workflows.
-        </p>
-        <div className="flex items-center justify-center gap-3">
-          <div className="main-card">
-            <p className="main-stat-label main-font">Available Levy</p>
-            <p className="main-font">£124,850</p>
-            <span className="main-badge main-badge--success">Live</span>
-          </div>
-        </div>
+    <DashboardLayout appName="provider">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard label="Providers" value="74" hint="Certified partners" />
+        <StatCard label="Courses live" value="219" hint="Across domains" />
+        <StatCard label="Audits pending" value="11" hint="Action needed" />
+        <StatCard label="Quality score" value="4.8/5" hint="Last 30 days" />
       </div>
-    </main>
+    </DashboardLayout>
   );
 }
