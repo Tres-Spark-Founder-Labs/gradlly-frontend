@@ -27,7 +27,7 @@
     "./eslint": "./eslint/eslint.config.js",
     "./next/base": "./next/base.ts",
     "./next/proxy": "./next/proxy.ts",
-    "./tailwind/base": "./tailwind/base.css",
+    "./tailwind/base.css": "./tailwind/base.css",
     "./typescript/base.json": "./typescript/base.json",
     "./typescript/next.json": "./typescript/next.json"
   }
