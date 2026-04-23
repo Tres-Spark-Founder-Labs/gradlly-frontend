@@ -5,10 +5,9 @@
    ============================================================ */
 
 :root {
-}
-
-@layer utilities {
-  .main-font {
-    color: red;
-  }
+  --portal-accent: #1d4ed8;
+  --portal-accent-subtle: #dbeafe;
+  --portal-accent-fg: #ffffff;
+  --portal-header-bg: #1e3a8a;
+  --portal-sidebar-bg: #1d4ed8;
 }
