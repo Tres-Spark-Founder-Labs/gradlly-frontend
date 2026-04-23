@@ -1,15 +1,13 @@
-/* global css  */
 @import "@gradlly/config/tailwind/base.css";
 
 /* ============================================================
-   MAIN APP — PORTAL THEME
+   EMPLOYER APP — PORTAL THEME
    ============================================================ */
 
 :root {
-}
-
-@layer utilities {
-  .main-font {
-    color: red;
-  }
+  --portal-accent: #4f46e5;
+  --portal-accent-subtle: #e0e7ff;
+  --portal-accent-fg: #ffffff;
+  --portal-header-bg: #312e81;
+  --portal-sidebar-bg: #4338ca;
 }

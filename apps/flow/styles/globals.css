@@ -1,14 +1,13 @@
 @import "@gradlly/config/tailwind/base.css";
 
 /* ============================================================
-   MAIN APP — PORTAL THEME
+   FLOW APP — PORTAL THEME
    ============================================================ */
 
 :root {
-}
-
-@layer utilities {
-  .main-font {
-    color: red;
-  }
+  --portal-accent: #9333ea;
+  --portal-accent-subtle: #f3e8ff;
+  --portal-accent-fg: #ffffff;
+  --portal-header-bg: #581c87;
+  --portal-sidebar-bg: #7e22ce;
 }

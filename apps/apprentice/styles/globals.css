@@ -5,10 +5,9 @@
    ============================================================ */
 
 :root {
-}
-
-@layer utilities {
-  .apprentice-font {
-    color: blue;
-  }
+  --portal-accent: #0ea5a4;
+  --portal-accent-subtle: #ccfbf1;
+  --portal-accent-fg: #ffffff;
+  --portal-header-bg: #115e59;
+  --portal-sidebar-bg: #134e4a;
 }
