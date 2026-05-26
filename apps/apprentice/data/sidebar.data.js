@@ -13,7 +13,7 @@ export const sidebarData = [
         icon: "BookOpen",
         href: "/courses",
         children: [
-          { label: "In Progress", href: "/courses/active" },
+          { label: "In Progress", href: "/courses/in-progress" },
           { label: "Completed", href: "/courses/completed" },
           { label: "Browse All", href: "/courses/browse" },
         ],
@@ -77,7 +77,7 @@ export const progressData = {
 export const pageLabels = {
   "/home": "Home",
   "/courses": "My Courses",
-  "/courses/active": "In Progress",
+  "/courses/in-progress": "In Progress",
   "/courses/completed": "Completed",
   "/courses/browse": "Browse Courses",
   "/assessments": "Assessments",
