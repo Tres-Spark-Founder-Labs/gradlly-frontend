@@ -1,11 +1,9 @@
 import { z } from "zod";
 
-// ---------------------------------------------------------------------------
-// Schema
-// ---------------------------------------------------------------------------
-
-const clientSchema = z
+const schema = z
   .object({
+    NEXT_PUBLIC_PORTAL: z.enum(["employer", "provider", "apprentice", "flow"]),
+    NEXT_PUBLIC_APP_URL: z.string().url().optional(),
     NEXT_PUBLIC_EMPLOYER_URL: z.string().url(),
     NEXT_PUBLIC_PROVIDER_URL: z.string().url(),
     NEXT_PUBLIC_APPRENTICE_URL: z.string().url(),
@@ -14,42 +12,33 @@ const clientSchema = z
   })
   .strict();
 
-// ---------------------------------------------------------------------------
-// Parser
-// ---------------------------------------------------------------------------
-
-function parseClientEnv(env) {
-  const result = clientSchema.safeParse(env);
-
+function parse(env) {
+  const result = schema.safeParse(env);
   if (!result.success) {
     const fields = [
       ...new Set(
-        result.error.issues
-          .map((issue) => issue.path.join("."))
-          .filter(Boolean),
+        result.error.issues.map((i) => i.path.join(".")).filter(Boolean),
       ),
     ];
-
-    // In Docker / CI — surface a clear message pointing to the real cause
     throw new Error(
       [
         "❌ Invalid client environment variables:",
         ...fields.map((f) => `  • ${f}`),
         "",
-        "In Docker: ensure ARG and ENV are declared in your Dockerfile",
-        "and passed via --build-arg at build time.",
-        "NEXT_PUBLIC_* variables are inlined at build time, not runtime.",
+        "NEXT_PUBLIC_* values are inlined at build time, not runtime.",
+        "In Docker, declare ARG and ENV and pass via --build-arg.",
       ].join("\n"),
     );
   }
-
   return result.data;
 }
 
-export const clientEnv = parseClientEnv({
-  NEXT_PUBLIC_EMPLOYER_URL: process.env["NEXT_PUBLIC_EMPLOYER_URL"],
-  NEXT_PUBLIC_PROVIDER_URL: process.env["NEXT_PUBLIC_PROVIDER_URL"],
-  NEXT_PUBLIC_APPRENTICE_URL: process.env["NEXT_PUBLIC_APPRENTICE_URL"],
-  NEXT_PUBLIC_FLOW_URL: process.env["NEXT_PUBLIC_FLOW_URL"],
-  NEXT_PUBLIC_MAIN_URL: process.env["NEXT_PUBLIC_MAIN_URL"],
+export const clientEnv = parse({
+  NEXT_PUBLIC_PORTAL: process.env.NEXT_PUBLIC_PORTAL,
+  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+  NEXT_PUBLIC_EMPLOYER_URL: process.env.NEXT_PUBLIC_EMPLOYER_URL,
+  NEXT_PUBLIC_PROVIDER_URL: process.env.NEXT_PUBLIC_PROVIDER_URL,
+  NEXT_PUBLIC_APPRENTICE_URL: process.env.NEXT_PUBLIC_APPRENTICE_URL,
+  NEXT_PUBLIC_FLOW_URL: process.env.NEXT_PUBLIC_FLOW_URL,
+  NEXT_PUBLIC_MAIN_URL: process.env.NEXT_PUBLIC_MAIN_URL,
 });

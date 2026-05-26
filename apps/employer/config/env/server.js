@@ -1,62 +1,45 @@
-// config/env/server.ts
+import "server-only";
 import { z } from "zod";
 
-// ---------------------------------------------------------------------------
-// Browser guard
-// ---------------------------------------------------------------------------
-if (typeof window !== "undefined") {
-  throw new Error(
-    [
-      "❌ config/env/server.ts was imported in a browser context.",
-      "Server-only env variables must never be accessed on the client.",
-      "Find the client component that is importing this file and fix it.",
-    ].join("\n"),
-  );
-}
+/**
+ * Server-only environment.
+ *
+ * `server-only` makes this file throw at build time if a client module
+ * imports it transitively. Anything secret or server-shaped lives here.
+ */
 
-// ---------------------------------------------------------------------------
-// Schema — server-only variables
-// ---------------------------------------------------------------------------
-
-const serverSchema = z
+const schema = z
   .object({
     API_BASE_URL: z.string().url(),
+    AUTH_COOKIE_DOMAIN: z.string().optional(),
+    NODE_ENV: z
+      .enum(["development", "test", "production"])
+      .default("development"),
   })
   .strict();
 
-// ---------------------------------------------------------------------------
-// Parser
-// ---------------------------------------------------------------------------
-
-function parseServerEnv(env) {
-  const result = serverSchema.safeParse(env);
-
+function parse(env) {
+  const result = schema.safeParse(env);
   if (!result.success) {
     const fields = [
       ...new Set(
-        result.error.issues
-          .map((issue) => issue.path.join("."))
-          .filter(Boolean),
+        result.error.issues.map((i) => i.path.join(".")).filter(Boolean),
       ),
     ];
-
     throw new Error(
       [
         "❌ Invalid server environment variables:",
         ...fields.map((f) => `  • ${f}`),
         "",
-        "Ensure these are set in your .env.local or CI secrets.",
+        "Ensure these are set in .env.local or CI secrets.",
       ].join("\n"),
     );
   }
-
   return result.data;
 }
 
-// ---------------------------------------------------------------------------
-// Validated export
-// ---------------------------------------------------------------------------
-
-export const serverEnv = parseServerEnv({
-  API_BASE_URL: process.env["API_BASE_URL"],
+export const serverEnv = parse({
+  API_BASE_URL: process.env.API_BASE_URL,
+  AUTH_COOKIE_DOMAIN: process.env.AUTH_COOKIE_DOMAIN,
+  NODE_ENV: process.env.NODE_ENV,
 });

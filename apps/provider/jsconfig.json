@@ -6,9 +6,7 @@
     "checkJs": false,
     "noEmit": true,
     "paths": {
-      "@/*": ["./*"],
-      "@gradlly/ui": ["../../packages/ui/src/index.js"],
-      "@gradlly/utils": ["../../packages/utils/src/index.js"]
+      "@/*": ["./*"]
     }
   },
   "include": [

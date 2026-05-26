@@ -1,92 +1,68 @@
-export const portalMeta = {
-  name: "Provider",
-  tagline: "Course Hub",
-};
+import {
+  AlertTriangle,
+  Archive,
+  BarChart3,
+  BookOpen,
+  Building2,
+  ClipboardList,
+  FileText,
+  HelpCircle,
+  LayoutDashboard,
+  MessageSquare,
+  Settings,
+  Shield,
+  UserCircle,
+  Users,
+  Users2,
+} from "lucide-react";
 
-export const sidebarData = [
+export const NAV_SECTIONS = [
   {
     title: "Overview",
     items: [
-      { label: "Dashboard", icon: "LayoutDashboard", href: "/home" },
-      { label: "Analytics", icon: "BarChart3", href: "/analytics" },
+      { label: "Dashboard", href: "/", icon: LayoutDashboard },
+      { label: "Cohort", href: "/cohort", icon: Users2 },
+      { label: "At-Risk Queue", href: "/at-risk", icon: AlertTriangle },
     ],
   },
   {
-    title: "Programme",
+    title: "Compliance",
     items: [
+      { label: "Ofsted Hub", href: "/ofsted-hub", icon: Shield },
+      { label: "QIP", href: "/qip", icon: ClipboardList },
+      { label: "ILR & DAS", href: "/ilr-das", icon: FileText },
+      { label: "Evidence Vault", href: "/evidence-vault", icon: Archive },
+    ],
+  },
+  {
+    title: "Delivery",
+    items: [
+      { label: "Reviews", href: "/reviews", icon: MessageSquare },
+      { label: "Tutors", href: "/tutors", icon: Users },
       {
-        label: "Courses",
-        icon: "BookOpen",
-        href: "/courses",
+        label: "Employers",
+        href: "/employers",
+        icon: Building2,
         children: [
-          { label: "Live Courses", href: "/courses/live" },
-          { label: "Drafts", href: "/courses/drafts" },
-          { label: "Archived", href: "/courses/archived" },
+          { label: "All Employers", href: "/employers" },
+          { label: "Commitment Statements", href: "/commitment-statements" },
         ],
-      },
-      { label: "Curriculum", icon: "BookMarked", href: "/curriculum" },
-      {
-        label: "Assessments",
-        icon: "ClipboardList",
-        href: "/assessments",
-        badge: { text: "11 pending", variant: "warning" },
       },
     ],
   },
   {
-    title: "Learners",
+    title: "Insights",
     items: [
-      { label: "All Learners", icon: "Users", href: "/learners" },
-      { label: "Progress", icon: "TrendingUp", href: "/progress" },
-      {
-        label: "Reports",
-        icon: "FileText",
-        href: "/reports",
-        children: [
-          { label: "Completion", href: "/reports/completion" },
-          { label: "Engagement", href: "/reports/engagement" },
-        ],
-      },
+      { label: "Reports", href: "/reports", icon: BarChart3 },
+      { label: "KSB Coverage", href: "/ksb-coverage", icon: BookOpen },
     ],
   },
   {
     title: "Account",
-    items: [{ label: "Settings", icon: "Settings", href: "/settings" }],
+    items: [
+      { label: "Profile", href: "/profile", icon: UserCircle },
+      { label: "Settings", href: "/settings", icon: Settings },
+      { label: "Help & Docs", href: "/help", icon: HelpCircle },
+    ],
   },
 ];
-
-export const profileData = {
-  name: "Sarah Williams",
-  role: "Course Director",
-  initials: "SW",
-  isOnline: true,
-  stats: [
-    { value: "47", label: "learners" },
-    { value: "11", label: "courses" },
-  ],
-};
-
-export const progressData = {
-  label: "Delivery Progress",
-  percent: 72,
-  subtitle: "Q2 cohort · 8 of 11 courses",
-  detail: "On schedule · 2 pending review",
-};
-
-export const pageLabels = {
-  "/home": "Dashboard",
-  "/analytics": "Analytics",
-  "/courses": "Courses",
-  "/courses/live": "Live Courses",
-  "/courses/drafts": "Drafts",
-  "/courses/archived": "Archived",
-  "/curriculum": "Curriculum",
-  "/assessments": "Assessments",
-  "/learners": "All Learners",
-  "/progress": "Progress",
-  "/reports": "Reports",
-  "/reports/completion": "Completion Report",
-  "/reports/engagement": "Engagement Report",
-  "/settings": "Settings",
-  "/profile": "Profile",
-};

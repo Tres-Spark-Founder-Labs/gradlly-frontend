@@ -1,20 +1,17 @@
-import { createPageMetadata, createViewport } from "@gradlly/utils";
-
-import "@/styles/globals.css";
+import "@/assets/css/globals.css";
+import { PORTAL } from "@/config/portal.config";
 import { AppProvider } from "@/providers";
+import { createPageSeo } from "@/utils/metadata";
 
-export const metadata = createPageMetadata({
-  description:
-    "Gradlly employer portal for hiring, onboarding, and apprenticeship tracking.",
-  portalName: "Employer Portal",
-  baseUrl: process.env["NEXT_PUBLIC_APP_URL"] ?? "https://employer.gradlly.com",
-});
-
-export const viewport = createViewport({ themeColor: "#8b5cf6" });
+export const { metadata, viewport } = createPageSeo();
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html
+      lang={PORTAL.locale.replace("_", "-")}
+      data-scroll-behavior="smooth"
+      className="h-full antialiased"
+    >
       <body>
         <AppProvider>{children}</AppProvider>
       </body>

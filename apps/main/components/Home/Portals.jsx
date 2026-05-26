@@ -77,7 +77,7 @@ export default function Portals() {
                   key={i}
                   className="flex items-start gap-3 text-sm leading-relaxed"
                 >
-                  <span className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold flex items-center justify-center mt-0.5">
+                  <span className="shrink-0 w-5 h-5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold flex items-center justify-center mt-0.5">
                     ✓
                   </span>
                   {f}

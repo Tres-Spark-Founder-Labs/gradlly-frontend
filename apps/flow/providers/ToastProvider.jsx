@@ -1,8 +1,9 @@
 "use client";
 
-import { toasterConfig } from "@gradlly/hooks";
 import { Toaster } from "react-hot-toast";
 
+import { PORTAL } from "@/config/portal.config";
+
 export function ToasterProvider() {
-  return <Toaster {...toasterConfig} />;
+  return <Toaster {...PORTAL?.toastOptions} />;
 }

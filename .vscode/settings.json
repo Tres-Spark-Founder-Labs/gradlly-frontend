@@ -1,0 +1,19 @@
+{
+  "editor.showUnused": true,
+
+  "eslint.useFlatConfig": true,
+
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+
+  "js/ts.preferences.importModuleSpecifier": "non-relative"
+}

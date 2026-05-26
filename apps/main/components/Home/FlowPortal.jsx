@@ -62,7 +62,7 @@ export default function FlowPortal() {
           {CARDS.map((c, i) => (
             <Reveal key={i} delay={i * 160}>
               <div className="bg-white border border-amber-100 rounded-2xl p-10 relative overflow-hidden h-full">
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500 to-yellow-400" />
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-amber-500 to-yellow-400" />
                 <span className="font-mono text-xs text-amber-600 uppercase tracking-widest block mb-3">
                   {c.tag}
                 </span>
@@ -78,7 +78,7 @@ export default function FlowPortal() {
                       key={j}
                       className="flex items-start gap-2 text-sm leading-relaxed"
                     >
-                      <span className="text-amber-500 font-bold mt-0.5 flex-shrink-0">
+                      <span className="text-amber-500 font-bold mt-0.5 shrink-0">
                         →
                       </span>
                       {item}

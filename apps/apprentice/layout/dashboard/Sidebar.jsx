@@ -1,212 +1,279 @@
 "use client";
-import { cn } from "@gradlly/utils";
-import { X } from "lucide-react";
 
-import { SidebarSection } from "./SidebarSection";
+import { ChevronDown, X } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
-import { progressData, sidebarData, portalMeta } from "@/data/sidebar.data";
-
-const R = 17,
-  C = 2 * Math.PI * R;
-
-function ArcProgress({ percent }) {
-  const offset = C - (percent / 100) * C;
-  return (
-    <div className="relative size-[52px] shrink-0">
-      <svg
-        viewBox="0 0 44 44"
-        className="size-[52px]"
-        aria-hidden="true"
-        style={{ transform: "rotate(-90deg)" }}
-      >
-        <circle
-          cx="22"
-          cy="22"
-          r={R}
-          fill="none"
-          stroke="rgba(255,255,255,0.07)"
-          strokeWidth="3"
-        />
-        <circle
-          cx="22"
-          cy="22"
-          r={R}
-          fill="none"
-          stroke="var(--portal-accent)"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeDasharray={C}
-          strokeDashoffset={offset}
-          style={{
-            transition:
-              "stroke-dashoffset 800ms cubic-bezier(0.34,1.56,0.64,1)",
-          }}
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-px">
-        <span className="text-[12px] font-bold leading-none text-white">
-          {percent}
-        </span>
-        <span className="text-[7px] font-semibold uppercase tracking-wide text-white/40">
-          %
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function LogoSection({ onClose }) {
-  return (
-    <div
-      className="relative flex shrink-0 items-center justify-between px-5 py-[18px]"
-      style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-    >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-px"
-        style={{
-          background:
-            "linear-gradient(90deg,transparent 0%,color-mix(in srgb,var(--portal-accent) 55%,transparent) 45%,color-mix(in srgb,var(--portal-accent) 15%,transparent) 100%)",
-        }}
-      />
-      <div className="flex items-center gap-3.5">
-        <div
-          className="flex size-10 shrink-0 items-center justify-center rounded-xl"
-          style={{
-            background:
-              "linear-gradient(145deg,color-mix(in srgb,var(--portal-accent) 42%,transparent) 0%,color-mix(in srgb,var(--portal-accent) 20%,transparent) 100%)",
-            border:
-              "1px solid color-mix(in srgb,var(--portal-accent) 40%,transparent)",
-            boxShadow:
-              "0 0 18px color-mix(in srgb,var(--portal-accent) 20%,transparent),inset 0 1px 0 rgba(255,255,255,0.14)",
-          }}
-        >
-          <span className="font-display text-base font-bold text-white">G</span>
-        </div>
-        <div className="flex flex-col gap-[5px] leading-none">
-          <div className="flex items-center gap-2">
-            <span className="font-display text-[15px] font-semibold tracking-tight text-white/90">
-              Gradlly
-            </span>
-            {portalMeta?.name && (
-              <span
-                className="rounded-md px-[7px] py-[3px] text-[9px] font-bold uppercase tracking-wider text-white/48"
-                style={{
-                  background: "rgba(255,255,255,0.07)",
-                  border: "1px solid rgba(255,255,255,0.11)",
-                }}
-              >
-                {portalMeta.name}
-              </span>
-            )}
-          </div>
-          {portalMeta?.tagline && (
-            <span className="text-[10px] font-medium tracking-wide text-white/26">
-              {portalMeta.tagline}
-            </span>
-          )}
-        </div>
-      </div>
-      <button
-        aria-label="Close sidebar"
-        data-icon-button
-        onClick={onClose}
-        className="rounded-lg p-1.5 text-white/28 transition-colors hover:bg-white/6 hover:text-white/55 lg:hidden"
-      >
-        <X aria-hidden="true" className="size-3.5" />
-      </button>
-    </div>
-  );
-}
-
-function ProgressCard() {
-  if (!progressData) return null;
-  const { percent, label, subtitle, detail } = progressData;
-  return (
-    <div
-      className="mx-3 mt-3 rounded-2xl p-4"
-      style={{
-        background: "rgba(255,255,255,0.032)",
-        border: "1px solid rgba(255,255,255,0.07)",
-        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
-      }}
-    >
-      <div className="flex items-center gap-3.5">
-        <ArcProgress percent={percent} />
-        <div className="min-w-0 flex-1">
-          <p className="text-[12px] font-semibold leading-snug text-white/84">
-            {label}
-          </p>
-          <p className="mt-1 text-[11px] leading-none text-white/44">
-            {subtitle}
-          </p>
-          <p className="mt-1 text-[10px] leading-none text-white/26">
-            {detail}
-          </p>
-        </div>
-      </div>
-      <div
-        className="mt-3.5 h-[5px] overflow-hidden rounded-full"
-        style={{ background: "rgba(255,255,255,0.07)" }}
-      >
-        <div
-          className="h-full rounded-full transition-all duration-700"
-          style={{
-            width: `${percent}%`,
-            background:
-              "linear-gradient(90deg,var(--portal-accent) 0%,color-mix(in srgb,var(--portal-accent) 70%,white) 100%)",
-          }}
-        />
-      </div>
-      <div className="mt-2 flex items-center justify-between">
-        <span className="text-[9px] font-semibold uppercase tracking-wide text-white/20">
-          Start
-        </span>
-        <span className="text-[10px] font-semibold text-white/38">
-          {percent}% complete
-        </span>
-        <span className="text-[9px] font-semibold uppercase tracking-wide text-white/20">
-          End
-        </span>
-      </div>
-    </div>
-  );
-}
+import { GradllyLogo } from "@/assets/svgs/GradllyLogo";
+import { Avatar } from "@/components/ui/Avatar";
+import { NAV_SECTIONS } from "@/data/sidebar.data";
+import { LogoutButton } from "@/features/auth/components/LogoutButton";
+import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
+import { capitalise, cn, getFullName, getInitials } from "@/utils/helper";
 
 export function Sidebar({ isOpen, onClose }) {
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const { user, activeOrganisation } = useAuthUser();
+  const pathname = usePathname();
+
+  const org = activeOrganisation?.organisation;
+  const roles = activeOrganisation?.roles ?? [];
+  const orgName = org?.name ?? "Your Provider";
+  const orgInitial = orgName[0].toUpperCase();
+  const initials = getInitials(user?.firstName, user?.lastName);
+  const fullName = getFullName(user);
+  const role = capitalise(roles?.[0] ?? "apprentice");
+
   return (
     <>
       {isOpen && (
         <div
-          aria-hidden="true"
-          className="fixed inset-0 z-300 bg-black/65 backdrop-blur-sm lg:hidden"
+          aria-hidden
+          className="sidebar-backdrop lg:hidden"
           onClick={onClose}
         />
       )}
+
       <aside
-        aria-label="Sidebar navigation"
-        className={cn(
-          "fixed inset-y-0 left-0 z-400 flex w-[272px] flex-col transition-transform duration-300 ease-out lg:relative lg:z-auto lg:translate-x-0",
-          isOpen ? "translate-x-0" : "-translate-x-full",
-        )}
-        style={{ background: "var(--portal-sidebar-bg)" }}
+        aria-label="Main navigation"
+        aria-hidden={!isOpen || undefined}
+        inert={!isOpen}
+        className={cn("sidebar", !isOpen && "sidebar-closed")}
       >
-        <LogoSection onClose={onClose} />
-        <ProgressCard />
-        <nav
-          aria-label="Main navigation"
-          className="flex-1 space-y-4 overflow-y-auto px-3 py-4 [scrollbar-width:none]"
+        {/* Brand */}
+        <div
+          className="flex shrink-0 items-center justify-between px-5 py-4"
+          style={{ borderBottom: "1px solid rgba(94,164,120,0.12)" }}
         >
-          {sidebarData.map((section) => (
-            <SidebarSection key={section.title} section={section} />
+          <Link
+            href="/"
+            aria-label="Gradlly home"
+            className="flex items-center gap-2.5 rounded-lg focus-visible:outline-2 focus-visible:outline-[#5ea478] focus-visible:outline-offset-2"
+          >
+            <GradllyLogo size={34} />
+            <span className="text-[15px] font-bold tracking-tight text-white">
+              Gradlly
+            </span>
+            <span
+              className="rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest"
+              style={{ background: "rgba(94,164,120,0.18)", color: "#5ea478" }}
+            >
+              Apprentice
+            </span>
+          </Link>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close navigation"
+            className="lg:hidden flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 text-white/50 transition-colors duration-150 hover:border-white/20 hover:bg-white/10 hover:text-white"
+          >
+            <X size={14} aria-hidden />
+          </button>
+        </div>
+
+        {/* Org block */}
+        <div className="shrink-0 px-4 py-3">
+          <div
+            className="rounded-xl p-3"
+            style={{
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(94,164,120,0.15)",
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[14px] font-extrabold text-white"
+                style={{
+                  background: "linear-gradient(145deg,#22c55e 0%,#15803d 100%)",
+                }}
+              >
+                {orgInitial}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[12.5px] font-semibold text-white">
+                  {orgName}
+                </p>
+                <p className="mt-0.5 text-[10.5px] text-white/40">
+                  Apprentice Account
+                </p>
+              </div>
+              <span
+                className="flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5"
+                style={{ background: "rgba(34,197,94,0.15)" }}
+              >
+                <span
+                  aria-hidden
+                  className="h-1.5 w-1.5 rounded-full bg-[#22c55e]"
+                />
+                <span className="text-[9px] font-bold text-[#22c55e]">
+                  Active
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Nav */}
+        <nav aria-label="Primary navigation" className="sidebar-nav py-2">
+          {NAV_SECTIONS.map((section) => (
+            <div key={section.title}>
+              <p className="mx-4 mb-1 mt-3 text-[10px] font-semibold uppercase tracking-widest text-white/25">
+                {section.title}
+              </p>
+
+              {section.items.map((item) => {
+                const hasChildren = Boolean(item.children?.length);
+                const isActive =
+                  pathname === item.href ||
+                  (hasChildren &&
+                    item.children.some((c) => pathname === c.href));
+                const isExpanded = openDropdown === item.label;
+                const Icon = item.icon;
+
+                if (hasChildren) {
+                  return (
+                    <div key={item.label}>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOpenDropdown((p) =>
+                            p === item.label ? null : item.label,
+                          )
+                        }
+                        aria-expanded={isExpanded}
+                        className={cn(
+                          "group mx-2 flex w-[calc(100%-1rem)] items-center gap-3 rounded-lg px-3 py-3.5",
+                          "text-[13px] font-medium transition-colors duration-150",
+                          "focus-visible:outline-2 focus-visible:outline-[#5ea478] focus-visible:-outline-offset-2",
+                          isActive
+                            ? "bg-primary-400/14 text-white"
+                            : "text-white/55 hover:bg-primary-400/8 hover:text-white/85",
+                        )}
+                        style={
+                          isActive
+                            ? {
+                                borderLeft: "3px solid #5ea478",
+                                paddingLeft: "9px",
+                              }
+                            : undefined
+                        }
+                      >
+                        <Icon
+                          aria-hidden
+                          strokeWidth={1.75}
+                          className={cn(
+                            "h-4 w-4 shrink-0",
+                            isActive
+                              ? "text-primary-400"
+                              : "text-white/40 group-hover:text-primary-400/70",
+                          )}
+                        />
+                        <span className="flex-1 text-left">{item.label}</span>
+                        <ChevronDown
+                          aria-hidden
+                          className={cn(
+                            "h-3.5 w-3.5 text-white/30 transition-transform duration-200",
+                            isExpanded && "rotate-180",
+                          )}
+                        />
+                      </button>
+
+                      <div
+                        className={cn("sidebar-submenu", isExpanded && "open")}
+                      >
+                        <div className="sidebar-submenu-inner py-0.5 pl-10 pr-2">
+                          {item.children.map((child) => (
+                            <Link
+                              key={child.href}
+                              href={child.href}
+                              className={cn(
+                                "flex rounded-lg px-3 py-2.5 text-[12.5px] font-medium transition-colors duration-150",
+                                "focus-visible:outline-2 focus-visible:outline-[#5ea478] focus-visible:-outline-offset-2",
+                                pathname === child.href
+                                  ? "text-white"
+                                  : "text-white/45 hover:text-white/75",
+                              )}
+                            >
+                              {child.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      "group mx-2 flex items-center gap-3 rounded-lg px-3 py-3.5",
+                      "text-[13px] font-medium transition-colors duration-150",
+                      "focus-visible:outline-2 focus-visible:outline-[#5ea478] focus-visible:-outline-offset-2",
+                      isActive
+                        ? "bg-primary-400/14 text-white"
+                        : "text-white/55 hover:bg-primary-400/8 hover:text-white/85",
+                    )}
+                    style={
+                      isActive
+                        ? {
+                            borderLeft: "3px solid #5ea478",
+                            paddingLeft: "9px",
+                          }
+                        : undefined
+                    }
+                  >
+                    <Icon
+                      aria-hidden
+                      strokeWidth={1.75}
+                      className={cn(
+                        "h-4 w-4 shrink-0",
+                        isActive
+                          ? "text-primary-400"
+                          : "text-white/40 group-hover:text-primary-400/70",
+                      )}
+                    />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
           ))}
         </nav>
+
+        {/* User block */}
         <div
-          className="flex items-center justify-between px-5 py-3"
-          style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+          className="shrink-0 px-3 py-3"
+          style={{ borderTop: "1px solid rgba(94,164,120,0.12)" }}
         >
-          <span className="text-[10px] text-white/16">v0.1.0</span>
-          <span className="text-[10px] text-white/16">© 2026 Gradlly</span>
+          <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5">
+            <div className="relative shrink-0">
+              <Avatar
+                initials={initials}
+                src={user?.avatarUrl}
+                size="sm"
+                className="ring-2 ring-primary-400/30"
+              />
+              {user?.isActive && (
+                <span
+                  aria-hidden
+                  className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#22c55e]"
+                  style={{ outline: "2px solid #06170d" }}
+                />
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[12.5px] font-semibold text-white">
+                {fullName}
+              </p>
+              <p className="mt-0.5 truncate text-[10.5px] text-white/40">
+                {role}
+              </p>
+            </div>
+            <LogoutButton variant="sidebar" />
+          </div>
         </div>
       </aside>
     </>

@@ -93,7 +93,7 @@ export default function Pricing() {
                       }`}
                     >
                       <span
-                        className={`font-bold flex-shrink-0 mt-0.5 ${
+                        className={`font-bold shrink-0 mt-0.5 ${
                           p.featured ? "text-amber-300" : "text-emerald-700"
                         }`}
                       >

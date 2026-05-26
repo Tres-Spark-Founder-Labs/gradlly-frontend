@@ -50,7 +50,7 @@ export function EmployerMockup() {
           Expires in 8 months · £18K at risk
         </div>
         <div className="h-1.5 rounded-full bg-stone-100 mt-3 overflow-hidden">
-          <div className="h-full w-[73%] rounded-full bg-gradient-to-r from-emerald-700 to-emerald-500" />
+          <div className="h-full w-[73%] rounded-full bg-linear-to-r from-emerald-700 to-emerald-500" />
         </div>
       </div>
       <div className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">

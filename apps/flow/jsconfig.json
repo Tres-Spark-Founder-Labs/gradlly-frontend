@@ -1,14 +1,12 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./",
     "ignoreDeprecations": "6.0",
     "allowJs": true,
     "checkJs": false,
     "noEmit": true,
     "paths": {
-      "@/*": ["./*"],
-      "@gradlly/ui": ["../../packages/ui/src/index.js"],
-      "@gradlly/utils": ["../../packages/utils/src/index.js"]
+      "@/*": ["./*"]
     }
   },
   "include": [
@@ -21,5 +19,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", ".next", "dist"]
 }

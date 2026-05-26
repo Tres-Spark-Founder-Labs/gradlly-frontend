@@ -45,7 +45,7 @@ export default function HowItWorks() {
           {STEPS.map((s, i) => (
             <Reveal key={i} delay={i * 120}>
               <div className="group bg-stone-900 hover:bg-stone-800 p-10 transition-colors relative h-full">
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-700 to-emerald-400 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-linear-to-r from-emerald-700 to-emerald-400 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300" />
                 <div className="font-serif text-6xl text-white/5 leading-none mb-4">
                   {s.n}
                 </div>

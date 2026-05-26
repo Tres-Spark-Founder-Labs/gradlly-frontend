@@ -100,7 +100,7 @@ export default function Hero() {
         className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-xs text-stone-400 tracking-widest uppercase"
         style={{ animation: "fadeIn 1s 1.2s ease forwards", opacity: 0 }}
       >
-        <div className="w-px h-10 bg-gradient-to-b from-emerald-700 to-transparent" />
+        <div className="w-px h-10 bg-linear-to-b from-emerald-700 to-transparent" />
         scroll
       </div>
 

@@ -1,19 +1,15 @@
-import { createPageMetadata, createViewport } from "@gradlly/utils";
-
 import "@/assets/css/globals.css";
+import { PORTAL } from "@/config/portal.config";
+import { createPageSeo } from "@/utils/metadata";
 
-export const metadata = createPageMetadata({
-  description:
-    "Gradlly main portal for cross-platform administration and oversight.",
-  portalName: "Main Portal",
-  baseUrl: process.env["NEXT_PUBLIC_APP_URL"] ?? "https://gradlly.com",
+export const { metadata, viewport } = createPageSeo({
+  portalName: PORTAL.name,
+  description: PORTAL.defaultDescription,
 });
-
-export const viewport = createViewport({ themeColor: "#1d4ed8" });
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang={PORTAL.locale.replace("_", "-")} className="h-full antialiased">
       <body>
         <>{children}</>
       </body>

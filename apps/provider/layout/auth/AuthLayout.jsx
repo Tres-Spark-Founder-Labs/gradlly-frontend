@@ -1,7 +1,7 @@
-import { Home } from "lucide-react";
 import Link from "next/link";
 
 import AuthLayoutSVG from "@/assets/svgs/AuthLayoutSVG";
+import { GradllyLogo } from "@/assets/svgs/GradllyLogo";
 
 export default function AuthLayout({ children }) {
   return (
@@ -29,21 +29,19 @@ export default function AuthLayout({ children }) {
       </aside>
 
       {/* Form panel, centered on both axes */}
-      <main className="relative flex items-center justify-center px-6 sm:px-10 py-20 sm:py-24 lg:py-16">
+      <main className="h-screen overflow-y-auto relative flex items-center justify-center px-6 sm:px-10 py-20 sm:py-24 lg:py-16">
         <Link
           href="/"
-          aria-label="Go to homepage"
-          className="absolute top-6 left-6 sm:top-8 sm:left-8 lg:top-10 lg:left-10 flex items-center gap-2.5 z-10 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1b4f32] focus-visible:ring-offset-2 rounded-lg"
+          aria-label="Gradlly home"
+          className="absolute top-6 left-6 sm:top-8 sm:left-8 lg:top-10 lg:left-10 flex items-center gap-2.5 z-10 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
         >
-          <div className="w-9 h-9 bg-[#1b4f32] rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm transition-colors group-hover:bg-[#225e3c]">
-            <Home className="w-4 h-4 text-[#7ecb9a]" strokeWidth={2.25} />
-          </div>
-          <span className="text-[15px] font-semibold text-[#141f18] tracking-tight">
+          <GradllyLogo size={36} />
+          <span className="text-sm font-semibold tracking-tight text-primary-700">
             Gradlly
           </span>
         </Link>
 
-        <div className="w-full max-w-[400px]">{children}</div>
+        <div className="w-full mt-5">{children}</div>
       </main>
     </div>
   );
