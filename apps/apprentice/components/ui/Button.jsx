@@ -112,7 +112,7 @@ const ICON_ONLY_SIZE = {
 };
 
 const BASE =
-  "inline-flex items-center justify-center font-medium leading-none tracking-tight " +
+  "inline-flex items-center justify-center font-medium leading-snug tracking-tight " +
   "rounded-lg border transition-all duration-150 ease-out " +
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 " +
   "disabled:pointer-events-none disabled:opacity-40 " +

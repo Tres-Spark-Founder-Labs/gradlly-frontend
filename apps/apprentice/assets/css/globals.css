@@ -11,8 +11,10 @@
 
 @theme {
   /* ── Fonts ─────────────────────────────────────────────── */
-  --font-sans: "Poppins", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-sans:
+    var(--font-inter, "Inter"), ui-sans-serif, system-ui, -apple-system,
+    sans-serif;
+  --font-mono: var(--font-jetbrains, "JetBrains Mono"), ui-monospace, monospace;
 
   /* ── Primary · Forest Green (monochromatic) ────────────── */
   --color-primary-50: #f1f7f3;
@@ -120,6 +122,7 @@
 
 @layer base {
   html {
+    text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
@@ -136,6 +139,11 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1,
+      "kern" 1;
+    font-variation-settings: "wdth" 100;
     min-height: 100dvh;
   }
 

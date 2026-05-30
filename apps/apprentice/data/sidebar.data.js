@@ -16,23 +16,27 @@ export const NAV_SECTIONS = [
     title: "My Learning",
     items: [
       { label: "Dashboard", href: "/", icon: LayoutDashboard },
-      { label: "My Courses", href: "/courses", icon: BookOpen },
-      { label: "Assessments", href: "/assessments", icon: ClipboardCheck },
-      { label: "Progress", href: "/progress", icon: TrendingUp },
+      { label: "OTJ log ", href: "/otj-logs", icon: BookOpen },
+      {
+        label: "Portfolio & KSBs",
+        href: "/portfolio",
+        icon: ClipboardCheck,
+      },
+      { label: "Milestones ", href: "/progress", icon: TrendingUp },
     ],
   },
   {
-    title: "Curriculum",
+    title: "Support",
     items: [
-      { label: "Curriculum", href: "/curriculum", icon: BookMarked },
-      { label: "Analytics", href: "/analytics", icon: BarChart3 },
+      { label: "Reviews ", href: "/curriculum", icon: BookMarked },
+      { label: "Messages ", href: "/analytics", icon: BarChart3 },
     ],
   },
   {
-    title: "Reporting",
+    title: "Programme",
     items: [
-      { label: "Reports", href: "/reports", icon: BarChart3 },
-      { label: "Learners", href: "/learners", icon: Users },
+      { label: "Training plan", href: "/reports", icon: BarChart3 },
+      { label: "English & maths ", href: "/learners", icon: Users },
     ],
   },
   {
