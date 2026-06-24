@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-import { useLearnerDocuments } from "@/features/otj/queries/otj.query";
+import { useState } from "react";
 
 import { OTJHeader } from "./OTJHeader";
 import { OTJInfoCard } from "./OTJInfoCard";
@@ -26,14 +24,6 @@ const OTJ_DATA = {
 
 export function OTJLogs() {
   const [logOpen, setLogOpen] = useState(false);
-  const { data: learnerDocuments } = useLearnerDocuments();
-
-  useEffect(() => {
-    if (learnerDocuments !== undefined) {
-      console.log("[/learners/me/documents]", learnerDocuments);
-    }
-  }, [learnerDocuments]);
-
   return (
     <>
       <div className="space-y-6 pb-10">
