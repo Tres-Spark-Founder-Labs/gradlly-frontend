@@ -56,6 +56,22 @@ export async function syncDonorLink({ orgId, id }) {
   }
 }
 
+/**
+ * F1.1.4 AC2 — browse/search SME transfer recipients.
+ * Returns only profiles whose owning SME opted in to the directory.
+ */
+export async function getRecipientDirectory({ orgId, params } = {}) {
+  try {
+    const result = await $apiClient.get(LEVY_PATHS.RECIPIENT_DIRECTORY, {
+      headers: buildHeaders(orgId),
+      params,
+    });
+    return result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
 export async function getMatchApplications({ orgId, params } = {}) {
   try {
     const result = await $apiClient.get(LEVY_PATHS.MATCH_APPLICATIONS, {

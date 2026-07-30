@@ -4,9 +4,9 @@ import { useState } from "react";
 
 import {
   useLevyExpiryCalendar,
-  useLevyMatchApplications,
   useLevySurplus,
 } from "@/features/levy/queries/levy.query";
+import { useLevyUtilisation } from "@/features/reporting/queries/reporting.query";
 
 import { ActionCentre } from "./ActionCentre";
 import { ApprenticeTable } from "./ApprenticeTable";
@@ -38,7 +38,13 @@ export function Dashboard() {
   const das = useDasSync();
   const { data: levy } = useLevySurplus();
   const { data: expiryCalendar = [] } = useLevyExpiryCalendar();
-  const { data: matchApplications = [] } = useLevyMatchApplications();
+
+  // F1.1.3. GET /reporting/levy-utilisation is purpose-built for this screen:
+  // it returns the three utilisation segments, a 12-month contribution/spend
+  // series, the forward forecast, and cost-per-apprentice rows. It existed all
+  // along but was only ever consumed by the separate /reports page.
+  const { data: utilisation, isLoading: utilisationLoading } =
+    useLevyUtilisation();
 
   const [expiryModal, setExpiryModal] = useState(false);
   const [exportModal, setExportModal] = useState(false);
@@ -51,11 +57,12 @@ export function Dashboard() {
       style={{ animation: "slide-up 320ms var(--ease-out) both" }}
     >
       <div className="space-y-3">
-        <ExpiryAlert levy={levy} />
+        {/* Self-contained: reads the expiry calendar directly (F1.1.2). */}
+        <ExpiryAlert />
         <DasSyncBanner
-          levy={levy}
+          balance={das.balance}
           isDegraded={das.isDegraded}
-          fmtLastSynced={das.fmtLastSynced}
+          fmtSyncedAt={das.fmtSyncedAt}
           onSync={das.sync}
         />
       </div>
@@ -72,18 +79,36 @@ export function Dashboard() {
       <section className="space-y-4">
         <SectionLabel>Analysis</SectionLabel>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <LevyUtilisation levy={levy} onExpiryModal={openExpiry} />
-          <YearEndForecast levy={levy} onExport={openExport} />
+          <LevyUtilisation
+            segments={utilisation?.segments}
+            isLoading={utilisationLoading}
+            onExpiryModal={openExpiry}
+          />
+          <YearEndForecast
+            forecast={utilisation?.forecast}
+            segments={utilisation?.segments}
+            isLoading={utilisationLoading}
+            onExport={openExport}
+          />
         </div>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 items-start">
-          <MonthlyChart levy={levy} />
-          <ApprenticeTable />
+          <MonthlyChart
+            monthlySeries={utilisation?.monthlySeries}
+            isLoading={utilisationLoading}
+          />
+          <ApprenticeTable
+            rows={utilisation?.costPerApprentice}
+            isLoading={utilisationLoading}
+          />
         </div>
       </section>
 
       <section className="space-y-4">
         <SectionLabel>Planning & Transfers</SectionLabel>
-        <TransferHub levy={levy} transfers={matchApplications} />
+        {/* TransferHub fetches its own transfers; it was previously handed
+            match applications, which are a different resource and a different
+            shape. */}
+        <TransferHub levy={levy} />
         <ExpiryTimeline
           expiryCalendar={expiryCalendar}
           onExpiryModal={openExpiry}

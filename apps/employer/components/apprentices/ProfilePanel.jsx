@@ -3,6 +3,12 @@
 import { Download, X } from "lucide-react";
 import { useState } from "react";
 
+import {
+  behindPercentLabel,
+  isFlagged,
+  isOverdue,
+} from "@/features/apprentices/utils/risk-status";
+
 import { ApprenticeAvatar } from "./ApprenticeAvatar";
 import { ProfileActivity } from "./ProfileActivity";
 import { ProfileDocuments } from "./ProfileDocuments";
@@ -63,14 +69,33 @@ export function ProfilePanel({ apprentice, onClose, onContact }) {
             <p className="text-[11px] mt-0.5" style={{ color: T.muted }}>
               ID: {a.employeeId ?? "—"}
             </p>
-            <div className="flex items-center gap-2 mt-1.5">
+            {/* F1.2.4 AC5 — at-risk badge on the individual profile, with how
+                far behind alongside it. The band alone does not distinguish
+                16% behind (a conversation) from 45% (a funding risk). */}
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
               <StatusBadge status={a.status} />
-              <span
-                className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
-                style={{ backgroundColor: T.card, color: T.muted }}
-              >
-                {a.cohort}
-              </span>
+              {isFlagged(a.status) &&
+                behindPercentLabel(a.otjBehindPercent) && (
+                  <span
+                    className="text-[10px] px-1.5 py-0.5 rounded font-bold"
+                    style={{
+                      backgroundColor: isOverdue(a.status)
+                        ? T.redLight
+                        : T.amberLight,
+                      color: isOverdue(a.status) ? T.red : T.amber,
+                    }}
+                  >
+                    {behindPercentLabel(a.otjBehindPercent)}
+                  </span>
+                )}
+              {a.cohort && (
+                <span
+                  className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
+                  style={{ backgroundColor: T.card, color: T.muted }}
+                >
+                  {a.cohort}
+                </span>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">

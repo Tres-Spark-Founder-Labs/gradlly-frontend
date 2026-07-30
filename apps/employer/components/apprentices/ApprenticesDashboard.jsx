@@ -3,8 +3,18 @@
 import { useMemo, useState } from "react";
 
 import { useApprenticeRoster } from "@/features/apprentices/queries/apprentices.query";
+import { isFlagged } from "@/features/apprentices/utils/risk-status";
+import {
+  deriveFilterOptions,
+  downloadRosterCsv,
+  filterRoster,
+  nextSortState,
+  sortRoster,
+} from "@/features/apprentices/utils/roster-export";
+import { toastError } from "@/hooks/useToast";
 
 import { EnrolDrawer } from "./EnrolDrawer";
+import { statusMeta } from "./helpers";
 import { OTJAlert } from "./OTJAlert";
 import { ProfilePanel } from "./ProfilePanel";
 import { ProviderModal } from "./ProviderModal";
@@ -16,31 +26,39 @@ import { T } from "./tokens";
 export function ApprenticesDashboard() {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
+  const [advanced, setAdvanced] = useState({});
+  const [sort, setSort] = useState({ sortBy: null, sortOrder: "asc" });
   const [profile, setProfile] = useState(null);
   const [contact, setContact] = useState(null);
   const [enrol, setEnrol] = useState(false);
 
   const { roster, isLoading } = useApprenticeRoster();
 
+  // F1.2.4 AC5 — the alert banner covers both flagged levels. Filtering on
+  // `at_risk` alone silently excluded the overdue cases, which are the ones
+  // most in need of the banner.
   const atRisk = useMemo(
-    () => roster.filter((a) => a.status === "at_risk"),
+    () => roster.filter((a) => isFlagged(a.status)),
     [roster],
   );
 
-  const searchLower = search.toLowerCase();
+  // Options come from the roster itself, so they can only ever offer values
+  // that exist in the data (F1.2.1 AC4).
+  const options = useMemo(() => deriveFilterOptions(roster), [roster]);
+
+  // Applies the search box, the status pills and the advanced dropdowns.
+  // Previously only search was applied here while the pills were applied
+  // inside the table, so this list did not match what was on screen — which
+  // would have made the CSV export write rows the user could not see.
   const visible = useMemo(
-    () =>
-      roster.filter((a) => {
-        if (search === "") return true;
-        return (
-          a.name.toLowerCase().includes(searchLower) ||
-          a.standard.toLowerCase().includes(searchLower) ||
-          a.provider.toLowerCase().includes(searchLower) ||
-          (a.employeeId ?? "").toLowerCase().includes(searchLower)
-        );
-      }),
-    [roster, search, searchLower],
+    () => sortRoster(filterRoster(roster, { filter, search, advanced }), sort),
+    [roster, filter, search, advanced, sort],
   );
+
+  const handleExportCsv = () => {
+    const wrote = downloadRosterCsv(visible);
+    if (!wrote) toastError("There is nothing to export.");
+  };
 
   if (isLoading) {
     return (
@@ -76,12 +94,13 @@ export function ApprenticesDashboard() {
               border: `1px solid ${T.blue}20`,
             }}
           >
+            {/* Reads the shared status map rather than an inline chain, which
+                fell through to "EPA < 90 days" for any status it did not know
+                — including "overdue". */}
             Filtering:{" "}
-            {filter === "on_track"
-              ? "On track"
-              : filter === "at_risk"
-                ? "At risk"
-                : "EPA < 90 days"}
+            {filter === "epa_imminent"
+              ? "EPA < 90 days"
+              : statusMeta(filter).label}
             <button
               type="button"
               onClick={() => setFilter("all")}
@@ -100,10 +119,19 @@ export function ApprenticesDashboard() {
           onFilter={setFilter}
           onSearch={setSearch}
           onEnrol={() => setEnrol(true)}
+          onExportCsv={handleExportCsv}
+          exportCount={visible.length}
+          advanced={advanced}
+          onAdvancedChange={setAdvanced}
+          options={options}
         />
+        {/* `visible` is already fully filtered, so the table no longer filters
+            again — one source of truth for what is on screen and exported. */}
         <RosterTable
           apprentices={visible}
-          filter={filter}
+          filter="all"
+          sort={sort}
+          onSort={(column) => setSort((c) => nextSortState(c, column))}
           onView={setProfile}
           onContact={setContact}
         />

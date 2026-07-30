@@ -9,6 +9,8 @@ export const LEVY_PATHS = Object.freeze({
   MATCH_APPLICATIONS: "/api/v1/levy-exchange/match-applications",
   matchApplication: (id) => `/api/v1/levy-exchange/match-applications/${id}`,
   MATCHES_SEARCH: "/api/v1/levy-exchange/matches/search",
+  // F1.1.4 AC2 — donor-facing SME directory (opted-in profiles only).
+  RECIPIENT_DIRECTORY: "/api/v1/levy-exchange/recipient-directory",
   TRANSFERS: "/api/v1/levy-exchange/transfers",
   transfer: (id) => `/api/v1/levy-exchange/transfers/${id}`,
   transferSign: (id) => `/api/v1/levy-exchange/transfers/${id}/sign`,

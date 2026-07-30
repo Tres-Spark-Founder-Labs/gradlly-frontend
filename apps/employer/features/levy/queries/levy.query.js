@@ -1,6 +1,11 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
 import { toastError, toastSuccess } from "@/hooks/useToast";
@@ -12,6 +17,7 @@ import {
   getExpiryCalendar,
   getLevy,
   getMatchApplications,
+  getRecipientDirectory,
   getTransfer,
   getTransferDocument,
   getTransfers,
@@ -79,6 +85,18 @@ export function useLevyExpiryCalendar() {
   });
 }
 
+/**
+ * F1.1.1 AC5: the levy balance must refresh automatically every 15 minutes
+ * without a page reload. Donor links carry the DAS-sourced balance
+ * (lastBalance) and sync time (lastSyncedAt), so polling this query is what
+ * keeps the balance current.
+ *
+ * refetchIntervalInBackground is left off deliberately: polling a background
+ * tab for 15 minutes serves nobody, and refetchOnWindowFocus already gives a
+ * fresh read the moment the user returns to the dashboard.
+ */
+const DAS_BALANCE_POLL_MS = 15 * 60 * 1000;
+
 export function useDonorLinks() {
   const { orgId } = useAuthUser();
 
@@ -87,6 +105,8 @@ export function useDonorLinks() {
     queryFn: () => getDonorLinks({ orgId }),
     enabled: !!orgId,
     staleTime: 5 * 60 * 1000,
+    refetchInterval: DAS_BALANCE_POLL_MS,
+    refetchOnWindowFocus: true,
     meta: { skipAuthRedirect: true },
     select: (response) =>
       Array.isArray(response?.data)
@@ -111,6 +131,28 @@ export function useSyncDonorLink() {
     onError: (error) => {
       toastError(error.message || "Sync failed. Please try again.");
     },
+  });
+}
+
+/**
+ * F1.1.4 AC2 — SME recipient directory, filterable by sector, region and
+ * programme type. Only opted-in profiles are returned (enforced server-side by
+ * RLS, not by this query).
+ */
+export function useRecipientDirectory(params = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: LEVY_QUERY_KEYS.recipientDirectory(orgId, params),
+    queryFn: () => getRecipientDirectory({ orgId, params }),
+    enabled: !!orgId,
+    staleTime: 60 * 1000,
+    placeholderData: keepPreviousData,
+    meta: { skipAuthRedirect: true },
+    select: (response) => ({
+      recipients: Array.isArray(response?.data) ? response.data : [],
+      meta: response?.meta ?? null,
+    }),
   });
 }
 

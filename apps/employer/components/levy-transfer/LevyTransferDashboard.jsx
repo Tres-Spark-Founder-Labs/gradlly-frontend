@@ -1,8 +1,9 @@
 "use client";
-import { Bell, Download } from "lucide-react";
+import { Bell, Download, ExternalLink } from "lucide-react";
 import { useState } from "react";
 
 import { T } from "@/components/dashboard/levy/tokens";
+import { clientEnv } from "@/config/env/client";
 
 import { ActiveTransfers } from "./ActiveTransfers";
 import { CreateTransferModal } from "./CreateTransferModal";
@@ -11,6 +12,7 @@ import { ExpiryBanner } from "./ExpiryBanner";
 import { HistoryDrawer } from "./HistoryDrawer";
 import { PendingMatchApplications } from "./PendingMatchApplications";
 import { PolicyAlert } from "./PolicyAlert";
+import { SmeDirectory } from "./SmeDirectory";
 import { TransferStatCards } from "./TransferStatCards";
 
 export function LevyTransferDashboard() {
@@ -35,6 +37,20 @@ export function LevyTransferDashboard() {
           </h1>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
+          {/* F1.1.4 AC6: surface the FlowPortal Levy Exchange (P4), where
+              donor–SME matching is automated. Previously FlowPortal was only
+              named in body copy with nothing to click. External target, so
+              noopener/noreferrer. */}
+          <a
+            href={`${clientEnv.NEXT_PUBLIC_FLOW_URL}/eligibility`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold hover:opacity-80 transition-opacity"
+            style={{ backgroundColor: T.blueLight, color: T.blue }}
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            FlowPortal Levy Exchange
+          </a>
           <button
             type="button"
             onClick={() => setHistory(true)}
@@ -83,6 +99,8 @@ export function LevyTransferDashboard() {
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_400px]">
         <div id="match-applications">
           <PendingMatchApplications onCreateTransfer={setCreateFor} />
+          {/* F1.1.4 AC2 — browse/search opted-in SME recipients. */}
+          <SmeDirectory />
         </div>
         <ActiveTransfers />
       </div>

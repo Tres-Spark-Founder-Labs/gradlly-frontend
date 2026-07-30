@@ -12,11 +12,13 @@ import { REPORTING_QUERY_KEYS } from "@/features/reporting/queries/keys";
 import { toastError, toastSuccess } from "@/hooks/useToast";
 
 import { OTJ_STATUSES } from "../constants";
-import { OTJ_QUERY_KEYS } from "./keys";
+import { NOTIFICATION_QUERY_KEYS, OTJ_QUERY_KEYS } from "./keys";
 import {
   bulkApproveOtj,
   bulkRejectOtj,
+  getDigestPreference,
   listOtjEntries,
+  updateDigestPreference,
 } from "../services/otj.service";
 
 export function useOtjPendingCount(options = {}) {
@@ -110,8 +112,9 @@ export function useBulkApproveOtj() {
 
   return useMutation({
     mutationFn: (input) => {
-      const { ids, reason } = normalizeBulkInput(input);
-      return bulkApproveOtj({ orgId, ids, reason });
+      // Approval never carries a reason — see bulkApproveOtj.
+      const { ids } = normalizeBulkInput(input);
+      return bulkApproveOtj({ orgId, ids });
     },
     onSuccess: (data) => {
       const count = data?.succeeded ?? data?.ids?.length ?? 0;
@@ -142,6 +145,39 @@ export function useBulkRejectOtj() {
     },
     onError: (error) => {
       toastError(error.message || "Failed to reject. Please try again.");
+    },
+  });
+}
+
+// ─── Digest preference (F1.2.3 AC7) ─────────────────────────────────────────
+
+export function useDigestPreference(options = {}) {
+  return useQuery({
+    queryKey: NOTIFICATION_QUERY_KEYS.digestPreference(),
+    queryFn: () => getDigestPreference(),
+    staleTime: 60_000,
+    ...options,
+  });
+}
+
+/**
+ * The drawer's Save button previously showed "✓ Saved" after a 1.2s timer and
+ * sent nothing — the setting reverted the moment the drawer was reopened. This
+ * writes it, and only reports success when the API agrees.
+ */
+export function useUpdateDigestPreference() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ frequency }) => updateDigestPreference({ frequency }),
+    onSuccess: (data) => {
+      // Seed the cache from the response rather than the requested value, so
+      // the UI reflects what was stored if the server ever normalises it.
+      qc.setQueryData(NOTIFICATION_QUERY_KEYS.digestPreference(), data);
+      toastSuccess("Digest settings saved.");
+    },
+    onError: (error) => {
+      toastError(error.message || "Could not save digest settings.");
     },
   });
 }

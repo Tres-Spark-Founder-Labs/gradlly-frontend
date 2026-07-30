@@ -1,181 +1,186 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 
-import { fmt } from "./helpers";
+import { ChartExportButton, useChartPng } from "./ChartExportButton";
+import { fmtGBP } from "./helpers";
 import { T } from "./tokens";
 
-const CH = 90,
-  BW = 22,
-  GAP = 11,
-  YW = 36;
+const CHART_H = 180;
+const PAIR_GAP = 4;
 
-export function MonthlyChart({ levy }) {
-  const bars = useMemo(
-    () => levy?.monthlyBreakdown ?? [],
-    [levy?.monthlyBreakdown],
+/** "2026-01" -> "Jan". Falls back to the raw value if it isn't a YYYY-MM. */
+export function shortMonth(month) {
+  if (typeof month !== "string") return "";
+  const m = /^(\d{4})-(\d{2})$/.exec(month);
+  if (!m) return month;
+  const date = new Date(Number(m[1]), Number(m[2]) - 1, 1);
+  if (Number.isNaN(date.getTime())) return month;
+  return date.toLocaleDateString("en-GB", { month: "short" });
+}
+
+/**
+ * F1.1.3 AC2 — normalise the 12-month series for rendering.
+ *
+ * Sorted ascending because the API orders months newest-first in places, and a
+ * time series running right-to-left misreads at a glance. Trimmed to the most
+ * recent 12 points, which is what the requirement asks for.
+ */
+export function prepareMonthlySeries(series) {
+  const rows = (series ?? [])
+    .filter((p) => p && typeof p.month === "string")
+    .map((p) => ({
+      month: p.month,
+      contributions: Number(p.contributions) || 0,
+      spend: Number(p.spend) || 0,
+    }))
+    .sort((a, b) => a.month.localeCompare(b.month));
+
+  const last12 = rows.slice(-12);
+  const max = Math.max(
+    ...last12.flatMap((r) => [r.contributions, r.spend]),
+    1, // never divide by zero
   );
-  const [heights, setHeights] = useState(() => bars.map(() => 0));
-  const [hovered, setHovered] = useState(null);
+  return { rows: last12, max };
+}
 
-  useEffect(() => {
-    const t = setTimeout(() => setHeights(bars.map((b) => b.value ?? 0)), 350);
-    return () => clearTimeout(t);
-  }, [bars]);
-
-  if (bars.length === 0) {
-    return (
-      <Card className="h-full flex flex-col">
-        <CardHeader>
-          <p className="eyebrow">Monthly Levy Drawdown</p>
-          <h2 className="mt-0.5 text-base font-semibold text-neutral-900">
-            No drawdown data yet
-          </h2>
-        </CardHeader>
-        <CardContent className="flex flex-1 items-center justify-center">
-          <p className="text-sm" style={{ color: T.muted }}>
-            Monthly breakdown will appear once levy activity begins
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const maxVal = Math.max(...bars.map((b) => b.value ?? 0), 1);
-  const avg = Math.round(
-    bars.reduce((s, b) => s + (b.value ?? 0), 0) / bars.length,
+function Legend() {
+  return (
+    <div className="flex items-center gap-4">
+      {[
+        { label: "Contributions", color: T.blue },
+        { label: "Spend", color: T.amber },
+      ].map((s) => (
+        <span key={s.label} className="flex items-center gap-1.5">
+          <span
+            className="inline-block h-2.5 w-2.5 rounded-sm"
+            style={{ backgroundColor: s.color }}
+            aria-hidden
+          />
+          <span className="text-[11px] font-medium" style={{ color: T.subtle }}>
+            {s.label}
+          </span>
+        </span>
+      ))}
+    </div>
   );
-  const totalW = YW + bars.length * (BW + GAP) - GAP + 4;
+}
+
+export function MonthlyChart({ monthlySeries, isLoading }) {
+  const { rows, max } = useMemo(
+    () => prepareMonthlySeries(monthlySeries),
+    [monthlySeries],
+  );
+  const {
+    ref: pngRef,
+    download: downloadPng,
+    busy: pngBusy,
+  } = useChartPng("levy-monthly-flow");
+
+  const slot = rows.length > 0 ? 100 / rows.length : 100;
+  const barW = Math.max((slot - PAIR_GAP) / 2, 1);
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card ref={pngRef}>
       <CardHeader>
-        <p className="eyebrow">Monthly Levy Drawdown</p>
-        <h2 className="mt-0.5 text-base font-semibold text-neutral-900">
-          Last {bars.length} months
-        </h2>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="eyebrow">Monthly Levy Flow</p>
+            <h2 className="mt-0.5 text-base font-semibold text-neutral-900">
+              Contributions vs spend
+            </h2>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <Legend />
+            {rows.length > 0 && (
+              <ChartExportButton onClick={downloadPng} busy={pngBusy} />
+            )}
+          </div>
+        </div>
       </CardHeader>
-      <CardContent className="flex flex-col flex-1 justify-between">
-        <div className="overflow-x-auto">
-          <svg
-            width="100%"
-            height={CH + 36}
-            viewBox={`0 0 ${totalW} ${CH + 36}`}
-            preserveAspectRatio="none"
-            style={{ display: "block", minWidth: `${totalW}px` }}
-          >
-            {[0, Math.round(maxVal / 2), maxVal].map((v) => {
-              const y = CH - (v / maxVal) * CH;
-              return (
-                <g key={v}>
-                  <text
-                    x={YW - 5}
-                    y={y + 4}
-                    textAnchor="end"
-                    fontSize="9"
-                    fill={T.muted}
-                    fontFamily="inherit"
-                  >
-                    {v ? `£${Math.round(v / 1000)}k` : "£0"}
-                  </text>
-                  <line
-                    x1={YW}
-                    y1={y}
-                    x2={totalW}
-                    y2={y}
-                    stroke={T.border}
-                    strokeWidth="0.5"
-                    strokeDasharray="3 3"
-                  />
-                </g>
-              );
-            })}
-            <line
-              x1={YW}
-              y1={CH - (avg / maxVal) * CH}
-              x2={totalW}
-              y2={CH - (avg / maxVal) * CH}
-              stroke={T.amber}
-              strokeWidth="1.5"
-              strokeDasharray="4 3"
-              opacity="0.7"
-            />
-            {bars.map((bar, i) => {
-              const x = YW + i * (BW + GAP);
-              const bh = (heights[i] / maxVal) * CH;
-              const isH = hovered === i;
-              return (
-                <g key={bar.month ?? i}>
-                  <rect
-                    x={x}
-                    y={CH - bh}
-                    width={BW}
-                    height={bh}
-                    rx="4"
-                    fill={isH || bar.current ? T.blue : `${T.blue}55`}
-                    style={{
-                      transition:
-                        "y 950ms cubic-bezier(0.16,1,0.3,1), height 950ms cubic-bezier(0.16,1,0.3,1)",
-                      cursor: "pointer",
-                    }}
-                    onMouseEnter={() => setHovered(i)}
-                    onMouseLeave={() => setHovered(null)}
-                  />
-                  {isH && (
-                    <g>
-                      <rect
-                        x={x - 8}
-                        y={CH - bh - 25}
-                        width={BW + 16}
-                        height={19}
-                        rx="5"
-                        fill={T.ink}
-                      />
-                      <text
-                        x={x + BW / 2}
-                        y={CH - bh - 12}
-                        textAnchor="middle"
-                        fontSize="9"
-                        fill="#fff"
-                        fontFamily="inherit"
-                        fontWeight="600"
-                      >
-                        {fmt(bar.value ?? 0)}
-                      </text>
-                    </g>
-                  )}
-                  <text
-                    x={x + BW / 2}
-                    y={CH + 13}
-                    textAnchor="middle"
-                    fontSize="9"
-                    fill={bar.current ? T.blue : T.muted}
-                    fontWeight={bar.current ? "700" : "400"}
-                    fontFamily="inherit"
-                  >
-                    {bar.month ?? ""}
-                  </text>
-                </g>
-              );
-            })}
-          </svg>
-        </div>
-        <div className="mt-3 flex items-center justify-between flex-wrap gap-2">
-          <p className="text-xs" style={{ color: T.subtle }}>
-            Avg: <strong style={{ color: T.ink }}>{fmt(avg)}</strong>
+      <CardContent>
+        {isLoading ? (
+          <p className="text-sm py-10 text-center" style={{ color: T.muted }}>
+            Loading monthly figures…
           </p>
-          <Link
-            href="/analytics"
-            className="flex items-center gap-1 text-xs font-semibold hover:underline"
-            style={{ color: T.blue }}
+        ) : rows.length === 0 ? (
+          <p className="text-sm py-10 text-center" style={{ color: T.muted }}>
+            No monthly levy history yet.
+          </p>
+        ) : (
+          <figure
+            data-chart="monthly-levy-flow"
+            aria-label={`Monthly levy contributions versus spend for the last ${rows.length} months`}
           >
-            Full history <ChevronRight className="h-3 w-3" />
-          </Link>
-        </div>
+            <svg
+              width="100%"
+              height={CHART_H + 28}
+              viewBox={`0 0 100 ${CHART_H + 28}`}
+              preserveAspectRatio="none"
+              role="img"
+            >
+              {/* Gridlines at 0 / 50% / max for readability. */}
+              {[0, 0.5, 1].map((f) => (
+                <line
+                  key={f}
+                  x1="0"
+                  x2="100"
+                  y1={CHART_H - f * CHART_H}
+                  y2={CHART_H - f * CHART_H}
+                  stroke={T.border}
+                  strokeWidth="0.5"
+                  vectorEffect="non-scaling-stroke"
+                />
+              ))}
+
+              {rows.map((row, i) => {
+                const x = i * slot;
+                const cH = (row.contributions / max) * CHART_H;
+                const sH = (row.spend / max) * CHART_H;
+                return (
+                  <g key={row.month}>
+                    <rect
+                      x={x + PAIR_GAP / 2}
+                      y={CHART_H - cH}
+                      width={barW}
+                      height={cH}
+                      fill={T.blue}
+                      rx="0.5"
+                    >
+                      <title>
+                        {`${row.month} contributions: ${fmtGBP(row.contributions)}`}
+                      </title>
+                    </rect>
+                    <rect
+                      x={x + PAIR_GAP / 2 + barW}
+                      y={CHART_H - sH}
+                      width={barW}
+                      height={sH}
+                      fill={T.amber}
+                      rx="0.5"
+                    >
+                      <title>{`${row.month} spend: ${fmtGBP(row.spend)}`}</title>
+                    </rect>
+                    <text
+                      x={x + slot / 2}
+                      y={CHART_H + 18}
+                      textAnchor="middle"
+                      fontSize="7"
+                      fill={T.muted}
+                    >
+                      {shortMonth(row.month)}
+                    </text>
+                  </g>
+                );
+              })}
+            </svg>
+            <figcaption className="sr-only">
+              Peak monthly value {fmtGBP(max)}.
+            </figcaption>
+          </figure>
+        )}
       </CardContent>
     </Card>
   );

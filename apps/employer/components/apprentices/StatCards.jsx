@@ -2,6 +2,8 @@
 
 import { AlertTriangle, BookOpen, CalendarCheck, Users } from "lucide-react";
 
+import { isFlagged, isOverdue } from "@/features/apprentices/utils/risk-status";
+
 import { T } from "./tokens";
 
 function Card({ icon, accent, bg, value, label, sub, badge, pulse, onClick }) {
@@ -46,7 +48,17 @@ export function StatCards({ roster = [], onFilter }) {
   const epaImm = roster.filter(
     (a) => a.epaDaysLeft !== null && a.epaDaysLeft < 90,
   );
-  const atRisk = roster.filter((a) => a.status === "at_risk");
+  /**
+   * F1.2.4 AC5 — the card counts everything currently flagged, at-risk and
+   * overdue alike.
+   *
+   * It previously counted only `at_risk`, so an apprentice more than 30%
+   * behind was in neither the "On track" card nor the "At risk" card. The
+   * headline numbers did not add up to the roster, and the worst cases were
+   * the ones missing.
+   */
+  const flagged = roster.filter((a) => isFlagged(a.status));
+  const overdue = flagged.filter((a) => isOverdue(a.status));
   const soonest = epaImm.sort(
     (a, b) => (a.epaDaysLeft ?? 0) - (b.epaDaysLeft ?? 0),
   )[0];
@@ -69,16 +81,23 @@ export function StatCards({ roster = [], onFilter }) {
       />
       <Card
         icon={<AlertTriangle className="h-4 w-4" />}
-        value={atRisk.length}
+        value={flagged.length}
         label="At risk"
-        sub="OTJ or review concern"
-        pulse={atRisk.length > 0}
+        sub={
+          overdue.length > 0
+            ? `${overdue.length} overdue · behind OTJ pace`
+            : "Behind OTJ pace"
+        }
+        pulse={flagged.length > 0}
         onClick={() => onFilter?.("at_risk")}
         badge={
-          atRisk.length > 0 ? (
+          flagged.length > 0 ? (
             <span
               className="text-[10px] font-bold px-2 py-0.5 rounded-full levy-countdown-pulse"
-              style={{ backgroundColor: T.amberLight, color: T.amber }}
+              style={{
+                backgroundColor: overdue.length > 0 ? T.redLight : T.amberLight,
+                color: overdue.length > 0 ? T.red : T.amber,
+              }}
             >
               OTJ
             </span>

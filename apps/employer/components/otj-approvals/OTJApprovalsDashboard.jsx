@@ -4,12 +4,13 @@ import { Bell, CheckSquare, Settings } from "lucide-react";
 import { useState } from "react";
 
 import { T } from "@/components/dashboard/levy/tokens";
-import { OTJ_STATUSES } from "@/features/otj/constants";
+import { BULK_OTJ_MAX, OTJ_STATUSES } from "@/features/otj/constants";
 import {
   useBulkApproveOtj,
   useBulkRejectOtj,
   useOtjEntries,
 } from "@/features/otj/queries/otj.query";
+import { toastError } from "@/hooks/useToast";
 
 import { OTJBulkToolbar } from "./OTJBulkToolbar";
 import { OTJEvidenceModal } from "./OTJEvidenceModal";
@@ -83,15 +84,32 @@ export function OTJApprovalsDashboard() {
       )
     : entries;
 
+  /**
+   * F1.2.3 AC4 — up to 20 at a time. Enforced here as well as at the API so
+   * the limit is explained before the request rather than surfacing as a
+   * validation error afterwards.
+   */
   const toggleSelect = (id) =>
     setSelected((s) => {
       const n = new Set(s);
-      n.has(id) ? n.delete(id) : n.add(id);
+      if (n.has(id)) {
+        n.delete(id);
+        return n;
+      }
+      if (n.size >= BULK_OTJ_MAX) {
+        toastError(
+          `You can action up to ${BULK_OTJ_MAX} entries at a time. Approve or reject the current selection first.`,
+        );
+        return s;
+      }
+      n.add(id);
       return n;
     });
 
+  // No `reason` on approve: only rejection carries a comment, and the API
+  // rejects unknown properties, so sending an empty one is a 400.
   const handleApprove = (id) => {
-    bulkApprove({ ids: [id], reason: "" });
+    bulkApprove({ ids: [id] });
   };
 
   const handleReject = (id, reason) => {
@@ -99,11 +117,13 @@ export function OTJApprovalsDashboard() {
   };
 
   const handleBulkApprove = () => {
-    const ids = selected.size > 0 ? [...selected] : entries.map((e) => e.id);
-    bulkApprove(
-      { ids, reason: "" },
-      { onSuccess: () => setSelected(new Set()) },
-    );
+    // Acts on the explicit selection only. This previously fell back to every
+    // entry on the page when nothing was selected — unreachable today because
+    // the toolbar hides at zero, but it would have silently approved a whole
+    // page the moment that changed.
+    const ids = [...selected];
+    if (ids.length === 0) return;
+    bulkApprove({ ids }, { onSuccess: () => setSelected(new Set()) });
   };
 
   const handleBulkReject = (reason) => {
