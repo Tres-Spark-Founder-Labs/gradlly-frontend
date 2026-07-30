@@ -84,3 +84,18 @@ export const resetPasswordDefaults = Object.freeze({
   newPassword: "",
   confirmPassword: "",
 });
+
+export const mfaCodeSchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .regex(/^\d{6}$/, "Enter the 6-digit code from your authenticator app"),
+});
+
+export const mfaCodeDefaults = Object.freeze({ code: "" });
+
+export const mfaRecoveryCodeSchema = z.object({
+  recoveryCode: z.string().trim().min(1, "Enter a recovery code"),
+});
+
+export const mfaRecoveryCodeDefaults = Object.freeze({ recoveryCode: "" });

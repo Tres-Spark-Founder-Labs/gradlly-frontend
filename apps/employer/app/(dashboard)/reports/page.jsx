@@ -1,10 +1,9 @@
-import { ReportsDashboard } from "@/components/reports/ReportsDashboard";
+import { ReportsDashboard } from "@/features/reporting/components/ReportsDashboard";
 import { createPageSeo } from "@/utils/metadata";
 
 export const { metadata, viewport } = createPageSeo({
   title: "Reports",
-  description:
-    "Levy ROI, completion rates, EPA forecasts, and provider performance for Midlands Engineering Ltd.",
+  description: "Levy ROI, utilisation, and provider performance.",
   path: "/reports",
   noIndex: true,
 });

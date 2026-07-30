@@ -10,6 +10,7 @@ import {
   GraduationCap,
   Mail,
   Megaphone,
+  MessageCircle,
   PauseCircle,
   User,
 } from "lucide-react";
@@ -20,6 +21,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { GoBackButton } from "@/components/ui/GoBackButton";
 import { PageSubheader } from "@/components/ui/PageSubheader";
 import { useRoleAccess } from "@/features/auth/hooks/useRoleAccess";
+import { LearnerMessageThread } from "@/features/messaging/components/LearnerMessageThread";
 import { ReviewStatusBadge } from "@/features/reviews/components/ReviewBadges";
 import { useDownloadObject } from "@/features/storage/queries/storage.query";
 import { formatDate, formatDateTime } from "@/utils/helper";
@@ -287,6 +289,11 @@ export function LearnerProfileView({ enrolmentId }) {
               )}
             </SectionCard>
           </div>
+
+          {/* Messages */}
+          <SectionCard icon={MessageCircle} title="Messages">
+            <LearnerMessageThread enrolmentId={enrolmentId} />
+          </SectionCard>
 
           {/* Documents */}
           <SectionCard icon={FileText} title="Documents">

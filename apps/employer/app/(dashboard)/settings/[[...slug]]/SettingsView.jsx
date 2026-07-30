@@ -1,11 +1,12 @@
 "use client";
 
-import { Bell, BookOpen, Building2, UserPlus } from "lucide-react";
+import { Bell, BookOpen, Building2, ShieldCheck, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
 import { PageSubheader } from "@/components/ui/PageSubheader";
 import { TabNav } from "@/components/ui/TabNav";
+import { MfaSetup } from "@/features/auth/components/MfaSetup";
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
 import { useRoleAccess } from "@/features/auth/hooks/useRoleAccess";
 import { InvitationsTable } from "@/features/invitations/components/InvitationsTable";
@@ -30,6 +31,11 @@ const TAB_META = {
     icon: Bell,
     description: "Your latest activity, alerts and updates.",
   },
+  security: {
+    label: "Security",
+    icon: ShieldCheck,
+    description: "Two-factor authentication and login security.",
+  },
   standards: {
     label: "Standards",
     icon: BookOpen,
@@ -49,6 +55,7 @@ export function SettingsView({ activeTab = "invitations" }) {
     const base = [
       { value: "invitations", ...TAB_META.invitations },
       { value: "notifications", ...TAB_META.notifications },
+      { value: "security", ...TAB_META.security },
     ];
     if (isOwner && hasOrg) {
       base.unshift({ value: "organisation", ...TAB_META.organisation });
@@ -100,6 +107,8 @@ export function SettingsView({ activeTab = "invitations" }) {
             <InvitationsTable />
           ) : resolvedTab === "standards" ? (
             <ProgrammesPanel />
+          ) : resolvedTab === "security" ? (
+            <MfaSetup />
           ) : (
             <NotificationsPanel />
           )}

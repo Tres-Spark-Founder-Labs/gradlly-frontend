@@ -9,6 +9,10 @@ export const AUTH_API_PATHS = Object.freeze({
   FORGOT_PASSWORD: "/api/v1/auth/forgot-password",
   RESET_PASSWORD: "/api/v1/auth/reset-password",
   ACCEPT_INVITATION: "/api/v1/invitations/accept",
+  MFA_ENROLL: "/api/v1/auth/mfa/enroll",
+  MFA_CONFIRM: "/api/v1/auth/mfa/confirm",
+  MFA_DISABLE: "/api/v1/auth/mfa/disable",
+  MFA_VERIFY: "/api/v1/auth/mfa/verify",
 });
 
 export const AUTH_COOKIES = Object.freeze({

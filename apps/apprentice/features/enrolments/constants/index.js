@@ -1,6 +1,7 @@
 export const ENROLMENT_PATHS = Object.freeze({
   BASE: "/api/v1/enrolments",
   byId: (id) => `/api/v1/enrolments/${id}`,
+  journey: (id) => `/api/v1/enrolments/${id}/journey`,
 });
 
 export const ENROLMENT_STATUS = Object.freeze({

@@ -8,6 +8,7 @@ import {
   FileSignature,
   FileText,
   LayoutDashboard,
+  MessageCircle,
   Settings,
   Sparkles,
   UserCircle,
@@ -25,6 +26,7 @@ export const NAV_SECTIONS = [
     items: [
       { label: "AI Programmes", href: "/courses", icon: Sparkles },
       { label: "Apprentices", href: "/learners", icon: Users },
+      { label: "Messages", href: "/messages", icon: MessageCircle },
     ],
   },
   {

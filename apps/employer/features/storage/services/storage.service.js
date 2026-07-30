@@ -26,6 +26,10 @@ export const STORAGE_CATEGORY = Object.freeze({
   GENERAL: "general",
   AVATAR: "general",
   LOGO: "general",
+  SIGNATURE: "signature",
+  EVIDENCE: "evidence",
+  ATTACHMENT: "attachment",
+  EXPORT: "export",
 });
 
 // Defensive client-side guard. The backend remains the source of truth, but
@@ -50,12 +54,13 @@ export async function requestUploadUrl({
   contentType,
   contentLength,
   category = STORAGE_CATEGORY.GENERAL,
+  learnerId,
   signal,
 }) {
   try {
     const result = await $apiClient.post(
       STORAGE_PATHS.UPLOAD_URL,
-      { filename, contentType, contentLength, category },
+      { filename, contentType, contentLength, category, learnerId },
       { signal },
     );
     const data = result.data?.data ?? result.data;
@@ -75,7 +80,10 @@ export async function requestUploadUrl({
       firstAbsoluteUrl(data?.fileUrl, data?.publicUrl, data?.key) ??
       stripQuery(uploadUrl);
 
-    return { uploadUrl, fileUrl };
+    // Org-scoped storage key (e.g. "orgs/{orgId}/signature/{objectId}/file.png").
+    // Required by APIs that store a key rather than a public URL — e-signature
+    // records, KSB evidence, message attachments.
+    return { uploadUrl, fileUrl, key: data?.key ?? null };
   } catch (e) {
     throw normalizeApiClientError(e);
   }
@@ -153,6 +161,67 @@ export async function uploadFile({
   await putToPresignedUrl({ uploadUrl, file, signal });
 
   return fileUrl;
+}
+
+/**
+ * Same presign → S3 PUT flow as {@link uploadFile}, but resolves the org-scoped
+ * storage *key* rather than a public URL. Use this for any API that expects a
+ * key (signatureImageKey, evidence file keys, message attachment keys) —
+ * `uploadFile`'s stripped URL is not a valid key for those endpoints.
+ *
+ * @param {{ file: File, category?: string, learnerId?: string,
+ *           signal?: AbortSignal }} params
+ * @returns {Promise<string>} the storage key
+ */
+export async function uploadFileForKey({
+  file,
+  category = STORAGE_CATEGORY.GENERAL,
+  learnerId,
+  signal,
+}) {
+  if (!file) {
+    throw new ApiClientError({ message: "No file selected.", status: 400 });
+  }
+  if (file.size > MAX_UPLOAD_BYTES) {
+    throw new ApiClientError({
+      message: `File must be smaller than ${Math.round(
+        MAX_UPLOAD_BYTES / (1024 * 1024),
+      )} MB.`,
+      status: 400,
+    });
+  }
+
+  const { uploadUrl, key } = await requestUploadUrl({
+    filename: file.name,
+    contentType: file.type,
+    contentLength: file.size,
+    category,
+    learnerId,
+    signal,
+  });
+
+  if (!key) {
+    throw new ApiClientError({
+      message: "Upload could not be initialised. Please try again.",
+      status: 502,
+    });
+  }
+
+  await putToPresignedUrl({ uploadUrl, file, signal });
+
+  return key;
+}
+
+/** Converts a canvas data URL (e.g. from a signature pad) into a File. */
+export function dataUrlToFile(dataUrl, filename = "signature.png") {
+  const [header, base64] = dataUrl.split(",");
+  const contentType = /data:(.*);base64/.exec(header)?.[1] ?? "image/png";
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return new File([bytes], filename, { type: contentType });
 }
 
 // ─── Validation helpers ─────────────────────────────────────────────────────

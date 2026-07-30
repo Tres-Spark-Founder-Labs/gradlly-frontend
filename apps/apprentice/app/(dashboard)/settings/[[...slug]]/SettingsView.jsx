@@ -1,10 +1,11 @@
 "use client";
 
-import { Bell } from "lucide-react";
+import { Bell, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { PageSubheader } from "@/components/ui/PageSubheader";
 import { TabNav } from "@/components/ui/TabNav";
+import { MfaSetup } from "@/features/auth/components/MfaSetup";
 import { NotificationsPanel } from "@/features/notifications/components/NotificationsPanel";
 
 const TABS = [
@@ -13,6 +14,12 @@ const TABS = [
     label: "Notifications",
     icon: Bell,
     description: "Your latest activity, alerts and updates.",
+  },
+  {
+    value: "security",
+    label: "Security",
+    icon: ShieldCheck,
+    description: "Two-factor authentication and login security.",
   },
 ];
 
@@ -50,7 +57,7 @@ export function SettingsView({ activeTab = "notifications" }) {
           role="tabpanel"
           aria-label={resolvedTab}
         >
-          <NotificationsPanel />
+          {resolvedTab === "security" ? <MfaSetup /> : <NotificationsPanel />}
         </section>
       </div>
     </div>

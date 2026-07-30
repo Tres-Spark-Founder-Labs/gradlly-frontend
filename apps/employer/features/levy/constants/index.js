@@ -8,8 +8,12 @@ export const LEVY_PATHS = Object.freeze({
   TRANSFER_PREFERENCES: "/api/v1/levy-exchange/transfer-preferences",
   MATCH_APPLICATIONS: "/api/v1/levy-exchange/match-applications",
   matchApplication: (id) => `/api/v1/levy-exchange/match-applications/${id}`,
+  MATCHES_SEARCH: "/api/v1/levy-exchange/matches/search",
   TRANSFERS: "/api/v1/levy-exchange/transfers",
   transfer: (id) => `/api/v1/levy-exchange/transfers/${id}`,
+  transferSign: (id) => `/api/v1/levy-exchange/transfers/${id}/sign`,
+  transferSubmit: (id) => `/api/v1/levy-exchange/transfers/${id}/submit`,
+  transferDocument: (id) => `/api/v1/levy-exchange/transfers/${id}/document`,
 });
 
 export const DONOR_LINK_STATUSES = Object.freeze({
@@ -23,4 +27,23 @@ export const MATCH_APPLICATION_STATUSES = Object.freeze({
   PENDING: "pending",
   CONFIRMED: "confirmed",
   REJECTED: "rejected",
+});
+
+export const TRANSFER_ROLE = Object.freeze({
+  DONOR: "donor",
+  RECIPIENT: "recipient",
+});
+
+export const TRANSFER_STATUSES = Object.freeze({
+  DRAFT: "draft",
+  PENDING_SIGNATURES: "pending_signatures",
+  PENDING_ESFA: "pending_esfa",
+  CONFIRMED: "confirmed",
+  ACTIVE: "active",
+  FAILED: "failed",
+});
+
+export const TRANSFER_PARTY = Object.freeze({
+  DONOR: "donor",
+  RECIPIENT: "recipient",
 });
