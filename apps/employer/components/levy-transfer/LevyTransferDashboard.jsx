@@ -1,66 +1,24 @@
 "use client";
-import { Bell, Download, Plus } from "lucide-react";
-import { useRef, useState } from "react";
-import toast from "react-hot-toast";
+import { Bell, Download } from "lucide-react";
+import { useState } from "react";
 
 import { T } from "@/components/dashboard/levy/tokens";
 
 import { ActiveTransfers } from "./ActiveTransfers";
-import { LEVY } from "./data";
+import { CreateTransferModal } from "./CreateTransferModal";
 import { ESFAModal } from "./ESFAModal";
 import { ExpiryBanner } from "./ExpiryBanner";
 import { HistoryDrawer } from "./HistoryDrawer";
-import { MatchModal } from "./MatchModal";
-import { NewTransferForm } from "./NewTransferForm";
+import { PendingMatchApplications } from "./PendingMatchApplications";
 import { PolicyAlert } from "./PolicyAlert";
-import { SMEFinder } from "./SMEFinder";
 import { TransferStatCards } from "./TransferStatCards";
 
 export function LevyTransferDashboard() {
-  const searchRef = useRef(null);
-  const formRef = useRef(null);
   const [banner, setBanner] = useState(true);
   const [policy, setPolicy] = useState(true);
   const [esfa, setEsfa] = useState(false);
   const [history, setHistory] = useState(false);
-  const [matchSME, setMatchSME] = useState(null);
-  const [prefill, setPrefill] = useState(null);
-  const [extras, setExtras] = useState([]);
-
-  const scrollToFinder = () => {
-    searchRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-    setTimeout(() => searchRef.current?.focus(), 500);
-  };
-
-  const handleMatchSuccess = (sme) => {
-    setMatchSME(null);
-    toast.success(`Match request sent — ${sme.name} will be notified`);
-    setExtras((e) => [
-      ...e,
-      {
-        id: `DAS-TR-2025-00${Math.floor(Math.random() * 900 + 100)}`,
-        recipient: sme.name,
-        payeRef: sme.payeRef ?? "",
-        apprentice: "TBC",
-        standard: sme.standard,
-        provider: "TBC",
-        startDate: "TBC",
-        expectedEndDate: "TBC",
-        amount: sme.fundingNeeded,
-        drawn: 0,
-        monthlyDrawdown: 0,
-        contactName: sme.contact.name,
-        contactEmail: sme.contact.email,
-        history: [],
-      },
-    ]);
-  };
-
-  const handleFormSuccess = () => {
-    const ref = `DAS-TR-2025-${Math.floor(Math.random() * 9000 + 1000)}`;
-    toast.success(`Transfer initiated — reference ${ref}`);
-    setPrefill(null);
-  };
+  const [createFor, setCreateFor] = useState(null);
 
   return (
     <div
@@ -70,7 +28,7 @@ export function LevyTransferDashboard() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-xs" style={{ color: T.muted }}>
-            Midlands Engineering → Levy Transfer
+            Levy Exchange
           </p>
           <h1 className="text-xl font-extrabold" style={{ color: T.ink }}>
             Levy transfer
@@ -87,16 +45,6 @@ export function LevyTransferDashboard() {
           </button>
           <button
             type="button"
-            onClick={() =>
-              formRef.current?.scrollIntoView({ behavior: "smooth" })
-            }
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold hover:opacity-80 transition-opacity"
-            style={{ backgroundColor: T.green, color: "#fff" }}
-          >
-            <Plus className="h-3.5 w-3.5" /> New transfer
-          </button>
-          <button
-            type="button"
             className="flex h-8 w-8 items-center justify-center rounded-xl border hover:opacity-75 transition-opacity"
             style={{ borderColor: T.border, color: T.subtle }}
           >
@@ -108,16 +56,22 @@ export function LevyTransferDashboard() {
       {banner && (
         <ExpiryBanner
           onDismiss={() => setBanner(false)}
-          onFindSME={scrollToFinder}
+          onFindSME={() =>
+            document
+              .getElementById("match-applications")
+              ?.scrollIntoView({ behavior: "smooth" })
+          }
           onLearnMore={() => setEsfa(true)}
-          onPrefill={() => {
-            setPrefill(LEVY.expiring);
-            formRef.current?.scrollIntoView({ behavior: "smooth" });
-          }}
         />
       )}
 
-      <TransferStatCards onScrollToFinder={scrollToFinder} />
+      <TransferStatCards
+        onScrollToFinder={() =>
+          document
+            .getElementById("match-applications")
+            ?.scrollIntoView({ behavior: "smooth" })
+        }
+      />
 
       {policy && (
         <PolicyAlert
@@ -127,36 +81,18 @@ export function LevyTransferDashboard() {
       )}
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_400px]">
-        <SMEFinder searchRef={searchRef} onRequestMatch={setMatchSME} />
-        <div className="space-y-5">
-          <ActiveTransfers extras={extras} />
-          <div ref={formRef}>
-            <NewTransferForm
-              prefillAmount={prefill}
-              onSuccess={handleFormSuccess}
-            />
-          </div>
+        <div id="match-applications">
+          <PendingMatchApplications onCreateTransfer={setCreateFor} />
         </div>
+        <ActiveTransfers />
       </div>
 
       <ESFAModal open={esfa} onClose={() => setEsfa(false)} />
       {history && <HistoryDrawer onClose={() => setHistory(false)} />}
-      <MatchModal
-        open={!!matchSME}
-        sme={
-          matchSME ?? {
-            name: "",
-            sector: "",
-            location: "",
-            standard: "",
-            fundingNeeded: 0,
-            dasRef: "",
-            learnfloVerified: false,
-            payeRef: "",
-          }
-        }
-        onClose={() => setMatchSME(null)}
-        onSuccess={handleMatchSuccess}
+      <CreateTransferModal
+        open={!!createFor}
+        application={createFor}
+        onClose={() => setCreateFor(null)}
       />
     </div>
   );

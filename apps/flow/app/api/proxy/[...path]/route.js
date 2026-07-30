@@ -51,6 +51,10 @@ async function dispatch(req, ctx, method) {
     return openSession(upstreamPath, method, body);
   if (upstreamPath?.startsWith?.(AUTH_API_PATHS?.VERIFY_EMAIL))
     return openSession(upstreamPath, method, body);
+  // MFA verify (login step 2) also exchanges credentials for a fresh token
+  // pair, so it goes through the same cookie-writing path as login.
+  if (upstreamPath?.startsWith?.(AUTH_API_PATHS?.MFA_VERIFY))
+    return openSession(upstreamPath, method, body);
   if (upstreamPath?.startsWith?.(AUTH_API_PATHS?.LOGOUT)) return closeSession();
 
   // Accepting an invitation needs the current session but must NOT clear cookies
@@ -72,10 +76,20 @@ async function dispatch(req, ctx, method) {
 async function openSession(path, method, body) {
   try {
     const result = await $apiServer(path, { method, body });
-    const tokens = result?.data?.data ?? result?.data;
+    const data = result?.data?.data ?? result?.data;
+
+    // Account has MFA enabled: no tokens yet, no cookies to set — the client
+    // completes login by submitting a code to MFA_VERIFY with this token.
+    if (data?.mfaRequired) {
+      return NextResponse.json({
+        mfaRequired: true,
+        challengeToken: data?.challengeToken,
+      });
+    }
+
     await writeSessionCookies({
-      accessToken: tokens?.accessToken,
-      refreshToken: tokens?.refreshToken,
+      accessToken: data?.accessToken,
+      refreshToken: data?.refreshToken,
     });
     return success();
   } catch (e) {

@@ -91,3 +91,50 @@ export async function updateMe(payload) {
     throw normalizeApiClientError(e);
   }
 }
+
+// ─── MFA ────────────────────────────────────────────────────────────────────
+
+export async function enrollMfa() {
+  try {
+    const result = await $apiClient.post(AUTH_API_PATHS.MFA_ENROLL);
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+export async function confirmMfa({ code }) {
+  try {
+    const result = await $apiClient.post(AUTH_API_PATHS.MFA_CONFIRM, { code });
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+export async function disableMfa({ code }) {
+  try {
+    const result = await $apiClient.post(AUTH_API_PATHS.MFA_DISABLE, { code });
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+/** Completes login started by a login() MFA challenge. */
+export async function verifyMfaChallenge({
+  challengeToken,
+  code,
+  recoveryCode,
+}) {
+  try {
+    const result = await $apiClient.post(AUTH_API_PATHS.MFA_VERIFY, {
+      challengeToken,
+      code,
+      recoveryCode,
+    });
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}

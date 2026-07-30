@@ -8,6 +8,7 @@ import {
   Bell,
   Building2,
   LayoutDashboard,
+  MessageCircle,
   PoundSterling,
   Settings,
   UserCircle,
@@ -51,6 +52,7 @@ export const NAV_SECTIONS = [
         icon: AlertTriangle,
         badge: 5,
       },
+      { label: "Messages", href: "/messages", icon: MessageCircle },
     ],
   },
   {

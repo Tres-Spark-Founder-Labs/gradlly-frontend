@@ -9,7 +9,7 @@ export const { metadata } = createPageSeo({
   noIndex: true,
 });
 
-const VALID_TABS = ["notifications"];
+const VALID_TABS = ["notifications", "security"];
 
 export default async function SettingsPage({ params }) {
   const { slug } = await params;

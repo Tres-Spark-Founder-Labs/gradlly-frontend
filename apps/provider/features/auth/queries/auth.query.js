@@ -7,6 +7,9 @@ import { PORTAL } from "@/config/portal.config";
 import { AUTH_REDIRECTS, safeRedirectPath } from "@/features/auth/constants";
 import { AUTH_QUERY_KEYS } from "@/features/auth/queries/keys";
 import {
+  confirmMfa,
+  disableMfa,
+  enrollMfa,
   forgotPassword,
   getMe,
   login,
@@ -15,6 +18,7 @@ import {
   resetPassword,
   signup,
   verifyEmail,
+  verifyMfaChallenge,
   updateMe,
 } from "@/features/auth/services/auth.service";
 import { toastError, toastSuccess } from "@/hooks/useToast";
@@ -53,6 +57,10 @@ export function useLogin({ redirectTo } = {}) {
   return useMutation({
     mutationFn: login,
     onSuccess: (data) => {
+      // Account has MFA enabled: no session was opened yet — the caller
+      // (LoginForm) switches to the code-entry step using data.challengeToken.
+      if (data?.mfaRequired) return;
+
       toastSuccess(data?.message || "Welcome back!");
       qc.removeQueries({ queryKey: AUTH_QUERY_KEYS.me() });
       router.refresh();
@@ -62,6 +70,70 @@ export function useLogin({ redirectTo } = {}) {
     onError: (error) => {
       if (error.code !== ERROR_CODES.VALIDATION) {
         toastError(error.message);
+      }
+    },
+  });
+}
+
+/** Completes login after a useLogin() call returned { mfaRequired: true }. */
+export function useVerifyMfaChallenge({ redirectTo } = {}) {
+  const router = useRouter();
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: verifyMfaChallenge,
+    onSuccess: (data) => {
+      toastSuccess(data?.message || "Welcome back!");
+      qc.removeQueries({ queryKey: AUTH_QUERY_KEYS.me() });
+      router.refresh();
+      router.replace(safeRedirectPath(redirectTo));
+    },
+    onError: (error) => {
+      if (error.code !== ERROR_CODES.VALIDATION) {
+        toastError(error.message);
+      }
+    },
+  });
+}
+
+export function useEnrollMfa() {
+  return useMutation({
+    mutationFn: enrollMfa,
+    onError: (error) => {
+      toastError(error.message || "Could not start MFA setup.");
+    },
+  });
+}
+
+export function useConfirmMfa() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: confirmMfa,
+    onSuccess: () => {
+      toastSuccess("MFA enabled. Save your recovery codes somewhere safe.");
+      qc.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.me() });
+    },
+    onError: (error) => {
+      if (error.code !== ERROR_CODES.VALIDATION) {
+        toastError(error.message || "Invalid code.");
+      }
+    },
+  });
+}
+
+export function useDisableMfa() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: disableMfa,
+    onSuccess: () => {
+      toastSuccess("MFA disabled.");
+      qc.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.me() });
+    },
+    onError: (error) => {
+      if (error.code !== ERROR_CODES.VALIDATION) {
+        toastError(error.message || "Invalid code.");
       }
     },
   });

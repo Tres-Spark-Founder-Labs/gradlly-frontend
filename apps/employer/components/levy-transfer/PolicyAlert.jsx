@@ -2,13 +2,13 @@
 import { X } from "lucide-react";
 
 import { T } from "@/components/dashboard/levy/tokens";
+import { useLevySurplus } from "@/features/levy/queries/levy.query";
 
-import { LEVY } from "./data";
-
-const fmt = (n) => `£${n.toLocaleString("en-GB")}`;
+const fmt = (n) => `£${Number(n ?? 0).toLocaleString("en-GB")}`;
 
 export function PolicyAlert({ onViewESFA, onDismiss }) {
-  const { remaining, expiring, expiryDays } = LEVY;
+  const { data: surplus } = useLevySurplus();
+
   return (
     <div
       className="rounded-2xl p-4 flex items-start gap-3"
@@ -30,9 +30,9 @@ export function PolicyAlert({ onViewESFA, onDismiss }) {
         </p>
         <p className="text-xs mt-1 leading-relaxed" style={{ color: T.ink }}>
           Levy-paying employers can transfer up to 50% of their annual levy
-          contribution to SMEs in their supply chain. You have {fmt(remaining)}{" "}
-          still available to transfer this year — including {fmt(expiring)}{" "}
-          expiring in {expiryDays} days.
+          contribution to SMEs in their supply chain.
+          {surplus &&
+            ` You have ${fmt(surplus.availableSurplus)} still available to transfer.`}
         </p>
         <div className="flex items-center gap-3 mt-2 flex-wrap">
           <button
@@ -43,15 +43,6 @@ export function PolicyAlert({ onViewESFA, onDismiss }) {
           >
             View ESFA guidance →
           </button>
-          <a
-            href="https://flowportal.learnflo.co.uk/levy-exchange"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-semibold hover:underline"
-            style={{ color: T.green }}
-          >
-            View FlowPortal Levy Exchange →
-          </a>
         </div>
       </div>
       <button

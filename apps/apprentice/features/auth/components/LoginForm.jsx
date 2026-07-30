@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { ServerErrorAlert } from "@/components/error/ServerErrorAlert";
@@ -11,6 +12,8 @@ import Button from "@/components/ui/Button";
 import { useLogin } from "@/features/auth/queries/auth.query";
 import { loginDefaults, loginSchema } from "@/features/auth/schemas";
 import { applyServerErrors } from "@/lib/errors";
+
+import { MfaChallengeForm } from "./MfaChallengeForm";
 
 export function LoginForm() {
   const searchParams = useSearchParams();
@@ -21,6 +24,8 @@ export function LoginForm() {
   const signupHref = redirect
     ? `/signup?redirect=${encodeURIComponent(redirect)}`
     : "/signup";
+
+  const [challengeToken, setChallengeToken] = useState(null);
 
   const {
     register,
@@ -42,11 +47,24 @@ export function LoginForm() {
 
   const onSubmit = async (values) => {
     try {
-      await mutateAsync(values);
+      const result = await mutateAsync(values);
+      if (result?.mfaRequired) {
+        setChallengeToken(result.challengeToken);
+      }
     } catch (error) {
       applyServerErrors(error, setError);
     }
   };
+
+  if (challengeToken) {
+    return (
+      <MfaChallengeForm
+        challengeToken={challengeToken}
+        redirectTo={redirect}
+        onBack={() => setChallengeToken(null)}
+      />
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">

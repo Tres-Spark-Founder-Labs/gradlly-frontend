@@ -7,6 +7,7 @@ import {
   FileText,
   FolderOpen,
   LayoutDashboard,
+  MessageCircle,
   Settings,
   TrendingUp,
   UserCircle,
@@ -34,6 +35,7 @@ export const NAV_SECTIONS = [
         href: "/progress",
         icon: TrendingUp,
       },
+      { label: "Messages", href: "/messages", icon: MessageCircle },
     ],
   },
   {

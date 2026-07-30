@@ -1,36 +1,33 @@
 "use client";
-import { Download, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useState } from "react";
 
 import { T } from "@/components/dashboard/levy/tokens";
+import { useLevyTransfers } from "@/features/levy/queries/levy.query";
 
-import { ACTIVE_TRANSFERS, HISTORY } from "./data";
-
-const fmt = (n) => `£${n.toLocaleString("en-GB")}`;
+const fmt = (n) => `£${Number(n ?? 0).toLocaleString("en-GB")}`;
 const STATUS_COLOR = {
-  Complete: T.green,
-  Active: T.blue,
-  Cancelled: T.red,
-  Expired: T.muted,
+  draft: T.muted,
+  pending_signatures: T.amber,
+  pending_esfa: T.blue,
+  confirmed: T.green,
+  active: T.green,
+  failed: T.red,
 };
 
-const ALL = [
-  ...ACTIVE_TRANSFERS.map((t) => ({
-    ...t,
-    endDate: t.expectedEndDate,
-    status: "Active",
-  })),
-  ...HISTORY,
-];
-
 export function HistoryDrawer({ onClose }) {
-  const [tab, setTab] = useState("All");
+  const [status, setStatus] = useState("all");
+  const { data, isLoading } = useLevyTransfers(
+    status === "all" ? {} : { status },
+  );
+  const transfers = data?.transfers ?? [];
+
   const TABS = [
-    { key: "Active", label: `Active (${ACTIVE_TRANSFERS.length})` },
-    { key: "Complete", label: `Complete (${HISTORY.length})` },
-    { key: "All", label: `All (${ALL.length})` },
+    { key: "all", label: "All" },
+    { key: "active", label: "Active" },
+    { key: "confirmed", label: "Confirmed" },
+    { key: "failed", label: "Failed" },
   ];
-  const rows = tab === "All" ? ALL : ALL.filter((t) => t.status === tab);
 
   return (
     <>
@@ -56,7 +53,7 @@ export function HistoryDrawer({ onClose }) {
               Transfer history
             </p>
             <p className="text-[11px] mt-0.5" style={{ color: T.muted }}>
-              Midlands Engineering Ltd — all levy transfers
+              All levy transfers where you are donor or recipient
             </p>
           </div>
           <button
@@ -76,11 +73,11 @@ export function HistoryDrawer({ onClose }) {
             <button
               key={key}
               type="button"
-              onClick={() => setTab(key)}
+              onClick={() => setStatus(key)}
               className="px-4 py-3 text-sm font-semibold border-b-2 -mb-px transition-colors duration-150"
               style={{
-                color: tab === key ? T.blue : T.muted,
-                borderColor: tab === key ? T.blue : "transparent",
+                color: status === key ? T.blue : T.muted,
+                borderColor: status === key ? T.blue : "transparent",
               }}
             >
               {label}
@@ -88,7 +85,17 @@ export function HistoryDrawer({ onClose }) {
           ))}
         </div>
         <div className="flex-1 overflow-y-auto">
-          {rows.map((t) => {
+          {isLoading && (
+            <p className="px-5 py-6 text-xs" style={{ color: T.muted }}>
+              Loading…
+            </p>
+          )}
+          {!isLoading && transfers.length === 0 && (
+            <p className="px-5 py-6 text-xs" style={{ color: T.muted }}>
+              No transfers found.
+            </p>
+          )}
+          {transfers.map((t) => {
             const sc = STATUS_COLOR[t.status] ?? T.muted;
             return (
               <div
@@ -99,7 +106,7 @@ export function HistoryDrawer({ onClose }) {
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="text-xs font-bold" style={{ color: T.ink }}>
-                      {t.recipient}
+                      {fmt(t.amount)}
                     </p>
                     <p
                       className="text-[10px] font-mono mt-0.5"
@@ -116,36 +123,13 @@ export function HistoryDrawer({ onClose }) {
                   </span>
                 </div>
                 <p className="text-[11px] mt-1.5" style={{ color: T.muted }}>
-                  {fmt(t.amount)} · {fmt(t.drawn)} drawn · {t.standard}
+                  Created {new Date(t.createdAt).toLocaleDateString("en-GB")}
+                  {t.confirmedAt &&
+                    ` · confirmed ${new Date(t.confirmedAt).toLocaleDateString("en-GB")}`}
                 </p>
-                <div className="flex items-center justify-between mt-1">
-                  <p className="text-[11px]" style={{ color: T.muted }}>
-                    {t.startDate} → {t.endDate}
-                  </p>
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold hover:underline"
-                    style={{ color: T.blue }}
-                  >
-                    <Download className="h-3 w-3" /> Report
-                  </button>
-                </div>
               </div>
             );
           })}
-        </div>
-        <div
-          className="p-4 shrink-0"
-          style={{ borderTop: `1px solid ${T.border}` }}
-        >
-          <button
-            type="button"
-            className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border hover:opacity-75 transition-opacity"
-            style={{ borderColor: T.border, color: T.subtle }}
-          >
-            <Download className="h-3.5 w-3.5" /> Export all transfer history
-            (CSV)
-          </button>
         </div>
       </div>
     </>

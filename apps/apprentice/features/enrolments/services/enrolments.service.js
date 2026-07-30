@@ -15,3 +15,12 @@ export async function listEnrolments({ page = 1, perPage = 20 } = {}) {
     throw normalizeApiClientError(e);
   }
 }
+
+export async function getEnrolmentJourney(id) {
+  try {
+    const result = await $apiClient.get(ENROLMENT_PATHS.journey(id));
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
