@@ -26,6 +26,56 @@ function formatApprenticeId(id = "") {
   return id.slice(0, 12);
 }
 
+/**
+ * F1.2.3 AC1 — the queue lists the apprentice's name.
+ *
+ * The card used to render a truncated UUID here, because the API only exposed
+ * `apprenticeId`. It now returns `apprenticeName`; the id remains the fallback
+ * for rows where the relation was not loaded, so the card degrades to the old
+ * behaviour rather than showing an empty space.
+ */
+export function displayApprentice(entry) {
+  return (
+    entry?.apprenticeName?.trim() || formatApprenticeId(entry?.apprenticeId)
+  );
+}
+
+/** Initials for the avatar; falls back to the id when there is no name. */
+export function apprenticeInitials(entry) {
+  const name = entry?.apprenticeName?.trim();
+  if (!name)
+    return formatApprenticeId(entry?.apprenticeId).slice(0, 2).toUpperCase();
+  const parts = name.split(/\s+/);
+  const letters =
+    parts.length >= 2
+      ? `${parts[0][0]}${parts[parts.length - 1][0]}`
+      : name.slice(0, 2);
+  return letters.toUpperCase();
+}
+
+/**
+ * AC1's "submission date" — when it arrived for approval, not when the
+ * learning happened (`loggedDate`) which is what the card used to show.
+ */
+export function formatSubmitted(entry) {
+  const iso = entry?.submittedAt;
+  if (!iso) return null;
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+/** "Taught learning" from "taught_learning". */
+export function formatCategory(category = "") {
+  if (!category) return "";
+  const spaced = String(category).replaceAll("_", " ");
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
+
 function formatDate(iso = "") {
   if (!iso) return "";
   return new Date(iso).toLocaleDateString("en-GB", {
@@ -35,9 +85,9 @@ function formatDate(iso = "") {
   });
 }
 
-function Avatar({ id }) {
-  const color = avatarColor(id);
-  const label = formatApprenticeId(id).slice(0, 2).toUpperCase();
+function Avatar({ entry }) {
+  const color = avatarColor(entry?.apprenticeId ?? "");
+  const label = apprenticeInitials(entry);
   return (
     <div
       className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
@@ -66,6 +116,7 @@ export function OTJQueueCard({
   const atRisk = entry.paceFlag !== null && entry.paceFlag !== undefined;
   const hasEvidence = !!entry.evidence;
   const isActing = isApproving || isRejecting;
+  const submitted = formatSubmitted(entry);
 
   const confirmReject = () => {
     if (reason.trim().length < 10) return;
@@ -92,16 +143,14 @@ export function OTJQueueCard({
           className="mt-1 shrink-0"
           style={{ accentColor: "#1847d4" }}
         />
-        <Avatar id={entry.apprenticeId} />
+        <Avatar entry={entry} />
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 flex-wrap">
             <div>
-              <p
-                className="text-sm font-bold font-mono"
-                style={{ color: T.ink }}
-              >
-                {formatApprenticeId(entry.apprenticeId)}
+              {/* AC1 — apprentice name, no longer a truncated UUID. */}
+              <p className="text-sm font-bold" style={{ color: T.ink }}>
+                {displayApprentice(entry)}
               </p>
               {atRisk && (
                 <span
@@ -112,16 +161,38 @@ export function OTJQueueCard({
                 </span>
               )}
             </div>
-            <p
-              className="text-[11px] tabular-nums shrink-0"
-              style={{ color: T.muted }}
-            >
-              Logged {formatDate(entry.loggedDate)}
-            </p>
+            {/* AC1 — submission date. Both dates are shown because they answer
+                different questions: when the learning happened, and how long
+                this has been waiting on the manager. */}
+            <div className="text-right shrink-0">
+              {submitted && (
+                <p
+                  className="text-[11px] tabular-nums"
+                  style={{ color: T.muted }}
+                >
+                  Submitted {submitted}
+                </p>
+              )}
+              <p
+                className="text-[11px] tabular-nums"
+                style={{ color: T.muted }}
+              >
+                Logged {formatDate(entry.loggedDate)}
+              </p>
+            </div>
           </div>
 
+          {/* AC1 — activity description. `activityName` is the activity
+              itself; `note` is optional extra commentary. Only the note was
+              rendered, so the queue showed nothing at all for the many entries
+              that have no note. */}
+          {entry.activityName && (
+            <p className="text-xs mt-2 font-semibold" style={{ color: T.ink }}>
+              {entry.activityName}
+            </p>
+          )}
           {entry.note && (
-            <p className="text-xs mt-2" style={{ color: T.subtle }}>
+            <p className="text-xs mt-1" style={{ color: T.subtle }}>
               {entry.note}
             </p>
           )}
@@ -133,6 +204,15 @@ export function OTJQueueCard({
             >
               {hours} hrs
             </span>
+            {/* AC1 — category. Was not rendered anywhere. */}
+            {entry.category && (
+              <span
+                className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                style={{ backgroundColor: T.card, color: T.subtle }}
+              >
+                {formatCategory(entry.category)}
+              </span>
+            )}
             {hasEvidence && (
               <button
                 type="button"

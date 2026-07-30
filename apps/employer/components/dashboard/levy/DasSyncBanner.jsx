@@ -2,10 +2,10 @@
 
 import { AlertCircle, RefreshCw } from "lucide-react";
 
-import { fmt } from "./helpers";
+import { fmtGBP } from "./helpers";
 import { T } from "./tokens";
 
-export function DasSyncBanner({ levy, isDegraded, fmtLastSynced, onSync }) {
+export function DasSyncBanner({ balance, isDegraded, fmtSyncedAt, onSync }) {
   if (!isDegraded) return null;
 
   return (
@@ -22,9 +22,11 @@ export function DasSyncBanner({ levy, isDegraded, fmtLastSynced, onSync }) {
           <p className="text-sm font-bold" style={{ color: T.amber }}>
             DAS API unavailable — displaying last known data
           </p>
+          {/* F1.1.1 AC4: last *known* balance plus the time it was accurate,
+              so a stale figure is never mistaken for a live one. */}
           <p className="text-xs mt-0.5" style={{ color: T.subtle }}>
-            Balance {fmt(levy?.balance ?? 0)} accurate as of {fmtLastSynced?.()}
-            . Live sync failed.
+            Last known balance {fmtGBP(balance)}, accurate as of{" "}
+            {fmtSyncedAt?.()}. Live sync failed.
           </p>
         </div>
       </div>

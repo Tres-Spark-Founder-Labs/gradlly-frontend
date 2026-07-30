@@ -1,36 +1,73 @@
 "use client";
 
-import { ArrowUpDown } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 
 import { RosterRow } from "./RosterRow";
 import { T } from "./tokens";
 
-const TH = ({ children, sortable, sticky, onClick }) => (
-  <th
-    className={`px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider select-none whitespace-nowrap${sticky ? " bg-[#faf9f7]" : ""}`}
-    style={{
-      color: T.muted,
-      cursor: sortable ? "pointer" : "default",
-      ...(sticky
-        ? {
-            position: "sticky",
-            left: 0,
-            zIndex: 2,
-            backgroundColor: T.card,
-            boxShadow: "2px 0 4px rgba(0,0,0,0.06)",
-          }
-        : {}),
-    }}
-    onClick={onClick}
-  >
-    <span className="flex items-center gap-1">
-      {children}
-      {sortable && <ArrowUpDown className="h-3 w-3 opacity-40" />}
-    </span>
-  </th>
-);
+/**
+ * `sortable` previously only drew an icon — no handler was ever passed, so the
+ * affordance was decorative. It now sorts, and the icon reflects the active
+ * column and direction.
+ */
+const TH = ({ children, sortKey, sticky, sort, onSort }) => {
+  const sortable = Boolean(sortKey);
+  const active = sortable && sort?.sortBy === sortKey;
+  const Icon = !active
+    ? ArrowUpDown
+    : sort.sortOrder === "asc"
+      ? ArrowUp
+      : ArrowDown;
 
-export function RosterTable({ apprentices, filter, onView, onContact }) {
+  return (
+    <th
+      className={`px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider select-none whitespace-nowrap${sticky ? " bg-[#faf9f7]" : ""}`}
+      style={{
+        color: active ? T.ink : T.muted,
+        cursor: sortable ? "pointer" : "default",
+        ...(sticky
+          ? {
+              position: "sticky",
+              left: 0,
+              zIndex: 2,
+              backgroundColor: T.card,
+              boxShadow: "2px 0 4px rgba(0,0,0,0.06)",
+            }
+          : {}),
+      }}
+      onClick={sortable ? () => onSort?.(sortKey) : undefined}
+      aria-sort={
+        active
+          ? sort.sortOrder === "asc"
+            ? "ascending"
+            : "descending"
+          : undefined
+      }
+    >
+      {sortable ? (
+        <button
+          type="button"
+          className="flex items-center gap-1 uppercase tracking-wider font-bold text-[10px]"
+          style={{ color: "inherit" }}
+        >
+          {children}
+          <Icon className={`h-3 w-3 ${active ? "opacity-90" : "opacity-40"}`} />
+        </button>
+      ) : (
+        <span className="flex items-center gap-1">{children}</span>
+      )}
+    </th>
+  );
+};
+
+export function RosterTable({
+  apprentices,
+  filter,
+  onView,
+  onContact,
+  sort,
+  onSort,
+}) {
   return (
     <div
       className="rounded-2xl overflow-hidden"
@@ -60,16 +97,32 @@ export function RosterTable({ apprentices, filter, onView, onContact }) {
                   style={{ accentColor: T.blue }}
                 />
               </th>
-              <TH sticky sortable>
+              {/* Standard and Provider are now sortable too: they carry real
+                  values since the mapper stopped discarding them. */}
+              <TH sticky sortKey="name" sort={sort} onSort={onSort}>
                 Apprentice
               </TH>
-              <TH>Standard</TH>
-              <TH>Provider</TH>
-              <TH sortable>OTJ progress</TH>
-              <TH sortable>EPA date</TH>
-              <TH sortable>Attendance</TH>
-              <TH sortable>Last activity</TH>
-              <TH>Status</TH>
+              <TH sortKey="standard" sort={sort} onSort={onSort}>
+                Standard
+              </TH>
+              <TH sortKey="provider" sort={sort} onSort={onSort}>
+                Provider
+              </TH>
+              <TH sortKey="otjActual" sort={sort} onSort={onSort}>
+                OTJ progress
+              </TH>
+              <TH sortKey="epaDate" sort={sort} onSort={onSort}>
+                EPA date
+              </TH>
+              <TH sortKey="attendance" sort={sort} onSort={onSort}>
+                Attendance
+              </TH>
+              <TH sortKey="lastActivity" sort={sort} onSort={onSort}>
+                Last activity
+              </TH>
+              <TH sortKey="status" sort={sort} onSort={onSort}>
+                Status
+              </TH>
               <th
                 className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider"
                 style={{ color: T.muted }}

@@ -4,19 +4,29 @@ import { ExternalLink, PlusCircle } from "lucide-react";
 import Link from "next/link";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
+import { clientEnv } from "@/config/env/client";
+import { useLevyTransfers } from "@/features/levy/queries/levy.query";
 
-import { fmt } from "./helpers";
+import { fmtGBP } from "./helpers";
 import { T } from "./tokens";
 
+// F1.1.4 AC4 — the pipeline the requirement names.
 const STAGES = ["Initiated", "Pending ESFA", "Confirmed", "Active"];
 
-function normaliseStage(status) {
+/**
+ * Maps LevyTransferStatus onto the four display stages. The previous map used
+ * a `pending` key that the enum has never contained, so every real transfer
+ * fell through to the raw status string and the pipeline never advanced.
+ */
+export function normaliseStage(status) {
   const map = {
-    pending: "Initiated",
+    draft: "Initiated",
+    pending_signatures: "Initiated",
+    pending_esfa: "Pending ESFA",
     confirmed: "Confirmed",
     active: "Active",
   };
-  return map[status?.toLowerCase()] ?? status ?? "Initiated";
+  return map[String(status ?? "").toLowerCase()] ?? "Initiated";
 }
 
 function Pipeline({ stage }) {
@@ -61,10 +71,19 @@ function PipelineLabel({ stage }) {
   );
 }
 
-export function TransferHub({ levy, transfers = [] }) {
-  const monthly = levy?.monthly ?? 0;
-  const transferred = levy?.transferred ?? 0;
-  const transferable = Math.round(monthly * 12 * 0.5);
+export function TransferHub({ levy }) {
+  // Real transfers, not match applications. The previous caller passed the
+  // result of useLevyMatchApplications(), which returns { applications, meta }
+  // — an object, so `transfers.map` threw at runtime.
+  const { data: transferData } = useLevyTransfers();
+  const transfers = transferData?.transfers ?? [];
+
+  // The ESFA 50% cap is computed server-side (SURPLUS_CAP_RATIO) and exposed
+  // as maxTransferable. This previously recomputed it in the browser as
+  // `monthly * 12 * 0.5` from a field that does not exist — so it rendered £0,
+  // and would have drifted from the backend even with real data.
+  const transferable = Number(levy?.maxTransferable ?? 0);
+  const transferred = Number(levy?.alreadyTransferred ?? 0);
 
   return (
     <Card>
@@ -77,7 +96,7 @@ export function TransferHub({ levy, transfers = [] }) {
             </h2>
           </div>
           <Link
-            href="/billing"
+            href="/levy-transfer"
             className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg hover:opacity-80 transition-opacity"
             style={{ backgroundColor: T.blueLight, color: T.blue }}
           >
@@ -104,12 +123,12 @@ export function TransferHub({ levy, transfers = [] }) {
               className="text-2xl font-extrabold tabular-nums mt-0.5"
               style={{ color: T.green }}
             >
-              {fmt(transferable)}
+              {fmtGBP(transferable)}
             </p>
           </div>
           <div className="text-right text-xs" style={{ color: T.subtle }}>
-            <p>Used: {fmt(transferred)}</p>
-            <p>Remaining: {fmt(Math.max(0, transferable - transferred))}</p>
+            <p>Used: {fmtGBP(transferred)}</p>
+            <p>Remaining: {fmtGBP(Math.max(0, transferable - transferred))}</p>
           </div>
         </div>
 
@@ -152,7 +171,7 @@ export function TransferHub({ levy, transfers = [] }) {
                       className="text-sm font-bold tabular-nums shrink-0"
                       style={{ color: T.green }}
                     >
-                      {fmt(amount)}
+                      {fmtGBP(amount)}
                     </span>
                   </div>
                   <Pipeline stage={stage} />
@@ -164,7 +183,7 @@ export function TransferHub({ levy, transfers = [] }) {
         )}
 
         <a
-          href="https://flowportal.co.uk"
+          href={`${clientEnv.NEXT_PUBLIC_FLOW_URL}/eligibility`}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 text-xs font-semibold hover:underline"

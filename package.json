@@ -37,7 +37,8 @@
     "docker:rebuild:employer": "docker compose build employer-app",
     "docker:shell:main": "docker compose exec main-app sh",
     "docker:shell:employer": "docker compose exec employer-app sh",
-    "docker:reset": "docker compose down --remove-orphans && docker compose up --build"
+    "docker:reset": "docker compose down --remove-orphans && docker compose up --build",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",

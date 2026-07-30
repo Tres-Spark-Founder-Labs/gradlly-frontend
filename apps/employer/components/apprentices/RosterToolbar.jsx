@@ -5,37 +5,25 @@ import { useState } from "react";
 
 import { T } from "./tokens";
 
+/**
+ * F1.2.4 AC5.
+ *
+ * "Overdue" now matches something: the mapper translates the API's
+ * `off_track` to `overdue`, where before this pill filtered on a string
+ * nothing in the system produced and so always returned an empty roster.
+ *
+ * "EPA Ready" was removed for the same reason and not replaced like-for-like.
+ * It was never a pace level — it came from the mock fixtures — and nothing in
+ * the API can set it, so no amount of translation would make it match. The
+ * EPA view that does exist is the derived "under 90 days" filter, which the
+ * stat card already triggers, so the pill now points at that.
+ */
 const STATUS_FILTERS = [
   { key: "all", label: "All" },
   { key: "on_track", label: "On track" },
   { key: "at_risk", label: "At risk" },
   { key: "overdue", label: "Overdue" },
-  { key: "epa_ready", label: "EPA Ready" },
-];
-
-const EPA_MONTHS = [
-  "All EPA months",
-  "Jul 2025",
-  "Oct 2025",
-  "Nov 2025",
-  "Jan 2026",
-  "Jun 2026",
-];
-const STANDARDS = [
-  "All standards",
-  "Software Developer L4",
-  "Data Technician L3",
-  "Business Admin L3",
-  "Accounting Technician L4",
-  "HR Support L3",
-];
-const COHORTS = [
-  "All cohorts",
-  "Sep 2023 cohort",
-  "Jan 2024 cohort",
-  "Mar 2024 cohort",
-  "Jun 2024 cohort",
-  "Sep 2024 cohort",
+  { key: "epa_imminent", label: "EPA < 90d" },
 ];
 
 const selStyle = {
@@ -47,7 +35,43 @@ const selStyle = {
   outline: "none",
 };
 
-export function RosterToolbar({ filter, search, onFilter, onSearch, onEnrol }) {
+/**
+ * A dropdown whose empty value means "no filter". Disabled when the roster
+ * offers nothing to choose from, so an employer with a single provider is not
+ * given a control that cannot change anything.
+ */
+function FilterSelect({ label, value, options, onChange }) {
+  return (
+    <select
+      aria-label={label}
+      value={value ?? ""}
+      onChange={(e) => onChange?.(e.target.value || null)}
+      disabled={options.length === 0}
+      className="px-3 py-1.5 rounded-lg border text-xs cursor-pointer focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
+      style={selStyle}
+    >
+      <option value="">{label}</option>
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+export function RosterToolbar({
+  filter,
+  search,
+  onFilter,
+  onSearch,
+  onEnrol,
+  onExportCsv,
+  exportCount = 0,
+  advanced = {},
+  onAdvancedChange,
+  options = { providers: [], standards: [], epaMonths: [], cohorts: [] },
+}) {
   const [moreOpen, setMoreOpen] = useState(false);
 
   return (
@@ -133,9 +157,18 @@ export function RosterToolbar({ filter, search, onFilter, onSearch, onEnrol }) {
             }}
           />
         </div>
+        {/* F1.2.1 AC6. Both buttons previously had no onClick at all — they
+            were styled elements that did nothing when pressed. */}
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold hover:opacity-80 transition-opacity shrink-0"
+          onClick={onExportCsv}
+          disabled={!exportCount}
+          title={
+            exportCount
+              ? `Export ${exportCount} apprentice${exportCount === 1 ? "" : "s"} as CSV`
+              : "Nothing to export"
+          }
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold hover:opacity-80 transition-opacity shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
           style={{
             backgroundColor: "#f5f4f2",
             color: T.subtle,
@@ -144,9 +177,14 @@ export function RosterToolbar({ filter, search, onFilter, onSearch, onEnrol }) {
         >
           ↓ CSV
         </button>
+        {/* PDF export needs a server-side template that does not exist yet
+            (the same gap as the levy charts). Disabled rather than left
+            looking clickable — an inert control is a broken promise. */}
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold hover:opacity-80 transition-opacity shrink-0"
+          disabled
+          title="PDF export is not available yet"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 opacity-40 cursor-not-allowed"
           style={{
             backgroundColor: "#f5f4f2",
             color: T.subtle,
@@ -167,39 +205,33 @@ export function RosterToolbar({ filter, search, onFilter, onSearch, onEnrol }) {
             animation: "slide-up 150ms ease both",
           }}
         >
-          <select
-            className="px-3 py-1.5 rounded-lg border text-xs cursor-pointer focus:outline-none"
-            style={selStyle}
-          >
-            <option>All providers</option>
-            <option>Birmingham Met College</option>
-            <option>Aston Training</option>
-            <option>WMG Academy</option>
-          </select>
-          <select
-            className="px-3 py-1.5 rounded-lg border text-xs cursor-pointer focus:outline-none"
-            style={selStyle}
-          >
-            {COHORTS.map((c) => (
-              <option key={c}>{c}</option>
-            ))}
-          </select>
-          <select
-            className="px-3 py-1.5 rounded-lg border text-xs cursor-pointer focus:outline-none"
-            style={selStyle}
-          >
-            {STANDARDS.map((s) => (
-              <option key={s}>{s}</option>
-            ))}
-          </select>
-          <select
-            className="px-3 py-1.5 rounded-lg border text-xs cursor-pointer focus:outline-none"
-            style={selStyle}
-          >
-            {EPA_MONTHS.map((m) => (
-              <option key={m}>{m}</option>
-            ))}
-          </select>
+          {/* F1.2.1 AC4. Options are derived from the roster on screen; these
+              were previously hardcoded invented names with no onChange, so
+              they offered choices matching nothing and did nothing. */}
+          <FilterSelect
+            label="All providers"
+            value={advanced.provider}
+            options={options.providers.map((p) => ({ value: p, label: p }))}
+            onChange={(v) => onAdvancedChange?.({ ...advanced, provider: v })}
+          />
+          <FilterSelect
+            label="All cohorts"
+            value={advanced.cohort}
+            options={options.cohorts}
+            onChange={(v) => onAdvancedChange?.({ ...advanced, cohort: v })}
+          />
+          <FilterSelect
+            label="All standards"
+            value={advanced.standard}
+            options={options.standards.map((s) => ({ value: s, label: s }))}
+            onChange={(v) => onAdvancedChange?.({ ...advanced, standard: v })}
+          />
+          <FilterSelect
+            label="All EPA months"
+            value={advanced.epaMonth}
+            options={options.epaMonths}
+            onChange={(v) => onAdvancedChange?.({ ...advanced, epaMonth: v })}
+          />
           <button
             type="button"
             onClick={() => setMoreOpen(false)}

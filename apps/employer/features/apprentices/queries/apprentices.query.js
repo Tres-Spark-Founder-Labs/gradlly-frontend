@@ -13,6 +13,7 @@ import {
   createApprentice,
   getApprentices,
 } from "../services/apprentices.service";
+import { normalisePaceStatus } from "../utils/risk-status";
 
 // ─── Avatar colour derived from apprentice id ─────────────────────────────────
 
@@ -57,27 +58,48 @@ function normalizeApprentice(apprentice, enrolment) {
     avatarColor: avatarColor(apprentice.id),
     email: apprentice.email,
     apprenticeStatus: apprentice.status, // pending|active|paused|completed|withdrawn
-    employeeId: null, // not in API
+    // No employee/payroll identifier exists on the Apprentice entity — checked
+    // across the whole API, not assumed. Any UI offering to search by one would
+    // be offering something the system cannot do.
+    employeeId: null,
 
     // Programme — from enrolment
     enrolmentId: enrolment?.id ?? null,
     standardId: enrolment?.standardId ?? null,
-    standard: "—", // name lookup not available from list endpoint
-    status: enrolment?.otjPaceAlertLevel ?? "on_track",
+    // EnrolmentResponseDto carries the display names directly. This previously
+    // rendered "—" with a comment claiming the lookup was unavailable; the
+    // value was in the response all along and was being discarded.
+    standard: enrolment?.standardDisplayName ?? "—",
+    // F1.2.4 AC5. Translated at the boundary: the API says `off_track`, the UI
+    // says `overdue`. Passing the raw value through meant the most serious
+    // level matched nothing anywhere on the screen.
+    status: normalisePaceStatus(enrolment?.otjPaceAlertLevel),
+    otjPaceAlertLevel: enrolment?.otjPaceAlertLevel ?? null,
+    otjBehindPercent: enrolment?.otjBehindPercent ?? null,
     epaDate: fmtDate(enrolment?.epaDate) ?? "—",
     epaDaysLeft: daysUntil(enrolment?.epaDate),
     startDate: fmtDate(enrolment?.plannedStartDate),
+    // Raw ISO alongside the display strings: the EPA-month and cohort filters
+    // group by date, and parsing "12 Oct 2026" back into one is both lossy and
+    // locale-dependent.
+    epaDateIso: enrolment?.epaDate ?? null,
+    startDateIso: enrolment?.plannedStartDate ?? null,
     expectedEndDate: fmtDate(enrolment?.plannedEndDate),
     levyCost: enrolment?.agreedPrice ?? 0,
     fundingBand: enrolment?.agreedPrice ?? 0,
     pipelineState: enrolment?.pipelineState ?? null,
 
-    // Unavailable from these endpoints — rendered as "—" / null
+    // Also present on the enrolment response, and likewise previously discarded.
+    provider: enrolment?.providerOrganisationName ?? "—",
+    tutorName: enrolment?.tutorUserDisplayName ?? null,
+    lineManager: enrolment?.employerManagerUserDisplayName ?? null,
+
+    // Genuinely absent from /apprentices and /enrolments. OTJ progress and
+    // last-activity recency are computed per enrolment by the learner cohort
+    // service (F1.2.1); until this screen reads that endpoint they stay null
+    // rather than being guessed at.
     cohort: null,
-    provider: "—",
-    tutorName: null,
     tutorEmail: null,
-    lineManager: null,
     lineManagerEmail: null,
     providerContact: { name: "—", email: "—", phone: "—" },
     lastActivity: null,

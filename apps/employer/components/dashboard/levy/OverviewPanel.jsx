@@ -13,7 +13,7 @@ import {
 
 import { HealthRing } from "./HealthRing";
 import { HealthSignal } from "./HealthSignal";
-import { fmt, scoreColor } from "./helpers";
+import { fmt, fmtGBP, scoreColor } from "./helpers";
 import { OverviewStat } from "./OverviewStat";
 import { T } from "./tokens";
 
@@ -121,9 +121,18 @@ export function OverviewPanel({ das, levy, onExpiryModal, onExport }) {
         <OverviewStat
           accent={T.blue}
           icon={<BarChart3 className="h-4 w-4" />}
-          value={fmt(levy?.balance ?? 0)}
+          /* F1.1.1 AC1: DAS-sourced balance, GBP to 2dp. Renders an em dash
+             rather than £0.00 when no DAS account is linked — showing a
+             confident zero for "unknown" is how people overcommit funds. */
+          value={das?.hasLink ? fmtGBP(das.balance) : "—"}
           label="Available Balance"
-          sub="Digital Apprenticeship Service"
+          /* F1.1.1 AC3: last-synced timestamp sits with the balance itself,
+             not only in the separate health-signal row. */
+          sub={
+            das?.hasLink
+              ? `DAS · synced ${das.fmtSyncedAt?.()}`
+              : "No DAS account linked"
+          }
         />
         <OverviewStat
           accent={T.green}
