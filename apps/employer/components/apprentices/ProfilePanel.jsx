@@ -6,7 +6,7 @@ import { useState } from "react";
 import {
   behindPercentLabel,
   isFlagged,
-  isOverdue,
+  isCriticallyBehind,
 } from "@/features/apprentices/utils/risk-status";
 import { PipelineStateBadge } from "@/features/enrolments/components/EnrolmentBadges";
 
@@ -80,10 +80,10 @@ export function ProfilePanel({ apprentice, onClose, onContact }) {
                   <span
                     className="text-[10px] px-1.5 py-0.5 rounded font-bold"
                     style={{
-                      backgroundColor: isOverdue(a.status)
+                      backgroundColor: isCriticallyBehind(a.status)
                         ? T.redLight
                         : T.amberLight,
-                      color: isOverdue(a.status) ? T.red : T.amber,
+                      color: isCriticallyBehind(a.status) ? T.red : T.amber,
                     }}
                   >
                     {behindPercentLabel(a.otjBehindPercent)}

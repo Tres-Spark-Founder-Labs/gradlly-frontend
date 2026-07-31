@@ -2,7 +2,7 @@
 
 import { MoreHorizontal } from "lucide-react";
 
-import { isOverdue } from "@/features/apprentices/utils/risk-status";
+import { isCriticallyBehind } from "@/features/apprentices/utils/risk-status";
 
 import { ApprenticeAvatar } from "./ApprenticeAvatar";
 import { attendanceColor, epaDays } from "./helpers";
@@ -48,7 +48,7 @@ export function RosterRow({ a, index, onView, onContact, isFiltered }) {
   // F1.2.4 AC5. These keyed off string literals that the API never emits, so
   // the red accent bar for the most serious cases never rendered. Both now go
   // through the shared status helpers.
-  const isOverdueRow = isOverdue(a.status);
+  const isCriticallyBehindRow = isCriticallyBehind(a.status);
   const isAtRisk = a.status === "at_risk";
   const isEpaNear = a.epaDaysLeft !== null && a.epaDaysLeft < 60;
   const epa = epaDays(a.epaDaysLeft);
@@ -57,7 +57,7 @@ export function RosterRow({ a, index, onView, onContact, isFiltered }) {
       ? attendanceColor(a.attendance)
       : T.muted;
   const actColor = lastActivityColor(a.lastActivity);
-  const accentColor = isOverdueRow
+  const accentColor = isCriticallyBehindRow
     ? T.red
     : isAtRisk
       ? T.amber

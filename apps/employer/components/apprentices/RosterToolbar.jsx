@@ -22,7 +22,7 @@ const STATUS_FILTERS = [
   { key: "all", label: "All" },
   { key: "on_track", label: "On track" },
   { key: "at_risk", label: "At risk" },
-  { key: "overdue", label: "Overdue" },
+  { key: "critically_behind", label: "Critically behind" },
   { key: "epa_imminent", label: "EPA < 90d" },
 ];
 

@@ -2,7 +2,10 @@
 
 import { AlertTriangle, BookOpen, CalendarCheck, Users } from "lucide-react";
 
-import { isFlagged, isOverdue } from "@/features/apprentices/utils/risk-status";
+import {
+  isFlagged,
+  isCriticallyBehind,
+} from "@/features/apprentices/utils/risk-status";
 
 import { T } from "./tokens";
 
@@ -58,7 +61,7 @@ export function StatCards({ roster = [], onFilter }) {
    * the ones missing.
    */
   const flagged = roster.filter((a) => isFlagged(a.status));
-  const overdue = flagged.filter((a) => isOverdue(a.status));
+  const overdue = flagged.filter((a) => isCriticallyBehind(a.status));
   const soonest = epaImm.sort(
     (a, b) => (a.epaDaysLeft ?? 0) - (b.epaDaysLeft ?? 0),
   )[0];
