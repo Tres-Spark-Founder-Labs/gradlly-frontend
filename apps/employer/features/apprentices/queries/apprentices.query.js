@@ -58,10 +58,13 @@ function normalizeApprentice(apprentice, enrolment) {
     avatarColor: avatarColor(apprentice.id),
     email: apprentice.email,
     apprenticeStatus: apprentice.status, // pending|active|paused|completed|withdrawn
-    // No employee/payroll identifier exists on the Apprentice entity — checked
-    // across the whole API, not assumed. Any UI offering to search by one would
-    // be offering something the system cannot do.
-    employeeId: null,
+    // Both added for F1.2.1/F1.2.5. This comment previously said no payroll
+    // identifier existed on the Apprentice entity and hardcoded null — true
+    // when written, stale once the column was added, and the reason the
+    // roster's search-by-employee-ID matched nothing: the predicate was
+    // correct but every row's employeeId was null before it got there.
+    employeeId: apprentice.employeeId ?? null,
+    jobTitle: apprentice.jobTitle ?? null,
 
     // Programme — from enrolment
     enrolmentId: enrolment?.id ?? null,

@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 
 import { Modal } from "@/components/ui/Modal";
+import { useLinkedProviders } from "@/features/enrolments/queries/enrolments.query";
 import {
   useCreateStandard,
   useProgrammes,
@@ -152,12 +153,19 @@ export function EnrolStep2({ data, onChange }) {
 
   const { data: standards = [], isLoading: standardsLoading } = useStandards();
   const { data: programmes = [], isLoading: progsLoading } = useProgrammes();
+  const { data: providers = [], isLoading: providersLoading } =
+    useLinkedProviders();
 
   const isLoading = standardsLoading || progsLoading;
 
   const standardOptions = standards.map((s) => ({
     value: s.id,
     label: s.title,
+  }));
+
+  const providerOptions = providers.map((p) => ({
+    value: p.organisationId,
+    label: p.ukprn ? `${p.name} · UKPRN ${p.ukprn}` : p.name,
   }));
 
   const selectedStandard = standards.find((s) => s.id === data.standard);
@@ -275,6 +283,48 @@ export function EnrolStep2({ data, onChange }) {
             </p>
           )}
         </div>
+      )}
+
+      {/*
+        F1.2.5 AC2 — training provider.
+
+        No step collected this before, even though step 3 displayed
+        `data.provider` and ticked a "Training provider selected" checklist
+        item for it. The value was always empty, so the enrolment was created
+        with no provider attached and the provider was never notified.
+
+        The list is providers who have accepted a previous enrolment from this
+        employer, which is what an accepted connection request amounts to here.
+      */}
+      {providersLoading ? (
+        <div
+          className="h-16 rounded-xl animate-pulse"
+          style={{ backgroundColor: T.card }}
+        />
+      ) : providerOptions.length === 0 ? (
+        <div
+          className="rounded-xl px-3 py-2.5 text-xs space-y-1"
+          style={{
+            backgroundColor: T.amberLight,
+            color: T.amber,
+            border: `1px solid ${T.amber}30`,
+          }}
+        >
+          <p className="font-semibold">No linked training providers yet.</p>
+          <p>
+            A provider appears here once they have accepted an enrolment from
+            you. Ask your provider to send you a connection request, or contact
+            support to link them.
+          </p>
+        </div>
+      ) : (
+        <Select
+          label="Training provider"
+          name="provider"
+          options={providerOptions}
+          value={data.provider}
+          onChange={onChange}
+        />
       )}
 
       <CreateStandardModal

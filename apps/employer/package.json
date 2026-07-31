@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start --port 3002",
     "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit -p tsconfig.check.json",
+    "api:types": "openapi-typescript ../../../graddly-api/openapi.json -o types/api.d.ts",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -35,6 +37,7 @@
     "@testing-library/react": "^16.3.2",
     "@vitejs/plugin-react": "^5.2.0",
     "jsdom": "^26.1.0",
+    "openapi-typescript": "^7.13.0",
     "vitest": "^3.2.7"
   }
 }

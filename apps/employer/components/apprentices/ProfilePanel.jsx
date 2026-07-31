@@ -8,6 +8,7 @@ import {
   isFlagged,
   isOverdue,
 } from "@/features/apprentices/utils/risk-status";
+import { PipelineStateBadge } from "@/features/enrolments/components/EnrolmentBadges";
 
 import { ApprenticeAvatar } from "./ApprenticeAvatar";
 import { ProfileActivity } from "./ProfileActivity";
@@ -88,6 +89,14 @@ export function ProfilePanel({ apprentice, onClose, onContact }) {
                     {behindPercentLabel(a.otjBehindPercent)}
                   </span>
                 )}
+              {/* F1.2.5 AC5 — how far the enrolment has progressed:
+                  invited, account created, provider accepted, ILR, DAS. The
+                  API tracked this all along and no employer screen showed it,
+                  so there was no way to tell whether an apprentice had
+                  accepted their invitation. */}
+              {a.pipelineState && (
+                <PipelineStateBadge state={a.pipelineState} />
+              )}
               {a.cohort && (
                 <span
                   className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
