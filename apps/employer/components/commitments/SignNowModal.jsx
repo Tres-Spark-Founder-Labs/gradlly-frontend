@@ -3,212 +3,342 @@ import { useRef, useState } from "react";
 
 import { T } from "@/components/dashboard/levy/tokens";
 import { Modal } from "@/components/ui/Modal";
-import { toastSuccess } from "@/hooks/useToast";
+import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
+import {
+  useCommitmentStatement,
+  useSignCommitmentStatement,
+} from "@/features/commitments/queries/commitments.query";
+import { renderStatementText } from "@/features/commitments/utils/statement-text";
+import {
+  STORAGE_CATEGORY,
+  dataUrlToFile,
+  uploadFileForKey,
+} from "@/features/storage/services/storage.service";
+import { toastError } from "@/hooks/useToast";
+import { getFullName } from "@/utils/helper";
 
-const DOC = `Employer responsibilities: Midlands Engineering Ltd agrees to release Amara Diallo for all scheduled training days, provide meaningful work relevant to the Accounting Technician standard, conduct quarterly progress reviews with the provider, and ensure the apprentice is not charged for any element of their training.
+/** The party an employer signs as. Matches TripartiteParty on the API. */
+const EMPLOYER_PARTY = "employer_manager";
 
-OTJ delivery plan: Minimum 20% off-the-job — delivered via day release Thursdays + structured workplace projects.`;
-
-function DrawCanvas({ onHasDrawing }) {
-  const ref = useRef(null);
+function DrawCanvas({ canvasRef, onHasDrawing }) {
   const drawing = useRef(false);
+
   const clear = () => {
-    const ctx = ref.current?.getContext("2d");
+    const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
-    ctx.clearRect(0, 0, 400, 120);
+    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     onHasDrawing(false);
   };
-  const getXY = (e) => {
-    const r = ref.current.getBoundingClientRect();
-    const pt = e.touches ? e.touches[0] : e;
-    return [pt.clientX - r.left, pt.clientY - r.top];
+
+  const pos = (e) => {
+    const rect = canvasRef.current.getBoundingClientRect();
+    const touch = e.touches?.[0];
+    return {
+      x: (touch?.clientX ?? e.clientX) - rect.left,
+      y: (touch?.clientY ?? e.clientY) - rect.top,
+    };
   };
+
   const start = (e) => {
     e.preventDefault();
     drawing.current = true;
-    const ctx = ref.current.getContext("2d");
-    const [x, y] = getXY(e);
+    const ctx = canvasRef.current.getContext("2d");
+    const { x, y } = pos(e);
     ctx.beginPath();
     ctx.moveTo(x, y);
   };
+
   const move = (e) => {
-    e.preventDefault();
     if (!drawing.current) return;
-    const ctx = ref.current.getContext("2d");
-    const [x, y] = getXY(e);
-    ctx.lineTo(x, y);
-    ctx.strokeStyle = T.ink;
+    e.preventDefault();
+    const ctx = canvasRef.current.getContext("2d");
+    const { x, y } = pos(e);
     ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#111827";
+    ctx.lineTo(x, y);
     ctx.stroke();
     onHasDrawing(true);
   };
-  const stop = () => {
+
+  const end = () => {
     drawing.current = false;
   };
 
   return (
-    <div>
-      <div className="overflow-x-auto">
-        <canvas
-          ref={ref}
-          width={400}
-          height={120}
-          onMouseDown={start}
-          onMouseMove={move}
-          onMouseUp={stop}
-          onMouseLeave={stop}
-          className="rounded-xl cursor-crosshair"
-          onTouchStart={start}
-          onTouchMove={move}
-          onTouchEnd={stop}
-          style={{
-            border: `1px solid ${T.border}`,
-            backgroundColor: T.card,
-            display: "block",
-            maxWidth: "100%",
-            width: "100%",
-            touchAction: "none",
-          }}
-        />
-      </div>
-      <div className="flex items-center justify-between mt-1">
-        <span className="text-[10px]" style={{ color: T.muted }}>
-          Draw your signature above
-        </span>
-        <button
-          type="button"
-          onClick={clear}
-          className="text-[11px] font-semibold hover:underline"
-          style={{ color: T.subtle }}
-        >
-          Clear
-        </button>
-      </div>
+    <div className="space-y-2">
+      <canvas
+        ref={canvasRef}
+        width={520}
+        height={160}
+        onMouseDown={start}
+        onMouseMove={move}
+        onMouseUp={end}
+        onMouseLeave={end}
+        onTouchStart={start}
+        onTouchMove={move}
+        onTouchEnd={end}
+        className="w-full rounded-xl touch-none cursor-crosshair"
+        style={{ backgroundColor: "#fff", border: `1px solid ${T.border}` }}
+      />
+      <button
+        type="button"
+        onClick={clear}
+        className="text-xs font-semibold hover:underline"
+        style={{ color: T.muted }}
+      >
+        Clear
+      </button>
     </div>
   );
 }
 
+/** Renders a typed name to a PNG, so both paths produce the same evidence. */
+function typedSignatureToDataUrl(name) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 520;
+  canvas.height = 160;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#111827";
+  ctx.font = "italic 48px Georgia, serif";
+  ctx.textBaseline = "middle";
+  ctx.fillText(name, 20, 80);
+  return canvas.toDataURL("image/png");
+}
+
 export function SignNowModal({ open, onClose, statement }) {
-  const apprenticeName = statement?.apprentice?.name ?? "Apprentice";
-  const statementRef = statement?.id?.slice(0, 8) ?? "";
+  const { user } = useAuthUser();
+  const canvasRef = useRef(null);
   const [sigTab, setSigTab] = useState("draw");
   const [agreed, setAgreed] = useState(false);
   const [typedName, setTypedName] = useState("");
   const [hasDrawing, setHasDrawing] = useState(false);
-  const [signed, setSigned] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
-  const canSign =
-    sigTab === "draw" ? hasDrawing : typedName.trim().length > 0 && agreed;
-  const sign = () => {
-    if (!canSign) return;
-    setSigned(true);
-    setTimeout(() => {
-      toastSuccess(`Commitment statement signed — ${apprenticeName}`);
-      onClose();
-    }, 900);
+  const statementId = statement?.statementId ?? statement?.id ?? null;
+  const apprenticeName =
+    statement?.apprenticeName ??
+    statement?.apprentice?.name ??
+    "this apprentice";
+
+  /**
+   * F1.3.2 AC1 — "employer can view the full commitment statement text in the
+   * portal before signing".
+   *
+   * The text used to be a hardcoded `DOC` constant naming "Midlands
+   * Engineering Ltd" and "Amara Diallo" — a fixed sample shown to every
+   * employer, for every apprentice, regardless of what their statement
+   * actually said. On the screen where they agree to be bound by it.
+   */
+  const { data: full, isLoading: loadingText } = useCommitmentStatement(
+    statementId,
+    { enabled: open && !!statementId },
+  );
+
+  const { mutateAsync: signStatement, isPending: signing } =
+    useSignCommitmentStatement();
+
+  const signatoryName = getFullName(user) || user?.email || "the signatory";
+
+  /**
+   * The confirmation checkbox gates *both* paths.
+   *
+   * It previously applied only to the typed-name tab, so a drawn signature
+   * could be submitted without the signatory confirming they had read
+   * anything — on a document the PRD describes as legally binding.
+   */
+  const hasMark = sigTab === "draw" ? hasDrawing : typedName.trim().length > 0;
+  const canSign = hasMark && agreed && !!statementId && !signing && !uploading;
+
+  const reset = () => {
+    setSigTab("draw");
+    setAgreed(false);
+    setTypedName("");
+    setHasDrawing(false);
   };
+
+  const handleClose = () => {
+    if (signing || uploading) return;
+    reset();
+    onClose();
+  };
+
+  /**
+   * Signs for real.
+   *
+   * This was `setSigned(true)` followed by a 900ms `setTimeout` and a success
+   * toast. No request was made: the employer drew their signature, ticked the
+   * confirmation, saw "Commitment statement signed", and nothing was recorded
+   * anywhere — no signature row, no PDF, no audit trail, and the other two
+   * parties were never told.
+   */
+  const handleSign = async () => {
+    if (!canSign) return;
+
+    try {
+      setUploading(true);
+      const dataUrl =
+        sigTab === "draw"
+          ? canvasRef.current?.toDataURL("image/png")
+          : typedSignatureToDataUrl(typedName.trim());
+
+      if (!dataUrl) {
+        throw new Error("Could not read the signature. Please try again.");
+      }
+
+      // The API stores a storage *key*, not a data URL — the image is
+      // evidence attached to the signature record alongside the IP and
+      // timestamp (AC3).
+      const signatureImageKey = await uploadFileForKey({
+        file: dataUrlToFile(dataUrl, `signature-${statementId}.png`),
+        category: STORAGE_CATEGORY.SIGNATURE,
+      });
+      setUploading(false);
+
+      await signStatement({
+        id: statementId,
+        party: EMPLOYER_PARTY,
+        signatureImageKey,
+      });
+      reset();
+      onClose();
+    } catch (error) {
+      setUploading(false);
+      toastError(error?.message || "Could not sign the statement.");
+    }
+  };
+
+  const busyLabel = uploading
+    ? "Uploading signature…"
+    : signing
+      ? "Signing…"
+      : "Sign statement";
 
   return (
     <Modal
       open={open}
-      onClose={onClose}
-      size="md"
-      title={`Sign commitment statement — ${apprenticeName}`}
-      description={
-        statementRef ? `Statement ${statementRef}…` : "Commitment statement"
-      }
+      onClose={handleClose}
+      size="lg"
+      title="Sign commitment statement"
+      description={`For ${apprenticeName}`}
       footer={
         <>
           <button
             type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl text-sm font-semibold border hover:opacity-75 transition-opacity"
+            onClick={handleClose}
+            disabled={signing || uploading}
+            className="px-4 py-2 rounded-xl text-sm font-semibold border hover:opacity-75 transition-opacity disabled:opacity-40"
             style={{ borderColor: T.border, color: T.subtle }}
           >
             Cancel
           </button>
           <button
             type="button"
-            onClick={sign}
-            disabled={!canSign || signed}
-            className="px-5 py-2 rounded-xl text-sm font-bold hover:opacity-80 transition-all disabled:opacity-40"
+            onClick={handleSign}
+            disabled={!canSign}
+            title={
+              !hasMark
+                ? "Draw or type your signature first"
+                : !agreed
+                  ? "Confirm you have read the statement"
+                  : undefined
+            }
+            className="px-5 py-2 rounded-xl text-sm font-bold hover:opacity-80 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
             style={{ backgroundColor: T.blue, color: "#fff" }}
           >
-            {signed ? "✓ Signed" : "Confirm signature"}
+            {busyLabel}
           </button>
         </>
       }
     >
       <div className="space-y-4">
-        <div
-          className="rounded-xl p-3.5 h-28 overflow-y-auto text-[11px] leading-relaxed whitespace-pre-line"
-          style={{
-            backgroundColor: T.card,
-            border: `1px solid ${T.border}`,
-            color: T.subtle,
-            fontFamily: "Georgia, serif",
-          }}
-        >
-          {DOC}
+        {/* AC1 — the real statement text, before signing. */}
+        <div>
+          <p className="text-xs font-semibold mb-2" style={{ color: T.subtle }}>
+            Commitment statement{full?.version ? ` · v${full.version}` : ""}
+          </p>
+          <div
+            className="rounded-xl px-4 py-3 max-h-56 overflow-y-auto text-xs whitespace-pre-wrap"
+            style={{
+              backgroundColor: T.card,
+              border: `1px solid ${T.border}`,
+              color: T.subtle,
+            }}
+          >
+            {loadingText
+              ? "Loading the statement…"
+              : renderStatementText(full?.content)}
+          </div>
         </div>
 
-        {/* Signature tabs */}
-        <div>
-          <div
-            className="flex rounded-xl overflow-hidden mb-3"
-            style={{ border: `1px solid ${T.border}` }}
-          >
-            {[
-              ["draw", "Draw signature"],
-              ["type", "Type name"],
-            ].map(([k, l]) => (
-              <button
-                key={k}
-                type="button"
-                onClick={() => setSigTab(k)}
-                className="flex-1 py-2 text-xs font-semibold transition-all"
-                style={{
-                  backgroundColor: sigTab === k ? T.ink : "transparent",
-                  color: sigTab === k ? "#fff" : T.subtle,
-                }}
-              >
-                {l}
-              </button>
-            ))}
-          </div>
-          {sigTab === "draw" ? (
-            <DrawCanvas onHasDrawing={setHasDrawing} />
-          ) : (
-            <div className="space-y-3">
-              <input
-                type="text"
-                placeholder="Type your full name"
-                value={typedName}
-                onChange={(e) => setTypedName(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl text-sm border focus:outline-none"
-                style={{
-                  borderColor: T.border,
-                  color: T.ink,
-                  backgroundColor: T.surface,
-                }}
-              />
-              <label className="flex items-start gap-2.5 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={agreed}
-                  onChange={(e) => setAgreed(e.target.checked)}
-                  className="mt-0.5 shrink-0"
-                  style={{ accentColor: T.blue }}
-                />
-                <span className="text-xs" style={{ color: T.ink }}>
-                  I, <strong>Sarah Rahman</strong>, confirm I have read and
-                  agree to the terms of this commitment statement on behalf of{" "}
-                  <strong>Midlands Engineering Ltd</strong>
-                </span>
-              </label>
-            </div>
-          )}
+        {/* AC2 — drawn signature or typed name. */}
+        <div
+          className="inline-flex rounded-xl overflow-hidden"
+          style={{ border: `1px solid ${T.border}` }}
+        >
+          {[
+            ["draw", "Draw signature"],
+            ["type", "Type name"],
+          ].map(([key, label], i) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setSigTab(key)}
+              className="px-4 py-2 text-xs font-semibold transition-all"
+              style={{
+                backgroundColor: sigTab === key ? T.ink : "transparent",
+                color: sigTab === key ? "#fff" : T.subtle,
+                borderRight: i === 0 ? `1px solid ${T.border}` : "none",
+              }}
+            >
+              {label}
+            </button>
+          ))}
         </div>
+
+        {sigTab === "draw" ? (
+          <DrawCanvas canvasRef={canvasRef} onHasDrawing={setHasDrawing} />
+        ) : (
+          <input
+            type="text"
+            value={typedName}
+            onChange={(e) => setTypedName(e.target.value)}
+            placeholder="Type your full name"
+            className="w-full rounded-xl px-3 py-2.5 text-base border focus:outline-none"
+            style={{
+              borderColor: T.border,
+              backgroundColor: T.surface,
+              color: T.ink,
+              fontFamily: "Georgia, serif",
+              fontStyle: "italic",
+            }}
+          />
+        )}
+
+        {/* AC2 — confirmation checkbox, required on both paths. */}
+        <label className="flex items-start gap-2.5 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+            className="mt-0.5 rounded"
+            style={{ accentColor: T.blue }}
+          />
+          <span className="text-xs" style={{ color: T.subtle }}>
+            {/* The signatory is the signed-in user. This was hardcoded to
+                "Sarah Rahman", so every employer signed under one name. */}
+            I, <strong style={{ color: T.ink }}>{signatoryName}</strong>,
+            confirm I have read and understood this commitment statement and
+            agree to be bound by it.
+          </span>
+        </label>
+
+        <p className="text-[11px]" style={{ color: T.muted }}>
+          Your signature is recorded with the date, time and IP address it was
+          made from, and a signed PDF is generated immediately.
+        </p>
       </div>
     </Modal>
   );

@@ -9,6 +9,7 @@ import { COMMITMENT_QUERY_KEYS } from "./keys";
 import {
   cancelCommitmentStatement,
   getCommitmentBoard,
+  getCommitmentStatement,
   createCommitmentStatement,
   getCommitmentStatements,
   publishCommitmentStatement,
@@ -30,6 +31,26 @@ export function useCommitmentBoard(filters = {}) {
     enabled: !!orgId,
     staleTime: 60 * 1000,
     meta: { skipAuthRedirect: true },
+  });
+}
+
+/**
+ * F1.3.2 AC1 — the full statement text, read before signing.
+ *
+ * The detail endpoint resolves for any *party* to the statement rather than
+ * only the organisation that owns it, which is what lets an employer read a
+ * document the provider drafted.
+ */
+export function useCommitmentStatement(id, options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: COMMITMENT_QUERY_KEYS.detail(orgId, id),
+    queryFn: () => getCommitmentStatement({ orgId, id }),
+    enabled: !!orgId && !!id,
+    staleTime: 60 * 1000,
+    meta: { skipAuthRedirect: true },
+    ...options,
   });
 }
 
