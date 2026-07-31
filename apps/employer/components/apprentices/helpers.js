@@ -15,8 +15,8 @@ export const statusMeta = (s) =>
     ? { label: "On track", color: T.green, bg: T.greenLight }
     : s === "at_risk"
       ? { label: "At risk", color: T.amber, bg: T.amberLight }
-      : s === "overdue" || s === "off_track"
-        ? { label: "Overdue", color: T.red, bg: T.redLight }
+      : s === "critically_behind" || s === "off_track" || s === "overdue"
+        ? { label: "Critically behind", color: T.red, bg: T.redLight }
         : s === "epa_ready"
           ? { label: "EPA Ready", color: "#1847d4", bg: "#e8eefb" }
           : s === "epa_imminent"

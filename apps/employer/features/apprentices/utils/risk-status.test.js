@@ -7,7 +7,7 @@ import {
   PACE_STATUS,
   behindPercentLabel,
   isFlagged,
-  isOverdue,
+  isCriticallyBehind,
   normalisePaceStatus,
 } from "./risk-status";
 
@@ -20,10 +20,10 @@ import {
  * nothing anywhere on the screen.
  */
 describe("normalisePaceStatus", () => {
-  it("maps off_track to overdue", () => {
+  it("maps off_track to critically_behind", () => {
     // The whole point: without this the worst cases render as "Unknown".
     expect(normalisePaceStatus(API_PACE_LEVEL.OFF_TRACK)).toBe(
-      PACE_STATUS.OVERDUE,
+      PACE_STATUS.CRITICALLY_BEHIND,
     );
   });
 
@@ -51,35 +51,35 @@ describe("normalisePaceStatus", () => {
   });
 });
 
-describe("isFlagged / isOverdue", () => {
-  it("counts both at-risk and overdue as flagged", () => {
+describe("isFlagged / isCriticallyBehind", () => {
+  it("counts both at-risk and critically-behind as flagged", () => {
     // The stat card and the alert banner both filtered on at_risk alone, so
     // overdue apprentices appeared in neither.
     expect(isFlagged(PACE_STATUS.AT_RISK)).toBe(true);
-    expect(isFlagged(PACE_STATUS.OVERDUE)).toBe(true);
+    expect(isFlagged(PACE_STATUS.CRITICALLY_BEHIND)).toBe(true);
   });
 
   it("does not flag on track", () => {
     expect(isFlagged(PACE_STATUS.ON_TRACK)).toBe(false);
   });
 
-  it("distinguishes overdue from at risk", () => {
-    expect(isOverdue(PACE_STATUS.OVERDUE)).toBe(true);
-    expect(isOverdue(PACE_STATUS.AT_RISK)).toBe(false);
+  it("distinguishes critically behind from at risk", () => {
+    expect(isCriticallyBehind(PACE_STATUS.CRITICALLY_BEHIND)).toBe(true);
+    expect(isCriticallyBehind(PACE_STATUS.AT_RISK)).toBe(false);
   });
 });
 
 describe("statusMeta after normalisation", () => {
-  it("gives overdue a red badge, not grey Unknown", () => {
+  it("gives critically-behind a red badge, not grey Unknown", () => {
     const meta = statusMeta(normalisePaceStatus(API_PACE_LEVEL.OFF_TRACK));
-    expect(meta.label).toBe("Overdue");
+    expect(meta.label).toBe("Critically behind");
     expect(meta.label).not.toBe("Unknown");
   });
 
   it("still handles the raw API value if something skips the mapper", () => {
     // Defence in depth: any path that bypasses normalisation degrades to a
     // correct red badge rather than a grey "Unknown".
-    expect(statusMeta("off_track").label).toBe("Overdue");
+    expect(statusMeta("off_track").label).toBe("Critically behind");
   });
 
   it("labels at risk in amber", () => {

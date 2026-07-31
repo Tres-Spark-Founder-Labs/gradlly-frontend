@@ -26,11 +26,23 @@
  * than silently resolved here.
  */
 
-/** What the employer UI displays. */
+/**
+ * What the employer UI displays.
+ *
+ * The 30%-behind level is `critically_behind`, not `overdue`. The PRD uses
+ * "Overdue" in three different senses — an apprentice behind on off-the-job
+ * hours (F1.2.4 AC3), a review not completed within three days of its
+ * scheduled date (F2.3.x), and an incomplete quality-improvement action
+ * (F2.2.x). Client decision, 31 July 2026: "Overdue" keeps the review meaning
+ * across the platform, and the off-the-job flag is renamed here.
+ *
+ * The stored value changed too, not just the label, so the collision cannot
+ * come back through a string comparison somewhere.
+ */
 export const PACE_STATUS = Object.freeze({
   ON_TRACK: "on_track",
   AT_RISK: "at_risk",
-  OVERDUE: "overdue",
+  CRITICALLY_BEHIND: "critically_behind",
 });
 
 /** What `GET /enrolments` actually returns for `otjPaceAlertLevel`. */
@@ -43,7 +55,7 @@ export const API_PACE_LEVEL = Object.freeze({
 const API_TO_UI = Object.freeze({
   [API_PACE_LEVEL.ON_TRACK]: PACE_STATUS.ON_TRACK,
   [API_PACE_LEVEL.AT_RISK]: PACE_STATUS.AT_RISK,
-  [API_PACE_LEVEL.OFF_TRACK]: PACE_STATUS.OVERDUE,
+  [API_PACE_LEVEL.OFF_TRACK]: PACE_STATUS.CRITICALLY_BEHIND,
 });
 
 /**
@@ -61,14 +73,23 @@ export function normalisePaceStatus(level) {
   return API_TO_UI[level] ?? PACE_STATUS.ON_TRACK;
 }
 
-/** True when the apprentice carries an at-risk or overdue flag (AC5). */
+/** True when the apprentice carries either off-the-job flag (AC5). */
 export function isFlagged(status) {
-  return status === PACE_STATUS.AT_RISK || status === PACE_STATUS.OVERDUE;
+  return (
+    status === PACE_STATUS.AT_RISK || status === PACE_STATUS.CRITICALLY_BEHIND
+  );
 }
 
-/** Overdue outranks at-risk when ordering or picking an accent colour. */
-export function isOverdue(status) {
-  return status === PACE_STATUS.OVERDUE;
+/**
+ * The more serious of the two levels — outranks at-risk when ordering or
+ * picking an accent colour.
+ *
+ * Named `isCriticallyBehind` rather than `isOverdue` so the employer-side
+ * concept cannot be confused with an overdue review, which is what "overdue"
+ * means everywhere else in the platform.
+ */
+export function isCriticallyBehind(status) {
+  return status === PACE_STATUS.CRITICALLY_BEHIND;
 }
 
 /**
