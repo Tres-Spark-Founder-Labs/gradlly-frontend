@@ -4,103 +4,55 @@ import { Bell, Download, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { T } from "@/components/dashboard/levy/tokens";
-import { useApprenticeRoster } from "@/features/apprentices/queries/apprentices.query";
-import { useCommitmentStatements } from "@/features/commitments/queries/commitments.query";
+import { useCommitmentBoard } from "@/features/commitments/queries/commitments.query";
+import {
+  cleanBoardFilters,
+  deriveBoardFilterOptions,
+} from "@/features/commitments/utils/board";
 
-import { CommitmentList } from "./CommitmentList";
-import { CommitmentStatCards } from "./CommitmentStatCards";
-import { CommitmentToolbar } from "./CommitmentToolbar";
-import { ComplianceBanner } from "./ComplianceBanner";
+import { CommitmentBoardFilters } from "./CommitmentBoardFilters";
+import { CommitmentBoardTable } from "./CommitmentBoardTable";
 import { DocumentPanel } from "./DocumentPanel";
 import { DraftDrawer } from "./DraftDrawer";
 import { SigningAlert } from "./SigningAlert";
 import { SignNowModal } from "./SignNowModal";
 
-// ─── Status normaliser ────────────────────────────────────────────────────────
-
-function mapStatus(apiStatus) {
-  switch (apiStatus) {
-    case "submitted":
-    case "awaiting_signatures":
-      return "pending_employer";
-    case "superseded":
-      return "renewal";
-    default:
-      return apiStatus; // draft | signed | cancelled
-  }
-}
-
-function normalizeStatement(cs, rosterById) {
-  const apprenticeData = rosterById[cs.apprenticeId];
-  const uiStatus = mapStatus(cs.status);
-  const isSigned = cs.status === "signed";
-  const hasApprenticeSigned = ["awaiting_signatures", "signed"].includes(
-    cs.status,
-  );
-
-  return {
-    id: cs.id,
-    groupId: cs.groupId,
-    enrolmentId: cs.enrolmentId,
-    apprenticeId: cs.apprenticeId,
-    apprentice: {
-      id: cs.apprenticeId,
-      name: apprenticeData?.name ?? "—",
-      initials: apprenticeData?.initials ?? "?",
-      avatarColor: apprenticeData?.avatarColor ?? "#6b7280",
-    },
-    standard: "—",
-    provider: "—",
-    startDate: "—",
-    status: uiStatus,
-    version: cs.version ?? 1,
-    needsRenewal: cs.status === "superseded",
-    content: cs.content,
-    employerSigned: { signed: isSigned, name: null, date: null },
-    providerSigned: { signed: isSigned, name: null, date: null },
-    apprenticeSigned: { signed: hasApprenticeSigned, name: null, date: null },
-    documentUrl: cs.finalSignedPdfKey ?? null,
-    publishedAt: cs.publishedAt,
-  };
-}
-
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 
 export function CommitmentsDashboard() {
-  const [filter, setFilter] = useState("all");
   const [modal, setModal] = useState(null); // { type: 'sign', statement } | null
   const [drawer, setDrawer] = useState(false);
   const [panel, setPanel] = useState(null);
+  const [filters, setFilters] = useState({});
 
-  const { data: rawStatements = [], isLoading } = useCommitmentStatements();
-  const { roster } = useApprenticeRoster();
+  /**
+   * F1.3.1 — reads the board endpoint.
+   *
+   * This previously called `useCommitmentStatements`, which hits the list
+   * endpoint scoped to the statement's owning organisation. Commitment
+   * statements are drafted by the provider, so that returned nothing for an
+   * employer: the screen rendered an empty table and looked like an employer
+   * with no commitments rather than a query that could never match.
+   *
+   * It then filtered on a `pending_employer` status that no endpoint emits,
+   * so the "awaiting your signature" alert could never appear either.
+   */
+  const { data, isLoading } = useCommitmentBoard(cleanBoardFilters(filters));
 
-  const rosterById = useMemo(() => {
-    const map = {};
-    for (const a of roster) map[a.id] = a;
-    return map;
-  }, [roster]);
+  /**
+   * Memoised because `data?.rows ?? []` builds a fresh array on every render
+   * when the query has not resolved, which would make the `useMemo` below
+   * recompute every time and defeat the point of it.
+   */
+  const rows = useMemo(() => data?.rows ?? [], [data]);
+  const actionRequiredCount = data?.actionRequiredCount ?? 0;
 
-  const statements = useMemo(
-    () => rawStatements.map((cs) => normalizeStatement(cs, rosterById)),
-    [rawStatements, rosterById],
-  );
+  // Options come from the rows themselves, so the dropdowns can only offer
+  // values that exist in the data (AC4).
+  const options = useMemo(() => deriveBoardFilterOptions(rows), [rows]);
 
-  // First statement awaiting employer signature
-  const pendingSignature = statements.find(
-    (s) => s.status === "pending_employer",
-  );
-
-  if (isLoading) {
-    return (
-      <div
-        className="flex items-center justify-center py-24"
-        style={{ color: T.muted }}
-      >
-        <p className="text-sm">Loading commitments…</p>
-      </div>
-    );
-  }
+  // AC3 — the first row the employer can actually sign drives the banner.
+  const pendingSignature = rows.find((r) => r.actionRequired) ?? null;
 
   return (
     <div
@@ -143,12 +95,6 @@ export function CommitmentsDashboard() {
         </div>
       </div>
 
-      <ComplianceBanner
-        statements={statements}
-        onSignNow={(s) => setModal({ type: "sign", statement: s })}
-      />
-      <CommitmentStatCards statements={statements} />
-
       {pendingSignature && (
         <SigningAlert
           statement={pendingSignature}
@@ -160,11 +106,18 @@ export function CommitmentsDashboard() {
       )}
 
       <div className="space-y-3">
-        <CommitmentToolbar filter={filter} onFilter={setFilter} />
-        <CommitmentList
-          statements={statements}
-          filter={filter}
-          onSign={(s) => setModal({ type: "sign", statement: s })}
+        {/* AC4 */}
+        <CommitmentBoardFilters
+          filters={filters}
+          onChange={setFilters}
+          options={options}
+          actionRequiredCount={actionRequiredCount}
+        />
+        {/* AC1, AC2, AC3 */}
+        <CommitmentBoardTable
+          rows={rows}
+          isLoading={isLoading}
+          onSign={(row) => setModal({ type: "sign", statement: row })}
           onView={setPanel}
         />
       </div>

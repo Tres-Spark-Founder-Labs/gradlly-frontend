@@ -12,6 +12,7 @@ import { LogoutButton } from "@/features/auth/components/LogoutButton";
 import { OrgSwitcher } from "@/features/auth/components/OrgSwitcher";
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
 import { useRoleAccess } from "@/features/auth/hooks/useRoleAccess";
+import { useCommitmentBoard } from "@/features/commitments/queries/commitments.query";
 import { useOtjPendingCount } from "@/features/otj/queries/otj.query";
 import { capitalise, cn, getFullName, getInitials } from "@/utils/helper";
 
@@ -54,8 +55,25 @@ export function Sidebar({ isOpen, onClose }) {
   const { can } = useRoleAccess();
   const pathname = usePathname();
   const otjPendingCount = useOtjPendingCount();
+  // F1.3.1 AC5 — "'Statements requiring action' count is shown as a badge on
+  // the sidebar navigation item". The board returns this alongside its rows,
+  // so the badge and the table are computed from one query and cannot
+  // disagree.
+  const commitmentBoard = useCommitmentBoard();
 
-  const liveBadges = { "/otj-approvals": otjPendingCount.data ?? 0 };
+  /**
+   * Live counts override the static `badge` values in sidebar.data.js.
+   *
+   * Those statics are placeholders — Commitments was hardcoded to 2 and
+   * Messages to 5, shown to every employer regardless of what was actually
+   * waiting. A red badge that never changes trains people to ignore it, so
+   * anything still on a static number should be treated as unfinished rather
+   * than as a working feature.
+   */
+  const liveBadges = {
+    "/otj-approvals": otjPendingCount.data ?? 0,
+    "/commitments": commitmentBoard.data?.actionRequiredCount ?? 0,
+  };
 
   // Active matching for nested routes (e.g. Settings sub-pages). Bare /settings
   // resolves to its default first sub-page (/settings/invitations).

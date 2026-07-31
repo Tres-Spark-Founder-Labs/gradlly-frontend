@@ -10,6 +10,50 @@ function buildHeaders(orgId) {
   return { "x-organisation-id": orgId };
 }
 
+/**
+ * F1.3.1 — the employer status board.
+ *
+ * Distinct from `getCommitmentStatements`, which hits the list endpoint
+ * scoped to the statement's owning organisation. Commitment statements are
+ * drafted by the provider, so that endpoint returns nothing for an employer
+ * no matter what filters are applied.
+ *
+ * Returns `{ rows, actionRequiredCount, total }`. The count is deliberately
+ * calculated across the whole board rather than the filtered rows, because it
+ * drives the sidebar badge (AC5).
+ */
+export async function getCommitmentBoard({
+  orgId,
+  status,
+  providerOrganisationId,
+  standardId,
+  actionRequiredOnly,
+} = {}) {
+  try {
+    const params = new URLSearchParams();
+    if (status) params.set("status", status);
+    if (providerOrganisationId) {
+      params.set("providerOrganisationId", providerOrganisationId);
+    }
+    if (standardId) params.set("standardId", standardId);
+    if (actionRequiredOnly) params.set("actionRequiredOnly", "true");
+
+    const qs = params.toString();
+    const result = await $apiClient.get(
+      qs ? `${COMMITMENT_PATHS.BOARD}?${qs}` : COMMITMENT_PATHS.BOARD,
+      { headers: buildHeaders(orgId) },
+    );
+    const data = result.data?.data ?? result.data;
+    return {
+      rows: data?.rows ?? [],
+      actionRequiredCount: data?.actionRequiredCount ?? 0,
+      total: data?.total ?? 0,
+    };
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
 export async function getCommitmentStatements({
   orgId,
   page = 1,

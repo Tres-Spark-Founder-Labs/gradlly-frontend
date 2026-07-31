@@ -8,11 +8,30 @@ import { toastError, toastSuccess } from "@/hooks/useToast";
 import { COMMITMENT_QUERY_KEYS } from "./keys";
 import {
   cancelCommitmentStatement,
+  getCommitmentBoard,
   createCommitmentStatement,
   getCommitmentStatements,
   publishCommitmentStatement,
   signCommitmentStatement,
 } from "../services/commitments.service";
+
+/**
+ * F1.3.1 2014 the employer status board.
+ *
+ * `actionRequiredCount` comes back alongside the rows and is what the sidebar
+ * badge reads (AC5), so the badge and the table can never disagree.
+ */
+export function useCommitmentBoard(filters = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: COMMITMENT_QUERY_KEYS.board(orgId, filters),
+    queryFn: () => getCommitmentBoard({ orgId, ...filters }),
+    enabled: !!orgId,
+    staleTime: 60 * 1000,
+    meta: { skipAuthRedirect: true },
+  });
+}
 
 export function useCommitmentStatements(filters = {}) {
   const { orgId } = useAuthUser();
