@@ -54,6 +54,41 @@ export async function getCommitmentBoard({
   }
 }
 
+/** F1.3.2 AC5 — all versions with dates and signatories, newest first. */
+export async function getCommitmentVersionHistory({ orgId, groupId }) {
+  try {
+    const result = await $apiClient.get(
+      COMMITMENT_PATHS.versionHistory(groupId),
+      { headers: buildHeaders(orgId) },
+    );
+    const data = result.data?.data ?? result.data;
+    return {
+      groupId: data?.groupId ?? groupId,
+      versions: data?.versions ?? [],
+    };
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+/**
+ * F1.3.2 AC6 — a short-lived link to the signed PDF.
+ *
+ * Not the generic storage download endpoint: that authorises on the key
+ * prefix, and the PDF sits under the drafting provider namespace, so it
+ * refuses an employer who is a party to the document.
+ */
+export async function getSignedCommitmentDocument({ orgId, id }) {
+  try {
+    const result = await $apiClient.get(COMMITMENT_PATHS.signedDocument(id), {
+      headers: buildHeaders(orgId),
+    });
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
 export async function getCommitmentStatements({
   orgId,
   page = 1,

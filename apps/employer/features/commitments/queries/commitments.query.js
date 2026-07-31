@@ -10,6 +10,8 @@ import {
   cancelCommitmentStatement,
   getCommitmentBoard,
   getCommitmentStatement,
+  getCommitmentVersionHistory,
+  getSignedCommitmentDocument,
   createCommitmentStatement,
   getCommitmentStatements,
   publishCommitmentStatement,
@@ -51,6 +53,41 @@ export function useCommitmentStatement(id, options = {}) {
     staleTime: 60 * 1000,
     meta: { skipAuthRedirect: true },
     ...options,
+  });
+}
+
+/** F1.3.2 AC5 — version history for a statement group. */
+export function useCommitmentVersionHistory(groupId, options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: COMMITMENT_QUERY_KEYS.versionHistory(orgId, groupId),
+    queryFn: () => getCommitmentVersionHistory({ orgId, groupId }),
+    enabled: !!orgId && !!groupId,
+    staleTime: 60 * 1000,
+    meta: { skipAuthRedirect: true },
+    ...options,
+  });
+}
+
+/**
+ * F1.3.2 AC6 — fetches a fresh presigned link and opens it.
+ *
+ * A mutation rather than a query: the URL is short-lived, so it is requested
+ * at the moment of the click rather than held in a cache that could hand back
+ * an expired link.
+ */
+export function useDownloadSignedCommitment() {
+  const { orgId } = useAuthUser();
+
+  return useMutation({
+    mutationFn: (id) => getSignedCommitmentDocument({ orgId, id }),
+    onSuccess: (doc) => {
+      if (doc?.downloadUrl) window.open(doc.downloadUrl, "_blank", "noopener");
+    },
+    onError: (error) => {
+      toastError(error.message || "Could not open the signed document.");
+    },
   });
 }
 

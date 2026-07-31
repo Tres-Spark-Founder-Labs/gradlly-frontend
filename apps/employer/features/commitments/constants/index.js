@@ -8,6 +8,10 @@ export const COMMITMENT_PATHS = Object.freeze({
   // F1.3.1 — the employer status board. Scoped by the enrolment employer
   // link, unlike LIST which is scoped to the statement owner (the provider).
   BOARD: "/api/v1/commitment-statements/board",
+  // F1.3.2 AC5 / AC6
+  versionHistory: (groupId) =>
+    `/api/v1/commitment-statements/${groupId}/version-history`,
+  signedDocument: (id) => `/api/v1/commitment-statements/${id}/signed-document`,
 });
 
 export const COMMITMENT_STATUSES = Object.freeze({
