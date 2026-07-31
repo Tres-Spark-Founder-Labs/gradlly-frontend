@@ -1,5 +1,14 @@
+"use client";
+
+import {
+  useEmployerManagerOptions,
+  useLinkedProviders,
+} from "@/features/enrolments/queries/enrolments.query";
+import { useStandards } from "@/features/standards/queries/standards.query";
+
 import { T } from "./tokens";
 
+/** Mirrors EnrolmentPipelineState on the API (F1.2.5 AC5). */
 const STAGES = [
   { label: "Invited", desc: "Magic-link sent to apprentice" },
   { label: "Account created", desc: "Apprentice registered on Portal 3" },
@@ -49,25 +58,52 @@ function StageTracker({ activeStage = 0 }) {
   );
 }
 
-export function EnrolStep3({ data }) {
+export function EnrolStep3({ data, missing = [] }) {
+  /**
+   * The form holds ids for standard, provider and manager, so the review has
+   * to resolve them back to names. Printing the raw values here would show the
+   * employer three UUIDs and ask them to confirm.
+   */
+  const { data: standards = [] } = useStandards();
+  const { data: providers = [] } = useLinkedProviders();
+  const { data: managers = [] } = useEmployerManagerOptions();
+
   const fullName = [data.firstName, data.lastName].filter(Boolean).join(" ");
+  const standardName = standards.find((s) => s.id === data.standard)?.title;
+  const providerName = providers.find(
+    (p) => p.organisationId === data.provider,
+  )?.name;
+  const managerName = managers.find((m) => m.id === data.manager)?.displayName;
 
   const summary = [
     ["Name", fullName || "—"],
     ["Email", data.email || "—"],
-    ["Standard", data.standard || "—"],
-    ["Provider", data.provider || "—"],
+    ["Employee ID", data.employeeId || "—"],
+    ["Job title", data.jobTitle || "—"],
+    ["Standard", standardName || "—"],
+    ["Provider", providerName || "—"],
+    ["Line manager", managerName || "—"],
     ["Start date", data.startDate || "—"],
-    ["Cohort", data.cohort || "—"],
   ];
 
+  /**
+   * Derived from the same `missingEnrolFields` the submit button uses, rather
+   * than a hand-written list. The old checklist ticked "Training provider
+   * selected" against a field no step collected, and carried a permanently
+   * unticked "Commitment statement generated after submission" — which nothing
+   * in the platform does.
+   */
+  const missingFields = new Set(missing.map((m) => m.field));
   const checks = [
-    { ok: !!fullName, text: "Learner name provided" },
-    { ok: !!data.email, text: "Email address provided" },
-    { ok: !!data.standard, text: "Apprenticeship standard selected" },
-    { ok: !!data.provider, text: "Training provider selected" },
-    { ok: false, text: "Commitment statement generated after submission" },
-  ];
+    { field: "firstName", text: "Learner name provided" },
+    { field: "email", text: "Email address provided" },
+    { field: "standard", text: "Apprenticeship standard selected" },
+    { field: "provider", text: "Training provider selected" },
+    { field: "manager", text: "Line manager selected" },
+    { field: "startDate", text: "Start date set" },
+  ].map((c) => ({ ...c, ok: !missingFields.has(c.field) }));
+
+  const allOk = checks.every((c) => c.ok);
 
   return (
     <div className="space-y-4">
@@ -79,9 +115,9 @@ export function EnrolStep3({ data }) {
         style={{ backgroundColor: T.card, border: `1px solid ${T.border}` }}
       >
         {summary.map(([l, v]) => (
-          <div key={l} className="flex justify-between text-xs">
+          <div key={l} className="flex justify-between text-xs gap-4">
             <span style={{ color: T.muted }}>{l}</span>
-            <span className="font-semibold" style={{ color: T.ink }}>
+            <span className="font-semibold text-right" style={{ color: T.ink }}>
               {v}
             </span>
           </div>
@@ -90,8 +126,8 @@ export function EnrolStep3({ data }) {
       <div
         className="rounded-xl px-4 py-3 space-y-2"
         style={{
-          backgroundColor: T.greenLight,
-          border: `1px solid ${T.green}20`,
+          backgroundColor: allOk ? T.greenLight : T.amberLight,
+          border: `1px solid ${allOk ? T.green : T.amber}20`,
         }}
       >
         {checks.map((c) => (
@@ -111,8 +147,9 @@ export function EnrolStep3({ data }) {
         <StageTracker activeStage={0} />
       </div>
       <p className="text-xs px-1" style={{ color: T.subtle }}>
-        On submit, a magic-link invitation will be sent to the apprentice&apos;s
-        email. Stages will auto-update as each completes.
+        On submit we email the apprentice an invitation to set up their account,
+        and notify {providerName || "the training provider"} that the enrolment
+        is waiting for them to accept.
       </p>
     </div>
   );

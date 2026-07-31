@@ -6,6 +6,12 @@ export const ENROLMENT_PATHS = Object.freeze({
   cancel: (id) => `/api/v1/enrolments/${id}/cancel`,
   complete: (id) => `/api/v1/enrolments/${id}/complete`,
   participants: (id) => `/api/v1/enrolments/${id}/participants`,
+  // F1.2.5 — the enrol flow needs all three: the provider link, the line
+  // manager, and activation (which is what triggers the apprentice invitation
+  // and the notification to the provider).
+  organisationLinks: (id) => `/api/v1/enrolments/${id}/organisation-links`,
+  LINKED_PROVIDERS: "/api/v1/enrolments/linked-providers",
+  EMPLOYER_MANAGER_OPTIONS: "/api/v1/enrolments/employer-manager-options",
 });
 
 export const ENROLMENT_STATUS = Object.freeze({
