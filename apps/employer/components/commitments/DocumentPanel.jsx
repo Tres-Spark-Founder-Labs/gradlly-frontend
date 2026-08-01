@@ -1,15 +1,19 @@
 "use client";
-import { Download, X } from "lucide-react";
+import { Download, FileText, X } from "lucide-react";
+import { useState } from "react";
 
 import { T } from "@/components/dashboard/levy/tokens";
 import {
   useCommitmentVersionHistory,
   useDownloadSignedCommitment,
+  useExportCommitmentAuditTrail,
 } from "@/features/commitments/queries/commitments.query";
 import {
   partyStatusMeta,
   statementStatusLabel,
 } from "@/features/commitments/utils/board";
+import { usePdfJobPoll } from "@/hooks/usePdfJobPoll";
+import { toastError } from "@/hooks/useToast";
 
 /** Party keys the API returns, in signing order (COMMITMENT_SIGNING_ORDER). */
 const PARTY_LABELS = Object.freeze({
@@ -143,6 +147,39 @@ export function DocumentPanel({ statement, onClose }) {
   const { mutate: download, isPending: downloading } =
     useDownloadSignedCommitment();
 
+  /**
+   * F1.3.3 AC3 — the audit trail as an Ofsted evidence document.
+   *
+   * Generated on demand rather than held anywhere: the trail is the database,
+   * and a stored PDF would go stale the moment anyone else opened the
+   * statement.
+   */
+  const [auditJobId, setAuditJobId] = useState(null);
+  const { mutateAsync: exportAuditTrail, isPending: queueingAudit } =
+    useExportCommitmentAuditTrail();
+
+  usePdfJobPoll({
+    jobId: auditJobId,
+    enabled: !!auditJobId,
+    onComplete: (job) => {
+      setAuditJobId(null);
+      if (job?.status === "completed" && job.downloadUrl) {
+        window.open(job.downloadUrl, "_blank", "noopener,noreferrer");
+      } else {
+        toastError("Audit trail export failed. Please try again.");
+      }
+    },
+  });
+
+  const handleExportAuditTrail = async () => {
+    if (!currentStatementId) return;
+    const job = await exportAuditTrail(currentStatementId).catch(() => null);
+    // The mutation already toasts on failure; only start polling on a real id.
+    if (job?.jobId) setAuditJobId(job.jobId);
+  };
+
+  const preparingAudit = queueingAudit || !!auditJobId;
+
   const versions = data?.versions ?? [];
 
   return (
@@ -210,6 +247,28 @@ export function DocumentPanel({ statement, onClose }) {
               />
             ))
           )}
+        </div>
+
+        {/* F1.3.3 AC3 — always offered, including on a draft: "nothing has
+            happened to this statement yet" is itself a thing an inspector can
+            be shown. */}
+        <div
+          className="shrink-0 px-5 py-4 space-y-2"
+          style={{ borderTop: `1px solid ${T.border}` }}
+        >
+          <button
+            type="button"
+            onClick={handleExportAuditTrail}
+            disabled={!currentStatementId || preparingAudit}
+            className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold hover:opacity-80 transition-opacity disabled:opacity-40"
+            style={{ backgroundColor: "#f5f4f2", color: T.subtle }}
+          >
+            <FileText className="h-3.5 w-3.5" />
+            {preparingAudit ? "Preparing…" : "Export audit trail (PDF)"}
+          </button>
+          <p className="text-[11px] text-center" style={{ color: T.muted }}>
+            Every version, view and signature, with who did it and when.
+          </p>
         </div>
       </div>
     </>

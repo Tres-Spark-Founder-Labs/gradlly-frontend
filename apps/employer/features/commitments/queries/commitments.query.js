@@ -8,6 +8,7 @@ import { toastError, toastSuccess } from "@/hooks/useToast";
 import { COMMITMENT_QUERY_KEYS } from "./keys";
 import {
   cancelCommitmentStatement,
+  exportCommitmentAuditTrail,
   getCommitmentBoard,
   getCommitmentStatement,
   getCommitmentVersionHistory,
@@ -87,6 +88,25 @@ export function useDownloadSignedCommitment() {
     },
     onError: (error) => {
       toastError(error.message || "Could not open the signed document.");
+    },
+  });
+}
+
+/**
+ * F1.3.3 AC3 — queues the audit trail PDF.
+ *
+ * Returns the job; the caller polls it with `usePdfJobPoll` and opens the
+ * download when it completes. No success toast here — "queued" is not the
+ * outcome the user is waiting for, and claiming it is would be the same
+ * success-theatre the signing modal used to do.
+ */
+export function useExportCommitmentAuditTrail() {
+  const { orgId } = useAuthUser();
+
+  return useMutation({
+    mutationFn: (id) => exportCommitmentAuditTrail({ orgId, id }),
+    onError: (error) => {
+      toastError(error.message || "Could not export the audit trail.");
     },
   });
 }

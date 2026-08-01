@@ -89,6 +89,27 @@ export async function getSignedCommitmentDocument({ orgId, id }) {
   }
 }
 
+/**
+ * F1.3.3 AC3 — queues the Ofsted-ready audit trail PDF.
+ *
+ * Returns `{ jobId, status, ... }`; the caller polls `GET /pdf/jobs/:id` and
+ * opens `downloadUrl` when it completes. Asynchronous because the trail spans
+ * every version and every signature of the statement, which is more work than
+ * a request should hold open.
+ */
+export async function exportCommitmentAuditTrail({ orgId, id }) {
+  try {
+    const result = await $apiClient.post(
+      COMMITMENT_PATHS.auditTrailExport(id),
+      {},
+      { headers: buildHeaders(orgId) },
+    );
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
 export async function getCommitmentStatements({
   orgId,
   page = 1,

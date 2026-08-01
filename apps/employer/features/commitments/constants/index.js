@@ -12,6 +12,10 @@ export const COMMITMENT_PATHS = Object.freeze({
   versionHistory: (groupId) =>
     `/api/v1/commitment-statements/${groupId}/version-history`,
   signedDocument: (id) => `/api/v1/commitment-statements/${id}/signed-document`,
+  // F1.3.3 AC3 — queues an Ofsted-ready PDF of the statement's audit trail.
+  // Returns a job to poll, like every other PDF on the platform.
+  auditTrailExport: (id) =>
+    `/api/v1/commitment-statements/${id}/audit-trail/export`,
 });
 
 export const COMMITMENT_STATUSES = Object.freeze({
