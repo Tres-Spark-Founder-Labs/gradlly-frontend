@@ -9,4 +9,5 @@ export const REPORTING_QUERY_KEYS = {
     orgId,
     groupBy,
   ],
+  levyRoiSubscribers: (orgId) => ["reporting", "levy-roi-subscribers", orgId],
 };

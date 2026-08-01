@@ -66,3 +66,71 @@ export async function exportLevyRoiPdf(orgId) {
     throw normalizeApiClientError(e);
   }
 }
+
+/** F1.4.1 AC5 — who currently receives the scheduled monthly report. */
+export async function getLevyRoiSubscribers(orgId) {
+  try {
+    const result = await $apiClient.get(REPORTING_PATHS.LEVY_ROI_SUBSCRIBERS, {
+      headers: orgId ? { "X-Organisation-Id": orgId } : undefined,
+    });
+    return unwrap(result) ?? [];
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+/**
+ * Replaces the distribution list wholesale.
+ *
+ * A PUT of the full list rather than add/remove calls: the screen is a set of
+ * checkboxes and a save button, and incremental calls would make it issue a
+ * diff — which goes wrong when two admins edit at once.
+ */
+export async function setLevyRoiSubscribers(orgId, userIds) {
+  try {
+    const result = await $apiClient.put(
+      REPORTING_PATHS.LEVY_ROI_SUBSCRIBERS,
+      { userIds },
+      { headers: orgId ? { "X-Organisation-Id": orgId } : undefined },
+    );
+    return unwrap(result) ?? [];
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+/**
+ * F1.4.2 AC3 — downloads the comparison as CSV.
+ *
+ * Fetched through `$apiClient` rather than pointing a link at the URL so the
+ * bearer token and organisation header go with it; a bare anchor would hit
+ * the endpoint unauthenticated and download a 401 page named ".csv".
+ */
+export async function downloadProviderComparisonCsv(orgId) {
+  try {
+    const result = await $apiClient.get(
+      REPORTING_PATHS.PROVIDER_COMPARISON_CSV,
+      {
+        headers: orgId ? { "X-Organisation-Id": orgId } : undefined,
+        responseType: "blob",
+      },
+    );
+    return result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+/** F1.4.2 AC3 — queues the comparison PDF; poll the returned job. */
+export async function exportProviderComparisonPdf(orgId) {
+  try {
+    const result = await $apiClient.post(
+      REPORTING_PATHS.PROVIDER_COMPARISON_EXPORT,
+      {},
+      { headers: orgId ? { "X-Organisation-Id": orgId } : undefined },
+    );
+    return unwrap(result);
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}

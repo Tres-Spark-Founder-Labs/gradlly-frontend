@@ -9,6 +9,7 @@ import { toastError, toastSuccess } from "@/hooks/useToast";
 import { LevyRoiView } from "./LevyRoiView";
 import { LevyUtilisationView } from "./LevyUtilisationView";
 import { ProviderPerformanceView } from "./ProviderPerformanceView";
+import { ReportRecipientsCard } from "./ReportRecipientsCard";
 import { useExportLevyRoiPdf } from "../queries/reporting.query";
 
 const TABS = [
@@ -80,7 +81,14 @@ export function ReportsDashboard() {
         ))}
       </div>
 
-      {tab === "roi" && <LevyRoiView />}
+      {tab === "roi" && (
+        <div className="space-y-6">
+          <LevyRoiView />
+          {/* F1.4.1 AC5 — sits under the ROI report because that is the
+              report being scheduled. */}
+          <ReportRecipientsCard />
+        </div>
+      )}
       {tab === "utilisation" && <LevyUtilisationView />}
       {tab === "providers" && <ProviderPerformanceView />}
     </div>
