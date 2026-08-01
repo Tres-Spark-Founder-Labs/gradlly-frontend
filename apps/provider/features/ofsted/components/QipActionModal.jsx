@@ -11,10 +11,9 @@ import { SingleSelectField } from "@/components/form/SingleSelectField";
 import { TextareaField } from "@/components/form/TextareaField";
 import Button from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { STORAGE_CATEGORY } from "@/features/storage/services/storage.service";
 import { applyServerErrors } from "@/lib/errors";
 
-import { FileUploadButton } from "./FileUploadButton";
+import { EvidenceAttachments } from "./EvidenceAttachments";
 import { QIP_STATUS_OPTIONS } from "../constants";
 import {
   useCreateQipAction,
@@ -218,20 +217,13 @@ export function QipActionModal({ open, onClose, action = null, prefillSlug }) {
 
         <div className="space-y-2">
           <p className="text-sm font-medium text-neutral-700">
-            Evidence attachment (optional)
+            Evidence attachments (optional)
           </p>
-          <FileUploadButton
-            category={STORAGE_CATEGORY.ATTACHMENT}
-            label="Upload evidence"
-            uploaded={attachmentKeys.length > 0}
+          <EvidenceAttachments
+            keys={attachmentKeys}
+            onChange={setAttachmentKeys}
             disabled={disabled}
-            onUploaded={(key) => setAttachmentKeys([key])}
           />
-          {attachmentKeys.length > 0 ? (
-            <p className="truncate text-xs text-neutral-400">
-              {attachmentKeys[0]}
-            </p>
-          ) : null}
         </div>
       </form>
     </Modal>

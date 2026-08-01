@@ -27,6 +27,16 @@ export async function getEifScores() {
   }
 }
 
+/** F2.1.1 AC5 — twelve-month score movement, one series per criterion. */
+export async function getEifScoreTrend() {
+  try {
+    const result = await $apiClient.get(OFSTED_PATHS.eifScoreTrend);
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
 // ─── QIP actions ─────────────────────────────────────────────────────────────
 export async function listQipActions({
   page = 1,
@@ -70,6 +80,26 @@ export async function updateQipAction({ id, payload }) {
   try {
     const result = await $apiClient.patch(
       OFSTED_PATHS.qipActionById(id),
+      payload,
+    );
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+/**
+ * F2.1.2 — progress only: status, evidence notes and attachments.
+ *
+ * Separate from updateQipAction because the capability behind it is wider.
+ * A tutor who did the work marks it done; what the plan *contains* stays with
+ * whoever owns the plan. The narrow payload is what makes that safe — this
+ * route cannot reach the title, owner, target date or criterion.
+ */
+export async function updateQipActionProgress({ id, payload }) {
+  try {
+    const result = await $apiClient.patch(
+      OFSTED_PATHS.qipActionProgress(id),
       payload,
     );
     return result.data?.data ?? result.data;
@@ -151,6 +181,20 @@ export async function createEvidencePackJob({ additionalStorageKeys } = {}) {
 export async function getEvidencePackJob(id) {
   try {
     const result = await $apiClient.get(OFSTED_PATHS.evidencePackById(id));
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+/**
+ * F2.1.2 AC5 — queues the Quality Improvement Plan as a PDF.
+ *
+ * Returns a job to poll, like every other PDF on the platform.
+ */
+export async function exportQipPlan() {
+  try {
+    const result = await $apiClient.post(OFSTED_PATHS.qipExport, {});
     return result.data?.data ?? result.data;
   } catch (e) {
     throw normalizeApiClientError(e);

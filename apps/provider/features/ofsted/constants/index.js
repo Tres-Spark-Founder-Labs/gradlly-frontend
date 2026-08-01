@@ -1,10 +1,16 @@
 export const OFSTED_PATHS = Object.freeze({
   eifCriteria: "/api/v1/ofsted/eif-criteria",
   eifScores: "/api/v1/ofsted/eif-scores",
+  // F2.1.1 AC5 — twelve-month trend from the nightly snapshot.
+  eifScoreTrend: "/api/v1/ofsted/eif-scores/trend",
 
   qipActions: "/api/v1/qip-actions",
   qipActionById: (id) => `/api/v1/qip-actions/${id}`,
   qipSummary: "/api/v1/qip-actions/summary",
+  // F2.1.2 AC5 — the plan as an inspection document.
+  qipExport: "/api/v1/qip-actions/export",
+  // F2.1.2 — progress only; cannot reach the plan's content.
+  qipActionProgress: (id) => `/api/v1/qip-actions/${id}/progress`,
 
   safeguardingChecklist: "/api/v1/ofsted/safeguarding-checklist",
   safeguardingItem: (slug) => `/api/v1/ofsted/safeguarding-checklist/${slug}`,

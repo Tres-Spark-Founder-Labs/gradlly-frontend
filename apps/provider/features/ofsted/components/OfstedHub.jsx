@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRoleAccess } from "@/features/auth/hooks/useRoleAccess";
 
 import { EifScoresDashboard } from "./EifScoresDashboard";
+import { EifTrendPanel } from "./EifTrendPanel";
 import { EvidencePackPanel } from "./EvidencePackPanel";
 import { ProgrammeDocumentsPanel } from "./ProgrammeDocumentsPanel";
 import { QipPanel } from "./QipPanel";
@@ -22,6 +23,10 @@ export function OfstedHub() {
   return (
     <div className="space-y-6">
       <EifScoresDashboard onCreateAction={setPrefillSlug} />
+
+      {/* F2.1.1 AC5 — sits directly under the scores, because a criterion's
+          movement is only meaningful next to where it stands today. */}
+      <EifTrendPanel />
 
       <QipPanel
         canManage={canManage}

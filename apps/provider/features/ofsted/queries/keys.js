@@ -2,6 +2,7 @@ export const OFSTED_QUERY_KEYS = {
   all: () => ["ofsted"],
   eifCriteria: (orgId) => ["ofsted", "eif-criteria", orgId],
   eifScores: (orgId) => ["ofsted", "eif-scores", orgId],
+  eifScoreTrend: (orgId) => ["ofsted", "eif-score-trend", orgId],
 
   qipList: (orgId, params = {}) => ["ofsted", "qip", "list", orgId, params],
   qipSummary: (orgId) => ["ofsted", "qip", "summary", orgId],
