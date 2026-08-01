@@ -1,269 +1,276 @@
 "use client";
-import { Download, Share2, X } from "lucide-react";
+import { Download, FileText, X } from "lucide-react";
 import { useState } from "react";
 
 import { T } from "@/components/dashboard/levy/tokens";
+import {
+  useCommitmentVersionHistory,
+  useDownloadSignedCommitment,
+  useExportCommitmentAuditTrail,
+} from "@/features/commitments/queries/commitments.query";
+import {
+  partyStatusMeta,
+  statementStatusLabel,
+} from "@/features/commitments/utils/board";
+import { usePdfJobPoll } from "@/hooks/usePdfJobPoll";
+import { toastError } from "@/hooks/useToast";
 
-export function DocumentPanel({ statement, onClose }) {
-  const [tab, setTab] = useState("document");
-  const { id, apprentice, standard, provider } = statement;
-  const parties = [
-    { role: "Apprentice", s: statement.apprenticeSigned },
-    { role: "Provider", s: statement.providerSigned },
-    { role: "Employer", s: statement.employerSigned },
-  ];
-  const audit = parties
-    .filter((p) => p.s?.signed)
-    .map((p) => ({
-      role: p.role,
-      name: p.s.name,
-      ts: p.s.timestamp,
-      ip: p.s.ip,
-    }));
+/** Party keys the API returns, in signing order (COMMITMENT_SIGNING_ORDER). */
+const PARTY_LABELS = Object.freeze({
+  tutor: "Provider",
+  employer_manager: "Employer",
+  apprentice: "Apprentice",
+});
+
+function formatDate(iso) {
+  if (!iso) return null;
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+/** F1.3.2 AC5 — one version, with its dates and who signed it. */
+function VersionCard({ version, isCurrent, onDownload, downloading }) {
+  const published = formatDate(version.publishedAt);
+  const superseded = formatDate(version.supersededAt);
 
   return (
     <div
-      className="fixed inset-0 z-[230] flex justify-end"
+      className="rounded-xl px-4 py-3 space-y-2"
       style={{
-        backgroundColor: "rgba(0,0,0,0.35)",
-        backdropFilter: "blur(2px)",
+        backgroundColor: isCurrent ? T.blueLight : T.card,
+        border: `1px solid ${isCurrent ? `${T.blue}30` : T.border}`,
       }}
     >
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-bold" style={{ color: T.ink }}>
+            Version {version.version}
+          </span>
+          {isCurrent && (
+            <span
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+              style={{ backgroundColor: T.blue, color: "#fff" }}
+            >
+              Current
+            </span>
+          )}
+          <span className="text-[11px]" style={{ color: T.muted }}>
+            {statementStatusLabel(version.status)}
+          </span>
+        </div>
+
+        {/* AC6 — offered only once the PDF exists. A download button on an
+            unsigned statement would fail when pressed. */}
+        {version.finalSignedPdfKey && (
+          <button
+            type="button"
+            onClick={() => onDownload(version.statementId)}
+            disabled={downloading}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold hover:opacity-80 transition-opacity disabled:opacity-40"
+            style={{ backgroundColor: "#f5f4f2", color: T.subtle }}
+          >
+            <Download className="h-3 w-3" />
+            {downloading ? "Opening…" : "Signed PDF"}
+          </button>
+        )}
+      </div>
+
+      <div className="flex gap-4 text-[11px]" style={{ color: T.muted }}>
+        {published && <span>Published {published}</span>}
+        {superseded && <span>Replaced {superseded}</span>}
+      </div>
+
+      {/* AC5 — the signatories, with the date each one signed. */}
+      <div className="space-y-1.5 pt-1">
+        {version.signatories.length === 0 ? (
+          <p className="text-[11px]" style={{ color: T.muted }}>
+            Not yet sent for signature.
+          </p>
+        ) : (
+          version.signatories.map((s) => {
+            const meta = partyStatusMeta(s.signed ? "signed" : "pending");
+            const signedOn = formatDate(s.signedAt);
+            return (
+              <div
+                key={s.party}
+                className="flex items-center justify-between gap-2 text-xs"
+              >
+                <span style={{ color: T.subtle }}>
+                  {PARTY_LABELS[s.party] ?? s.party}
+                  {s.name ? ` · ${s.name}` : ""}
+                </span>
+                <span className="flex items-center gap-2 shrink-0">
+                  {signedOn && (
+                    <span className="text-[11px]" style={{ color: T.muted }}>
+                      {signedOn}
+                    </span>
+                  )}
+                  <span
+                    className="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                    style={{ backgroundColor: meta.bg, color: meta.color }}
+                  >
+                    {meta.label}
+                  </span>
+                </span>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * F1.3.2 AC5 and AC6.
+ *
+ * This panel previously read `statement.apprenticeSigned`,
+ * `statement.providerSigned` and `statement.employerSigned` — fields invented
+ * by a client-side normaliser that mapped every status to a fixed guess: both
+ * employer and provider were reported as signed whenever the statement was
+ * signed, and the apprentice whenever it was merely awaiting signatures. So
+ * the "who has signed" panel was inferred from a single status field rather
+ * than read from the signatures. Its download button had no `onClick` at all.
+ *
+ * It now shows the real per-version signing history from the API.
+ */
+export function DocumentPanel({ statement, onClose }) {
+  const groupId = statement?.groupId ?? null;
+  const currentStatementId = statement?.statementId ?? statement?.id ?? null;
+
+  const { data, isLoading } = useCommitmentVersionHistory(groupId);
+  const { mutate: download, isPending: downloading } =
+    useDownloadSignedCommitment();
+
+  /**
+   * F1.3.3 AC3 — the audit trail as an Ofsted evidence document.
+   *
+   * Generated on demand rather than held anywhere: the trail is the database,
+   * and a stored PDF would go stale the moment anyone else opened the
+   * statement.
+   */
+  const [auditJobId, setAuditJobId] = useState(null);
+  const { mutateAsync: exportAuditTrail, isPending: queueingAudit } =
+    useExportCommitmentAuditTrail();
+
+  usePdfJobPoll({
+    jobId: auditJobId,
+    enabled: !!auditJobId,
+    onComplete: (job) => {
+      setAuditJobId(null);
+      if (job?.status === "completed" && job.downloadUrl) {
+        window.open(job.downloadUrl, "_blank", "noopener,noreferrer");
+      } else {
+        toastError("Audit trail export failed. Please try again.");
+      }
+    },
+  });
+
+  const handleExportAuditTrail = async () => {
+    if (!currentStatementId) return;
+    const job = await exportAuditTrail(currentStatementId).catch(() => null);
+    // The mutation already toasts on failure; only start polling on a real id.
+    if (job?.jobId) setAuditJobId(job.jobId);
+  };
+
+  const preparingAudit = queueingAudit || !!auditJobId;
+
+  const versions = data?.versions ?? [];
+
+  return (
+    <>
       <div
-        className="w-full sm:max-w-[560px] h-full flex flex-col"
+        className="fixed inset-0 z-[230] bg-black/30 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div
+        className="fixed right-0 top-0 h-full z-[240] flex flex-col shadow-2xl w-full sm:w-[460px]"
         style={{
           backgroundColor: T.surface,
           borderLeft: `1px solid ${T.border}`,
-          animation: "slide-in-right 300ms var(--ease-out) both",
+          animation: "slide-in-right 300ms cubic-bezier(0.16,1,0.3,1) both",
         }}
       >
         <div
-          className="flex items-center justify-between px-5 py-4 shrink-0"
+          className="flex items-start justify-between gap-3 px-5 py-4 shrink-0"
           style={{ borderBottom: `1px solid ${T.border}` }}
         >
           <div>
             <p className="text-sm font-bold" style={{ color: T.ink }}>
-              Commitment Statement · {id}
+              Commitment statement
             </p>
-            <p className="text-xs" style={{ color: T.muted }}>
-              {apprentice.name} · {standard}
+            <p className="text-xs mt-0.5" style={{ color: T.muted }}>
+              {statement?.apprenticeName ?? "Apprentice"}
+              {statement?.providerName ? ` · ${statement.providerName}` : ""}
             </p>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-              style={{ backgroundColor: T.greenLight, color: T.green }}
-            >
-              ✓ Fully signed
-            </span>
-            <button
-              type="button"
-              className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-neutral-100"
-            >
-              <Download className="h-3.5 w-3.5" style={{ color: T.muted }} />
-            </button>
-            <button
-              type="button"
-              className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-neutral-100"
-            >
-              <Share2 className="h-3.5 w-3.5" style={{ color: T.muted }} />
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-neutral-100"
-            >
-              <X className="h-4 w-4" style={{ color: T.muted }} />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-neutral-100 shrink-0"
+            style={{ color: T.muted }}
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
 
-        <div
-          className="flex shrink-0"
-          style={{ borderBottom: `1px solid ${T.border}` }}
-        >
-          {["document", "audit"].map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTab(t)}
-              className="px-5 py-2.5 text-xs font-semibold"
-              style={{
-                color: tab === t ? T.blue : T.subtle,
-                borderBottom:
-                  tab === t ? `2px solid ${T.blue}` : "2px solid transparent",
-              }}
-            >
-              {t === "audit" ? "Audit Trail" : "Document"}
-            </button>
-          ))}
-        </div>
+        <div className="flex-1 overflow-y-auto p-5 space-y-3">
+          <p
+            className="text-[10px] font-bold uppercase tracking-widest"
+            style={{ color: T.muted }}
+          >
+            Version history
+          </p>
 
-        <div className="flex-1 overflow-y-auto p-5">
-          {tab === "document" ? (
+          {isLoading ? (
             <div
-              className="rounded-xl p-4 text-xs space-y-3"
-              style={{
-                backgroundColor: T.card,
-                border: `1px solid ${T.border}`,
-              }}
-            >
-              <p className="font-bold text-sm" style={{ color: T.ink }}>
-                Commitment Statement
-              </p>
-              <p style={{ color: T.subtle }}>
-                {standard} · {provider} · {statement.startDate} –{" "}
-                {statement.endDate}
-              </p>
-              <p style={{ color: T.subtle }}>
-                OTJ hours agreed: {statement.otjHoursAgreed} hours (20% minimum)
-              </p>
-              <hr style={{ borderColor: T.border }} />
-              <p className="font-semibold" style={{ color: T.ink }}>
-                Employer Responsibilities
-              </p>
-              <p style={{ color: T.subtle }}>
-                Midlands Engineering Ltd agrees to release the apprentice for
-                all scheduled training, provide meaningful work aligned to the
-                standard, and conduct quarterly progress reviews with the
-                provider.
-              </p>
-              <p className="font-semibold" style={{ color: T.ink }}>
-                Off-the-Job Training Plan
-              </p>
-              <p style={{ color: T.subtle }}>
-                Minimum 20% off-the-job — delivered via day release Thursdays +
-                structured workplace projects.
-              </p>
-              <hr style={{ borderColor: T.border }} />
-              <div className="grid grid-cols-3 gap-2">
-                {parties
-                  .filter((p) => p.s?.signed)
-                  .map(({ role, s }) => (
-                    <div
-                      key={role}
-                      className="rounded-lg p-2 text-[10px]"
-                      style={{ backgroundColor: T.greenLight }}
-                    >
-                      <p className="font-bold" style={{ color: T.green }}>
-                        ✓ {role}
-                      </p>
-                      <p style={{ color: T.ink }}>{s.name}</p>
-                      <p style={{ color: T.muted }}>{s.date}</p>
-                    </div>
-                  ))}
-              </div>
-              {/* Version history */}
-              <div
-                className="mt-4 pt-4"
-                style={{ borderTop: `1px solid ${T.border}` }}
-              >
-                <p
-                  className="text-[10px] font-bold uppercase tracking-wider mb-2"
-                  style={{ color: T.muted }}
-                >
-                  Version history
-                </p>
-                {statement.version > 1 ? (
-                  <div
-                    className="rounded-lg p-2.5 text-xs"
-                    style={{
-                      backgroundColor: T.card,
-                      border: `1px solid ${T.border}`,
-                    }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span style={{ color: T.subtle }}>
-                        v1 · Signed{" "}
-                        {statement.originalSignedDate ?? "05 Mar 2024"} · All
-                        parties
-                      </span>
-                      <button
-                        type="button"
-                        className="text-[11px] font-semibold hover:underline"
-                        style={{ color: T.blue }}
-                      >
-                        ↓ Download
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-xs" style={{ color: T.muted }}>
-                    This is the original version — no prior versions
-                  </p>
-                )}
-              </div>
-            </div>
+              className="h-24 rounded-xl animate-pulse"
+              style={{ backgroundColor: T.card }}
+            />
+          ) : versions.length === 0 ? (
+            <p className="text-xs" style={{ color: T.muted }}>
+              No versions to show yet.
+            </p>
           ) : (
-            <div className="space-y-3">
-              {[
-                {
-                  icon: "📄",
-                  color: T.blue,
-                  label: "Created",
-                  desc: `Statement ${id} created by Sarah Rahman · 27 Dec 2023 · 09:12 GMT`,
-                },
-                {
-                  icon: "✏️",
-                  color: T.muted,
-                  label: "Draft saved",
-                  desc: "Draft updated by Sarah Rahman · 28 Dec 2023 · 11:05 GMT",
-                },
-                {
-                  icon: "📤",
-                  color: T.amber,
-                  label: "Sent for signing",
-                  desc: "Sent to all parties for signing · 28 Dec 2023 · 11:22 GMT",
-                },
-                ...audit.map((e) => ({
-                  icon: "✅",
-                  color: T.green,
-                  label: `Signed — ${e.role}`,
-                  desc: `${e.name} · ${e.ts}${e.ip ? ` · IP: ${e.ip}` : ""}`,
-                })),
-                {
-                  icon: "👁️",
-                  color: T.subtle,
-                  label: "Viewed",
-                  desc: "Document viewed by Sarah Rahman · 15 Jan 2025 · 14:33 GMT",
-                },
-              ].map((e, i, arr) => (
-                <div key={i} className="flex gap-3 text-xs">
-                  <div className="flex flex-col items-center shrink-0">
-                    <span className="text-sm mt-0.5">{e.icon}</span>
-                    {i < arr.length - 1 && (
-                      <span
-                        className="w-px flex-1 mt-1"
-                        style={{ backgroundColor: T.border }}
-                      />
-                    )}
-                  </div>
-                  <div className="pb-2">
-                    <p className="font-semibold" style={{ color: e.color }}>
-                      {e.label}
-                    </p>
-                    <p style={{ color: T.muted }}>{e.desc}</p>
-                  </div>
-                </div>
-              ))}
-              <p
-                className="text-[10px] p-3 rounded-lg"
-                style={{ backgroundColor: T.greenLight, color: T.green }}
-              >
-                This audit trail meets ESFA record-keeping requirements under
-                the Apprenticeship Funding Rules 2024/25
-              </p>
-              <button
-                type="button"
-                className="text-xs font-semibold hover:opacity-75 transition-opacity"
-                style={{ color: T.blue }}
-              >
-                ↓ Export audit log
-              </button>
-            </div>
+            versions.map((version) => (
+              <VersionCard
+                key={version.statementId}
+                version={version}
+                isCurrent={version.statementId === currentStatementId}
+                onDownload={download}
+                downloading={downloading}
+              />
+            ))
           )}
         </div>
+
+        {/* F1.3.3 AC3 — always offered, including on a draft: "nothing has
+            happened to this statement yet" is itself a thing an inspector can
+            be shown. */}
+        <div
+          className="shrink-0 px-5 py-4 space-y-2"
+          style={{ borderTop: `1px solid ${T.border}` }}
+        >
+          <button
+            type="button"
+            onClick={handleExportAuditTrail}
+            disabled={!currentStatementId || preparingAudit}
+            className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold hover:opacity-80 transition-opacity disabled:opacity-40"
+            style={{ backgroundColor: "#f5f4f2", color: T.subtle }}
+          >
+            <FileText className="h-3.5 w-3.5" />
+            {preparingAudit ? "Preparing…" : "Export audit trail (PDF)"}
+          </button>
+          <p className="text-[11px] text-center" style={{ color: T.muted }}>
+            Every version, view and signature, with who did it and when.
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

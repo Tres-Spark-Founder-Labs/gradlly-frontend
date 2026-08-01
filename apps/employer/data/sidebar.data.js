@@ -39,7 +39,7 @@ export const NAV_SECTIONS = [
         label: "Commitments",
         href: "/commitments",
         icon: ClipboardList,
-        badge: 2,
+        // Live from the board (F1.3.1 AC5) — see liveBadges in Sidebar.jsx.
       },
       {
         label: "OTJ Approvals",
