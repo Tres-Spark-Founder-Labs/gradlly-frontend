@@ -49,7 +49,13 @@ export const NAV_SECTIONS = [
     title: "Learners",
     items: [
       { label: "Apprentices", href: "/apprentices", icon: Users },
-      { label: "Caseload", href: "/learners", icon: UsersRound },
+      // F2.2.1 AC6 — carries the at-risk count badge.
+      {
+        label: "Caseload",
+        href: "/learners",
+        icon: UsersRound,
+        badge: "atRisk",
+      },
     ],
   },
   {

@@ -10,6 +10,7 @@ import { EvidencePackPanel } from "./EvidencePackPanel";
 import { ProgrammeDocumentsPanel } from "./ProgrammeDocumentsPanel";
 import { QipPanel } from "./QipPanel";
 import { SafeguardingChecklist } from "./SafeguardingChecklist";
+import { SarPanel } from "./SarPanel";
 
 export function OfstedHub() {
   const { can, isOwner, isAdmin } = useRoleAccess();
@@ -33,6 +34,11 @@ export function OfstedHub() {
         prefillSlug={prefillSlug}
         onPrefillConsumed={() => setPrefillSlug(null)}
       />
+
+      {/* F2.1.3 — sits after the QIP because the SAR's improvement section
+          is drawn from it, and reading them in that order matches how the
+          document is written. */}
+      <SarPanel canManage={canManage} />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <SafeguardingChecklist canManage={canManage} />

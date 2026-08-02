@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Eye, GraduationCap } from "lucide-react";
+import { Download, Eye, FileDown, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -8,63 +8,18 @@ import { InputField } from "@/components/form/InputField";
 import { SingleSelectField } from "@/components/form/SingleSelectField";
 import Button from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
+import { usePdfJobPoll } from "@/hooks/usePdfJobPoll";
+import { toastError } from "@/hooks/useToast";
 import { cn, formatDate, formatDateTime } from "@/utils/helper";
 
 import { LearnerStatusBadge } from "./LearnerBadges";
+import { COHORT_SORT_KEYS, LEARNER_STATUS_FILTER_OPTIONS } from "../constants";
 import {
-  COHORT_SORT_KEYS,
-  LEARNER_STATUS_FILTER_OPTIONS,
-  LEARNER_STATUS_LABELS,
-} from "../constants";
-import { useCohort } from "../queries/learners.query";
-
-// ─── CSV export (client-side from the loaded rows) ───────────────────────────
-// The backend also serves ?format=csv, but the JSON rows carry every column the
-// CSV needs, so we build it in-browser — no proxy/file-stream plumbing required.
-const CSV_COLUMNS = [
-  ["learnerName", "Learner"],
-  ["employerName", "Employer"],
-  ["standardTitle", "Standard"],
-  ["startDate", "Start date"],
-  ["otjPercent", "OTJ %"],
-  ["nextReviewDate", "Next review"],
-  ["epaDate", "EPA date"],
-  ["statusBadge", "Status"],
-  ["tutorName", "Tutor"],
-];
-
-function csvCell(value) {
-  if (value === null || value === undefined) return "";
-  const s = String(value);
-  // Quote if it contains a comma, quote, or newline; escape inner quotes.
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
-
-function exportCsv(rows) {
-  const header = CSV_COLUMNS.map(([, label]) => csvCell(label)).join(",");
-  const body = rows
-    .map((row) =>
-      CSV_COLUMNS.map(([key]) => {
-        if (key === "statusBadge") {
-          return csvCell(LEARNER_STATUS_LABELS[row[key]] ?? row[key]);
-        }
-        return csvCell(row[key]);
-      }).join(","),
-    )
-    .join("\n");
-
-  const blob = new Blob([`${header}\n${body}`], {
-    type: "text/csv;charset=utf-8;",
-  });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `learner-cohort-${new Date().toISOString().slice(0, 10)}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-}
+  useCohort,
+  useCohortFilterOptions,
+  useDownloadCohortCsv,
+  useExportCohortPdf,
+} from "../queries/learners.query";
 
 // ─── Cells ────────────────────────────────────────────────────────────────────
 function LearnerCell({ entry }) {
@@ -109,21 +64,76 @@ export function CohortTable() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
 
+  // F2.2.1 AC2 names five filters. Employer, standard and tutor existed in
+  // the API and had no controls until now.
+  const [employerOrganisationId, setEmployerOrganisationId] = useState("");
+  const [standardId, setStandardId] = useState("");
+  const [tutorUserId, setTutorUserId] = useState("");
+
+  const { data: filterOptions } = useCohortFilterOptions();
+  const toOptions = (items = []) => [
+    { value: "", text: "All" },
+    ...items.map((i) => ({ value: i.id, text: i.name })),
+  ];
+
   const params = useMemo(
     () => ({
       page,
       perPage,
+      employerOrganisationId: employerOrganisationId || undefined,
+      standardId: standardId || undefined,
       statusBadge: statusBadge || undefined,
+      tutorUserId: tutorUserId || undefined,
       epaMonth: epaMonth || undefined,
       sortBy: sort.sortBy,
       sortOrder: sort.sortOrder,
     }),
-    [page, perPage, statusBadge, epaMonth, sort],
+    [
+      page,
+      perPage,
+      employerOrganisationId,
+      standardId,
+      statusBadge,
+      tutorUserId,
+      epaMonth,
+      sort,
+    ],
   );
 
   const { data, isLoading, isFetching } = useCohort(params);
   const entries = data?.entries ?? [];
   const meta = data?.meta ?? null;
+
+  // F2.2.1 AC5 — filters without paging: an export is of the whole set.
+  const exportFilters = useMemo(() => {
+    const { page: _page, perPage: _perPage, ...filters } = params;
+    return filters;
+  }, [params]);
+
+  const { mutate: downloadCsv, isPending: downloadingCsv } =
+    useDownloadCohortCsv();
+  const { mutateAsync: exportPdf, isPending: queueingPdf } =
+    useExportCohortPdf();
+  const [pdfJobId, setPdfJobId] = useState(null);
+
+  usePdfJobPoll({
+    jobId: pdfJobId,
+    enabled: !!pdfJobId,
+    onComplete: (job) => {
+      setPdfJobId(null);
+      if (job?.status === "completed" && job.downloadUrl) {
+        window.open(job.downloadUrl, "_blank", "noopener,noreferrer");
+      } else {
+        toastError("Cohort PDF export failed. Please try again.");
+      }
+    },
+  });
+
+  const preparingPdf = queueingPdf || !!pdfJobId;
+  const handleExportPdf = async () => {
+    const job = await exportPdf(exportFilters).catch(() => null);
+    if (job?.jobId) setPdfJobId(job.jobId);
+  };
 
   const changePerPage = (next) => {
     setPerPage(next);
@@ -228,6 +238,45 @@ export function CohortTable() {
               searchable={false}
             />
           </div>
+          <div className="w-full sm:w-48">
+            <SingleSelectField
+              name="employerFilter"
+              label="Employer"
+              options={toOptions(filterOptions?.employers)}
+              value={employerOrganisationId}
+              setValue={(_, v) => {
+                setEmployerOrganisationId(v);
+                setPage(1);
+              }}
+              placeholder="All employers"
+            />
+          </div>
+          <div className="w-full sm:w-48">
+            <SingleSelectField
+              name="standardFilter"
+              label="Standard"
+              options={toOptions(filterOptions?.standards)}
+              value={standardId}
+              setValue={(_, v) => {
+                setStandardId(v);
+                setPage(1);
+              }}
+              placeholder="All standards"
+            />
+          </div>
+          <div className="w-full sm:w-44">
+            <SingleSelectField
+              name="tutorFilter"
+              label="Tutor"
+              options={toOptions(filterOptions?.tutors)}
+              value={tutorUserId}
+              setValue={(_, v) => {
+                setTutorUserId(v);
+                setPage(1);
+              }}
+              placeholder="All tutors"
+            />
+          </div>
           <div className="w-full sm:w-44">
             <InputField
               name="epaMonth"
@@ -265,16 +314,29 @@ export function CohortTable() {
           </div>
         </div>
 
-        <Button
-          size="sm"
-          color="black"
-          variant="neutral"
-          startIcon={<Download className="size-4" />}
-          disabled={entries.length === 0}
-          onClick={() => exportCsv(entries)}
-        >
-          Export CSV
-        </Button>
+        {/* F2.2.1 AC5. Both exports take the current filters and return the
+            whole matching cohort — not the page on screen. */}
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            color="black"
+            variant="neutral"
+            startIcon={<Download className="size-4" />}
+            disabled={entries.length === 0 || downloadingCsv}
+            onClick={() => downloadCsv(exportFilters)}
+          >
+            {downloadingCsv ? "Preparing…" : "Export CSV"}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            startIcon={<FileDown className="size-4" />}
+            disabled={entries.length === 0 || preparingPdf}
+            onClick={handleExportPdf}
+          >
+            {preparingPdf ? "Preparing…" : "Export PDF"}
+          </Button>
+        </div>
       </div>
 
       <DataTable

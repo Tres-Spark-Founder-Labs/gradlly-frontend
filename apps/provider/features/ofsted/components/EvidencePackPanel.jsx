@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { useDownloadObject } from "@/features/storage/queries/storage.query";
 
+import { EvidenceAttachments } from "./EvidenceAttachments";
 import { EVIDENCE_PACK_STATUS } from "../constants";
 import {
   useCreateEvidencePackJob,
@@ -30,10 +31,18 @@ export function EvidencePackPanel() {
   const completed = status === EVIDENCE_PACK_STATUS.COMPLETED;
   const failed = status === EVIDENCE_PACK_STATUS.FAILED;
 
+  /**
+   * F2.1.4 AC5 — "provider can add custom documents to the pack before
+   * download". The API has always accepted `additionalStorageKeys`; nothing
+   * sent any, so the criterion was backend-only and unreachable.
+   */
+  const [customKeys, setCustomKeys] = useState([]);
+
   const handleBuild = async () => {
     try {
-      // No additionalStorageKeys for the standard build.
-      const result = await create.mutateAsync(undefined);
+      const result = await create.mutateAsync(
+        customKeys.length ? customKeys : undefined,
+      );
       if (result?.jobId) setJobId(result.jobId);
     } catch {
       // surfaced via mutation onError toast
@@ -73,8 +82,30 @@ export function EvidencePackPanel() {
       <CardContent className="space-y-4">
         <p className="text-sm text-neutral-500">
           Compiles all org-wide quality artefacts (OTJ, reviews, commitments,
-          ILR, portfolio, QIP) into a ZIP organised by EIF theme for inspectors.
+          ILR, portfolio, programme documents, safeguarding checklist and QIP)
+          into a ZIP with one folder per EIF theme, ready for an inspector.
         </p>
+
+        {/* F2.1.4 AC5. Anything held outside Gradlly — governor minutes, an
+            external audit, a policy document — belongs in the pack too, and
+            without this the criterion had no way to be met from the UI. */}
+        <div className="space-y-2 rounded-xl border border-neutral-200 p-3">
+          <div>
+            <p className="text-sm font-medium text-neutral-700">
+              Add your own documents
+            </p>
+            <p className="text-xs text-neutral-400">
+              Included in a <span className="font-medium">custom</span> folder.
+              Added before you build — rebuild the pack to change them.
+            </p>
+          </div>
+          <EvidenceAttachments
+            keys={customKeys}
+            onChange={setCustomKeys}
+            disabled={create.isPending || inFlight}
+            label="Add document"
+          />
+        </div>
 
         {inFlight ? (
           <div className="flex items-center gap-2 rounded-lg border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-700">

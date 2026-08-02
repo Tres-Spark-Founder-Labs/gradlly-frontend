@@ -12,6 +12,7 @@ import { LogoutButton } from "@/features/auth/components/LogoutButton";
 import { OrgSwitcher } from "@/features/auth/components/OrgSwitcher";
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
 import { useRoleAccess } from "@/features/auth/hooks/useRoleAccess";
+import { useProviderDashboard } from "@/features/reporting/queries/reporting.query";
 import { capitalise, cn, getFullName, getInitials } from "@/utils/helper";
 
 // Compact labelled row for the sidebar organisation card.
@@ -52,6 +53,12 @@ export function Sidebar({ isOpen, onClose }) {
   const { user, activeOrganisation } = useAuthUser();
   const { can } = useRoleAccess();
   const pathname = usePathname();
+
+  // F2.2.1 AC6. Same figure the dashboard shows, from the same endpoint —
+  // a nav badge that disagrees with the screen it links to is worse than no
+  // badge at all.
+  const { data: dashboard } = useProviderDashboard();
+  const atRiskCount = dashboard?.summary?.atRiskCount ?? 0;
 
   // Active matching for nested routes (e.g. Settings sub-pages). Bare /settings
   // resolves to its default first sub-page (/settings/invitations).
@@ -370,7 +377,18 @@ export function Sidebar({ isOpen, onClose }) {
                           : "text-white/40 group-hover:text-primary-400/70",
                       )}
                     />
-                    {item.label}
+                    <span className="flex-1">{item.label}</span>
+                    {/* F2.2.1 AC6 — the at-risk count, on the nav item, so a
+                        tutor sees that someone needs attention without
+                        opening the caseload first. */}
+                    {item.badge === "atRisk" && atRiskCount > 0 ? (
+                      <span
+                        aria-label={`${atRiskCount} learners at risk`}
+                        className="ml-auto shrink-0 rounded-full bg-danger-500/90 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-white"
+                      >
+                        {atRiskCount > 99 ? "99+" : atRiskCount}
+                      </span>
+                    ) : null}
                   </Link>
                 );
               })}

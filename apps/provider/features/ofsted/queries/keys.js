@@ -8,6 +8,8 @@ export const OFSTED_QUERY_KEYS = {
   qipSummary: (orgId) => ["ofsted", "qip", "summary", orgId],
   qipDetail: (orgId, id) => ["ofsted", "qip", "detail", orgId, id],
 
+  sarReports: (orgId) => ["ofsted", "sar", "list", orgId],
+
   safeguarding: (orgId) => ["ofsted", "safeguarding", orgId],
   programmeDocuments: (orgId, programmeId) => [
     "ofsted",
