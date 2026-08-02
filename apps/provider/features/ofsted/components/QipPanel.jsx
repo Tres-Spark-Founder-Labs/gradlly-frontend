@@ -1,19 +1,33 @@
 "use client";
 
-import { ClipboardList, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  CheckCircle2,
+  ClipboardList,
+  FileDown,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { SingleSelectField } from "@/components/form/SingleSelectField";
 import Button from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { DataTable } from "@/components/ui/DataTable";
+import { usePdfJobPoll } from "@/hooks/usePdfJobPoll";
+import { toastError } from "@/hooks/useToast";
 import { cn, formatDate } from "@/utils/helper";
 
 import { DeleteQipActionModal } from "./DeleteQipActionModal";
 import { QipStatusBadge } from "./OfstedBadges";
 import { QipActionModal } from "./QipActionModal";
+import { QipProgressModal } from "./QipProgressModal";
 import { EIF_CRITERION_LABELS, QIP_STATUS_FILTER_OPTIONS } from "../constants";
-import { useQipActions, useQipSummary } from "../queries/ofsted.query";
+import {
+  useExportQipPlan,
+  useQipActions,
+  useQipSummary,
+} from "../queries/ofsted.query";
 
 const OVERDUE_OPTIONS = [
   { value: "", text: "All" },
@@ -66,6 +80,7 @@ export function QipPanel({ canManage = true, prefillSlug, onPrefillConsumed }) {
   const [formOpen, setFormOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [progressTarget, setProgressTarget] = useState(null);
 
   const params = useMemo(
     () => ({
@@ -79,6 +94,30 @@ export function QipPanel({ canManage = true, prefillSlug, onPrefillConsumed }) {
 
   const { data, isLoading, isFetching } = useQipActions(params);
   const { data: summary } = useQipSummary();
+
+  // F2.1.2 AC5 — queue the plan PDF, then poll and open it.
+  const [exportJobId, setExportJobId] = useState(null);
+  const { mutateAsync: exportPlan, isPending: queueingExport } =
+    useExportQipPlan();
+
+  usePdfJobPoll({
+    jobId: exportJobId,
+    enabled: !!exportJobId,
+    onComplete: (job) => {
+      setExportJobId(null);
+      if (job?.status === "completed" && job.downloadUrl) {
+        window.open(job.downloadUrl, "_blank", "noopener,noreferrer");
+      } else {
+        toastError("QIP export failed. Please try again.");
+      }
+    },
+  });
+
+  const exportingPlan = queueingExport || !!exportJobId;
+  const handleExport = async () => {
+    const job = await exportPlan().catch(() => null);
+    if (job?.jobId) setExportJobId(job.jobId);
+  };
   const actions = data?.actions ?? [];
   const meta = data?.meta ?? null;
 
@@ -130,38 +169,50 @@ export function QipPanel({ canManage = true, prefillSlug, onPrefillConsumed }) {
           : 0,
       cell: (row) => <DueCell action={row} />,
     },
-    ...(canManage
-      ? [
-          {
-            key: "actions",
-            header: "Actions",
-            align: "right",
-            mobileLabel: "Actions",
-            cell: (row) => (
-              <div className="flex items-center justify-end gap-1">
-                <button
-                  type="button"
-                  onClick={() => openEdit(row)}
-                  title="Edit action"
-                  className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
-                >
-                  <Pencil className="size-3.5" aria-hidden />
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDeleteTarget(row)}
-                  title="Delete action"
-                  className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-danger-600 transition-colors hover:bg-danger-50 hover:text-danger-700"
-                >
-                  <Trash2 className="size-3.5" aria-hidden />
-                  Delete
-                </button>
-              </div>
-            ),
-          },
-        ]
-      : []),
+    {
+      key: "actions",
+      header: "Actions",
+      align: "right",
+      mobileLabel: "Actions",
+      cell: (row) => (
+        <div className="flex items-center justify-end gap-1">
+          {/* Open to everyone who can see the plan. Marking your own action
+              done and attaching the evidence is the work itself; deciding
+              what the plan contains is the separate, narrower act below. */}
+          <button
+            type="button"
+            onClick={() => setProgressTarget(row)}
+            title="Update progress"
+            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+          >
+            <CheckCircle2 className="size-3.5" aria-hidden />
+            Progress
+          </button>
+          {canManage ? (
+            <>
+              <button
+                type="button"
+                onClick={() => openEdit(row)}
+                title="Edit action"
+                className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+              >
+                <Pencil className="size-3.5" aria-hidden />
+                Edit
+              </button>
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(row)}
+                title="Delete action"
+                className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-danger-600 transition-colors hover:bg-danger-50 hover:text-danger-700"
+              >
+                <Trash2 className="size-3.5" aria-hidden />
+                Delete
+              </button>
+            </>
+          ) : null}
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -175,16 +226,30 @@ export function QipPanel({ canManage = true, prefillSlug, onPrefillConsumed }) {
               Quality Improvement Plan
             </h2>
           </div>
-          {canManage ? (
+          <div className="flex items-center gap-2">
+            {/* F2.1.2 AC5 — the plan as an inspection document. Open to
+                anyone who can read the plan: being unable to produce it
+                because the one admin is away is the worse failure. */}
             <Button
               size="sm"
-              color="green"
-              startIcon={<Plus className="size-4" />}
-              onClick={openCreate}
+              variant="outline"
+              startIcon={<FileDown className="size-4" />}
+              onClick={handleExport}
+              disabled={exportingPlan}
             >
-              New action
+              {exportingPlan ? "Preparing…" : "Export PDF"}
             </Button>
-          ) : null}
+            {canManage ? (
+              <Button
+                size="sm"
+                color="green"
+                startIcon={<Plus className="size-4" />}
+                onClick={openCreate}
+              >
+                New action
+              </Button>
+            ) : null}
+          </div>
         </div>
 
         {summary ? (
@@ -265,6 +330,14 @@ export function QipPanel({ canManage = true, prefillSlug, onPrefillConsumed }) {
         onClose={closeForm}
         action={editTarget}
         prefillSlug={editTarget ? undefined : prefillSlug}
+      />
+      {/* Keyed per target for the same reason as the form above: the modal
+          seeds its status/notes/attachments from the row on first render. */}
+      <QipProgressModal
+        key={progressTarget?.id ?? "no-progress-target"}
+        action={progressTarget}
+        open={Boolean(progressTarget)}
+        onClose={() => setProgressTarget(null)}
       />
       <DeleteQipActionModal
         action={deleteTarget}

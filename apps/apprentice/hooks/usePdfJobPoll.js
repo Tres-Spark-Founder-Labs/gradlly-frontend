@@ -33,6 +33,13 @@ export function usePdfJobPoll({
     onCompleteRef.current = onComplete;
   }, [onComplete]);
 
+  // Re-arm for the next job. Without this the ref latches true after the
+  // first export and every later one hangs on "Preparing…" forever, because
+  // onComplete never runs to clear the caller's job id.
+  useEffect(() => {
+    completedRef.current = false;
+  }, [jobId]);
+
   const query = useQuery({
     queryKey: ["pdf-job", jobId],
     queryFn: () => getPdfJob(jobId),
