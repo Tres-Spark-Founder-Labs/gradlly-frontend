@@ -12,6 +12,12 @@ export const OFSTED_PATHS = Object.freeze({
   // F2.1.2 — progress only; cannot reach the plan's content.
   qipActionProgress: (id) => `/api/v1/qip-actions/${id}/progress`,
 
+  // F2.1.3 — Self-Assessment Report.
+  sarReports: "/api/v1/sar-reports",
+  sarReportById: (id) => `/api/v1/sar-reports/${id}`,
+  sarReportLock: (id) => `/api/v1/sar-reports/${id}/lock`,
+  sarReportExport: (id) => `/api/v1/sar-reports/${id}/export`,
+
   safeguardingChecklist: "/api/v1/ofsted/safeguarding-checklist",
   safeguardingItem: (slug) => `/api/v1/ofsted/safeguarding-checklist/${slug}`,
 
@@ -65,6 +71,49 @@ export const QIP_STATUS_FILTER_OPTIONS = [
 ];
 
 export const QIP_STATUS_VALUES = Object.values(QIP_STATUS);
+
+// ─── SAR (F2.1.3) ────────────────────────────────────────────────────────────
+export const SAR_STATUS = Object.freeze({
+  DRAFT: "draft",
+  LOCKED: "locked",
+});
+
+/**
+ * Ofsted's four-point scale. Deliberately has no "not yet judged" entry —
+ * an ungraded section is `null`, and offering it as a choice would invite
+ * providers to record indecision as a judgement.
+ */
+export const SAR_GRADE_OPTIONS = [
+  { value: "outstanding", text: "Outstanding (1)" },
+  { value: "good", text: "Good (2)" },
+  { value: "requires_improvement", text: "Requires improvement (3)" },
+  { value: "inadequate", text: "Inadequate (4)" },
+];
+
+export const SAR_GRADE_LABELS = Object.freeze({
+  outstanding: "Outstanding (1)",
+  good: "Good (2)",
+  requires_improvement: "Requires improvement (3)",
+  inadequate: "Inadequate (4)",
+});
+
+/** `2025-26` — the same convention the ILR uses. */
+export function currentAcademicYear(now = new Date()) {
+  const year = now.getFullYear();
+  // The English academic year starts in August.
+  const startYear = now.getMonth() >= 7 ? year : year - 1;
+  return `${startYear}-${String((startYear + 1) % 100).padStart(2, "0")}`;
+}
+
+export function academicYearOptions(now = new Date(), back = 3) {
+  const current = currentAcademicYear(now);
+  const startYear = Number(current.slice(0, 4));
+  return Array.from({ length: back + 1 }, (_, i) => {
+    const s = startYear - i;
+    const value = `${s}-${String((s + 1) % 100).padStart(2, "0")}`;
+    return { value, text: value };
+  });
+}
 
 // ─── Programme document types ────────────────────────────────────────────────
 export const PROGRAMME_DOC_TYPE = Object.freeze({

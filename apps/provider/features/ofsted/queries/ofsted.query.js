@@ -17,6 +17,11 @@ import { EVIDENCE_PACK_TERMINAL } from "../constants";
 import {
   completeSafeguardingItem,
   createEvidencePackJob,
+  downloadSarDocx,
+  generateSarReport,
+  listSarReports,
+  lockSarReport,
+  updateSarReport,
   createProgrammeDocument,
   createQipAction,
   deleteQipAction,
@@ -180,6 +185,70 @@ export function useDeleteQipAction() {
       toastSuccess("QIP action deleted.");
       invalidate();
     },
+    onError: (error) => toastError(error.message),
+  });
+}
+
+// ─── SAR (F2.1.3) ────────────────────────────────────────────────────────────
+
+export function useSarReports(options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: OFSTED_QUERY_KEYS.sarReports(orgId),
+    queryFn: listSarReports,
+    enabled: !!orgId,
+    select: (data) => data ?? [],
+    ...options,
+  });
+}
+
+export function useGenerateSarReport() {
+  const invalidate = useInvalidateOfsted();
+
+  return useMutation({
+    mutationFn: (academicYear) => generateSarReport(academicYear),
+    onSuccess: () => {
+      toastSuccess("SAR draft ready.");
+      invalidate();
+    },
+    onError: (error) => {
+      if (error.code !== ERROR_CODES.VALIDATION) toastError(error.message);
+    },
+  });
+}
+
+export function useUpdateSarReport() {
+  const invalidate = useInvalidateOfsted();
+
+  return useMutation({
+    mutationFn: ({ id, sections }) => updateSarReport({ id, sections }),
+    onSuccess: () => {
+      toastSuccess("SAR saved.");
+      invalidate();
+    },
+    onError: (error) => {
+      if (error.code !== ERROR_CODES.VALIDATION) toastError(error.message);
+    },
+  });
+}
+
+export function useLockSarReport() {
+  const invalidate = useInvalidateOfsted();
+
+  return useMutation({
+    mutationFn: (id) => lockSarReport(id),
+    onSuccess: () => {
+      toastSuccess("SAR locked. It is now a historical record.");
+      invalidate();
+    },
+    onError: (error) => toastError(error.message),
+  });
+}
+
+export function useDownloadSarDocx() {
+  return useMutation({
+    mutationFn: ({ id, academicYear }) => downloadSarDocx({ id, academicYear }),
     onError: (error) => toastError(error.message),
   });
 }

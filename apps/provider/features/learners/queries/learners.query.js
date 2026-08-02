@@ -13,6 +13,9 @@ import { ERROR_CODES } from "@/lib/errors";
 
 import { LEARNER_QUERY_KEYS } from "./keys";
 import {
+  downloadCohortCsv,
+  exportCohortPdf,
+  getCohortFilterOptions,
   getInterventionQueue,
   getLearnerProfile,
   listCohort,
@@ -75,5 +78,38 @@ export function useLogIntervention() {
     onError: (error) => {
       if (error.code !== ERROR_CODES.VALIDATION) toastError(error.message);
     },
+  });
+}
+
+/** F2.2.1 AC5 — CSV of the whole filtered cohort, not the visible page. */
+export function useDownloadCohortCsv() {
+  return useMutation({
+    mutationFn: (filters) => downloadCohortCsv(filters),
+    onError: (error) => toastError(error.message),
+  });
+}
+
+/** F2.2.1 AC5 — queues the cohort PDF through the shared job pipeline. */
+export function useExportCohortPdf() {
+  return useMutation({
+    mutationFn: (filters) => exportCohortPdf(filters),
+    onError: (error) => toastError(error.message),
+  });
+}
+
+/** F2.2.1 AC2 — employer, standard and tutor options for the filter bar. */
+export function useCohortFilterOptions(options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: LEARNER_QUERY_KEYS.cohortFilterOptions(orgId),
+    queryFn: getCohortFilterOptions,
+    enabled: !!orgId,
+    select: (data) => ({
+      employers: data?.employers ?? [],
+      standards: data?.standards ?? [],
+      tutors: data?.tutors ?? [],
+    }),
+    ...options,
   });
 }

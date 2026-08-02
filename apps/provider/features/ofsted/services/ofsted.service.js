@@ -116,6 +116,72 @@ export async function deleteQipAction(id) {
   }
 }
 
+// ─── SAR (F2.1.3) ────────────────────────────────────────────────────────────
+export async function listSarReports() {
+  try {
+    const result = await $apiClient.get(OFSTED_PATHS.sarReports);
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+/** Idempotent on the API — asking twice returns the draft already started. */
+export async function generateSarReport(academicYear) {
+  try {
+    const result = await $apiClient.post(OFSTED_PATHS.sarReports, {
+      academicYear,
+    });
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+export async function updateSarReport({ id, sections }) {
+  try {
+    const result = await $apiClient.patch(OFSTED_PATHS.sarReportById(id), {
+      sections,
+    });
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+export async function lockSarReport(id) {
+  try {
+    const result = await $apiClient.post(OFSTED_PATHS.sarReportLock(id), {});
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+/**
+ * F2.1.3 AC3 — the Word document, served inline rather than queued.
+ *
+ * `responseType: "blob"` matters: without it axios parses the .docx bytes as
+ * text and the saved file is corrupt.
+ */
+export async function downloadSarDocx({ id, academicYear }) {
+  try {
+    const result = await $apiClient.get(OFSTED_PATHS.sarReportExport(id), {
+      responseType: "blob",
+    });
+    const url = window.URL.createObjectURL(new Blob([result.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `sar-${academicYear}.docx`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
 // ─── Safeguarding checklist ──────────────────────────────────────────────────
 export async function getSafeguardingChecklist() {
   try {

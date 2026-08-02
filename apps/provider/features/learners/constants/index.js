@@ -1,5 +1,9 @@
 export const LEARNER_PATHS = Object.freeze({
   cohort: "/api/v1/learners/cohort",
+  // F2.2.1 AC2 — options for the employer, standard and tutor filters.
+  cohortFilterOptions: "/api/v1/learners/cohort/filter-options",
+  // F2.2.1 AC5 — the whole filtered set, not the visible page.
+  cohortExportPdf: "/api/v1/learners/cohort/export",
   interventionQueue: "/api/v1/learners/intervention-queue",
   interventions: (enrolmentId) =>
     `/api/v1/learners/${enrolmentId}/interventions`,
