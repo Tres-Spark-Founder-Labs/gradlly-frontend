@@ -15,7 +15,7 @@ export function AuditExportPanel() {
   const handleExport = async () => {
     setLoading(true);
     try {
-      const result = await $apiClient.get("/audit/export");
+      const result = await $apiClient.get("/api/v1/audit/export");
       const rows = result.data?.data ?? [];
       const blob = new Blob([JSON.stringify(rows, null, 2)], {
         type: "application/json",

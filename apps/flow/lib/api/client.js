@@ -5,8 +5,31 @@ import { parseFetchResponse } from "./parse-response";
 
 const BFF = "/api/proxy";
 
+/**
+ * Every upstream route is versioned, and the proxy forwards the path verbatim.
+ * A caller that omits the prefix therefore gets a 404 from the API rather than
+ * an error here — and a 404 on a poll loop is invisible: the job queues fine,
+ * the button just sits on "Preparing…" forever.
+ *
+ * That shipped. `usePdfJobPoll` polled `/pdf/jobs/:id` in all three apps,
+ * breaking every PDF export on the platform, and the audit CSV export had the
+ * same missing prefix. Failing at the call site is cheap; diagnosing it from a
+ * stuck spinner is not.
+ */
+function assertVersionedPath(path) {
+  if (typeof path !== "string" || !path.startsWith("/api/v1/")) {
+    throw new Error(
+      `API path must start with "/api/v1/" — received "${path}". ` +
+        "The BFF proxy forwards the path unchanged, so an unversioned path " +
+        "404s upstream.",
+    );
+  }
+}
+
 async function send(path, method, body, opts = {}) {
   const { signal, params, headers: extraHeaders, public: isPublic } = opts;
+
+  assertVersionedPath(path);
 
   let url = `${BFF}${path}`;
   if (params && Object.keys(params).length > 0) {

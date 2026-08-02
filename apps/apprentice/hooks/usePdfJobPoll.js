@@ -10,7 +10,7 @@ const TERMINAL = new Set(["completed", "failed", "cancelled"]);
 
 export async function getPdfJob(jobId) {
   try {
-    const result = await $apiClient.get(`/pdf/jobs/${jobId}`);
+    const result = await $apiClient.get(`/api/v1/pdf/jobs/${jobId}`);
     return result.data?.data ?? result.data;
   } catch (e) {
     throw normalizeApiClientError(e);
@@ -18,7 +18,7 @@ export async function getPdfJob(jobId) {
 }
 
 /**
- * Poll GET /pdf/jobs/:id until status is terminal, then invoke onComplete once.
+ * Poll GET /api/v1/pdf/jobs/:id until status is terminal, then invoke onComplete once.
  */
 export function usePdfJobPoll({
   jobId,
