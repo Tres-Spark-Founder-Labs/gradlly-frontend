@@ -8,7 +8,17 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "env": ["API_BASE_URL"],
+      "env": [
+        "API_BASE_URL",
+        "SKIP_ENV_VALIDATION",
+        "NEXT_PUBLIC_PORTAL",
+        "NEXT_PUBLIC_APP_URL",
+        "NEXT_PUBLIC_EMPLOYER_URL",
+        "NEXT_PUBLIC_PROVIDER_URL",
+        "NEXT_PUBLIC_APPRENTICE_URL",
+        "NEXT_PUBLIC_FLOW_URL",
+        "NEXT_PUBLIC_MAIN_URL"
+      ],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
