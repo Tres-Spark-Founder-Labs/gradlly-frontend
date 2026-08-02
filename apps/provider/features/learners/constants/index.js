@@ -47,6 +47,16 @@ export const FLAG_REASON_LABELS = Object.freeze({
 });
 
 // ─── Intervention action types (logged) ──────────────────────────────────────
+/**
+ * F2.2.2 AC4. Sixty seconds is chosen against what actually moves the queue:
+ * an OTJ log approval, a review slipping past its date, a gateway item being
+ * ticked. None of those change second to second, and a tutor acting on a
+ * minute-old queue is not acting on stale information.
+ *
+ * It is also cheap — one request per minute against a 100/minute budget.
+ */
+export const INTERVENTION_QUEUE_REFRESH_MS = 60_000;
+
 export const INTERVENTION_ACTION = Object.freeze({
   CONTACT_MADE: "contact_made",
   REVIEW_SCHEDULED: "review_scheduled",

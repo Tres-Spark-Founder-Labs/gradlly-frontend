@@ -3,6 +3,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
+import { INTERVENTION_QUEUE_REFRESH_MS } from "@/features/learners/constants";
 
 import {
   getProviderDashboard,
@@ -20,6 +21,14 @@ export const REPORTING_QUERY_KEYS = {
   ],
 };
 
+/**
+ * Also backs the sidebar at-risk badge (F2.2.1 AC6), which is why it refreshes
+ * on the same cycle as the intervention queue (F2.2.2 AC4). A badge that keeps
+ * claiming four when the queue it links to shows two teaches people to
+ * distrust both numbers.
+ *
+ * Not polled in a background tab — window focus already refetches on return.
+ */
 export function useProviderDashboard(options = {}) {
   const { orgId } = useAuthUser();
 
@@ -27,6 +36,9 @@ export function useProviderDashboard(options = {}) {
     queryKey: REPORTING_QUERY_KEYS.providerDashboard(orgId),
     queryFn: getProviderDashboard,
     enabled: !!orgId,
+    refetchInterval: INTERVENTION_QUEUE_REFRESH_MS,
+    refetchIntervalInBackground: false,
+    staleTime: 0,
     ...options,
   });
 }
