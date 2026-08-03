@@ -112,8 +112,28 @@ const wellbeingScore = z
     message: "Score must be a whole number from 1 to 10",
   });
 
+/**
+ * F2.2.3 AC4 — one row per goal agreed at the previous review.
+ *
+ * The objective is carried, not referenced: the previous record is a
+ * historical document, and if it were edited this review must still show what
+ * was actually agreed at the time.
+ */
+const previousGoalProgressSchema = z.object({
+  objective: z.string().trim().min(1),
+  outcome: z.enum([
+    "achieved",
+    "partially_achieved",
+    "not_achieved",
+    "carried_forward",
+  ]),
+  notes: z.string().trim().optional().or(z.literal("")),
+});
+
 export const reviewRecordSchema = z.object({
   smartGoals: z.array(smartGoalSchema).min(1, "Add at least one SMART goal"),
+  previousGoalProgress: z.array(previousGoalProgressSchema).optional(),
+  otjDiscussion: z.string().trim().optional().or(z.literal("")),
   wellbeingScore,
   wellbeingNotes: z.string().trim().optional().or(z.literal("")),
   progressSummary: z.string().trim().optional().or(z.literal("")),
@@ -131,6 +151,8 @@ export const emptySmartGoal = Object.freeze({
 
 export const reviewRecordDefaults = Object.freeze({
   smartGoals: [{ ...emptySmartGoal }],
+  previousGoalProgress: [],
+  otjDiscussion: "",
   wellbeingScore: "",
   wellbeingNotes: "",
   progressSummary: "",
@@ -158,6 +180,14 @@ export function reviewRecordDefaultsFromPayload(payload) {
         ? ""
         : String(payload.wellbeing.score),
     wellbeingNotes: payload.wellbeing?.notes ?? "",
+    previousGoalProgress: Array.isArray(payload.previousGoalProgress)
+      ? payload.previousGoalProgress.map((g) => ({
+          objective: g.objective ?? "",
+          outcome: g.outcome ?? "carried_forward",
+          notes: g.notes ?? "",
+        }))
+      : [],
+    otjDiscussion: payload.otjDiscussion ?? "",
     progressSummary: payload.progressSummary ?? "",
     actionsAgreed: payload.actionsAgreed ?? "",
     employerComments: payload.employerComments ?? "",
@@ -187,6 +217,19 @@ export function toRecordPayload(values) {
     })),
     wellbeing,
   };
+
+  // Only sent when there were goals to answer for; a first review omits it
+  // entirely rather than storing an empty array.
+  if (values.previousGoalProgress?.length) {
+    payload.previousGoalProgress = values.previousGoalProgress.map((g) => {
+      const entry = { objective: g.objective.trim(), outcome: g.outcome };
+      const notes = g.notes?.trim();
+      if (notes) entry.notes = notes;
+      return entry;
+    });
+  }
+  const otjDiscussion = values.otjDiscussion?.trim();
+  if (otjDiscussion) payload.otjDiscussion = otjDiscussion;
 
   const progressSummary = values.progressSummary?.trim();
   if (progressSummary) payload.progressSummary = progressSummary;

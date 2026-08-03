@@ -1,9 +1,13 @@
 export const REVIEW_PATHS = Object.freeze({
   BASE: "/api/v1/reviews",
   bulkSchedule: "/api/v1/reviews/bulk-schedule",
+  // F2.2.3 AC2 — one date across many learners; participants derived server-side.
+  bulkScheduleFromEnrolments: "/api/v1/reviews/bulk-schedule/from-enrolments",
   calendar: "/api/v1/reviews/calendar",
   byId: (id) => `/api/v1/reviews/${id}`,
   record: (id) => `/api/v1/reviews/${id}/record`,
+  // F2.2.3 AC4 — goals agreed at the previous review.
+  previousGoals: (id) => `/api/v1/reviews/${id}/previous-goals`,
   snapshotPdf: (id) => `/api/v1/reviews/${id}/snapshot-pdf`,
   sign: (id) => `/api/v1/reviews/${id}/sign`,
 });
@@ -82,3 +86,11 @@ export function getReviewActions(review) {
       status === REVIEW_STATUS.COMPLETED && !!review?.finalSignedPdfKey,
   };
 }
+
+// ─── Previous-goal outcomes (F2.2.3 AC4) ─────────────────────────────────────
+export const PREVIOUS_GOAL_OUTCOME_OPTIONS = [
+  { value: "achieved", text: "Achieved" },
+  { value: "partially_achieved", text: "Partially achieved" },
+  { value: "not_achieved", text: "Not achieved" },
+  { value: "carried_forward", text: "Carried forward" },
+];

@@ -57,6 +57,43 @@ export async function bulkScheduleReviews({ items }) {
   }
 }
 
+/**
+ * F2.2.3 AC2 — one date across many learners.
+ *
+ * The sibling above needs four ids per learner, which is why nothing ever
+ * called it from a UI. This sends enrolment ids and a date; the API derives
+ * apprentice, tutor and employer manager from each enrolment.
+ */
+export async function bulkScheduleReviewsFromEnrolments({
+  enrolmentIds,
+  scheduledAt,
+  title,
+  reviewType,
+}) {
+  try {
+    const body = { enrolmentIds, scheduledAt };
+    if (title) body.title = title;
+    if (reviewType) body.reviewType = reviewType;
+    const result = await $apiClient.post(
+      REVIEW_PATHS.bulkScheduleFromEnrolments,
+      body,
+    );
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+/** F2.2.3 AC4 — SMART goals from this enrolment's last completed review. */
+export async function getPreviousReviewGoals(reviewId) {
+  try {
+    const result = await $apiClient.get(REVIEW_PATHS.previousGoals(reviewId));
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
 export async function updateReview({ id, payload }) {
   try {
     const result = await $apiClient.patch(REVIEW_PATHS.byId(id), payload);

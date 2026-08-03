@@ -1,13 +1,16 @@
 "use client";
 
-import { CalendarDays, Eye } from "lucide-react";
+import { CalendarDays, CalendarPlus, Eye } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { SingleSelectField } from "@/components/form/SingleSelectField";
+import Button from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
+import { useRoleAccess } from "@/features/auth/hooks/useRoleAccess";
 import { cn, formatDateTime } from "@/utils/helper";
 
+import { BulkScheduleReviewsModal } from "./BulkScheduleReviewsModal";
 import { ReviewDueChip, ReviewStatusBadge } from "./ReviewBadges";
 import { REVIEW_STATUS_FILTER_OPTIONS } from "../constants";
 import { useReviews } from "../queries/reviews.query";
@@ -36,6 +39,9 @@ function ReviewCell({ review }) {
 }
 
 export function ReviewsTable() {
+  const { can } = useRoleAccess();
+  const canManage = can("admin");
+  const [bulkOpen, setBulkOpen] = useState(false);
   const [status, setStatus] = useState("");
   const [overdue, setOverdue] = useState("");
   const [page, setPage] = useState(1);
@@ -145,14 +151,34 @@ export function ReviewsTable() {
             />
           </div>
         </div>
-        <Link
-          href="/reviews/calendar"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
-        >
-          <CalendarDays className="size-4" aria-hidden />
-          Calendar view
-        </Link>
+        <div className="flex items-center gap-2">
+          {/* F2.2.3 AC2. A single review is still scheduled from its
+              enrolment, where the participants are already in context; this
+              is for setting one date across a caseload. */}
+          {canManage ? (
+            <Button
+              size="sm"
+              color="green"
+              startIcon={<CalendarPlus className="size-4" />}
+              onClick={() => setBulkOpen(true)}
+            >
+              Bulk schedule
+            </Button>
+          ) : null}
+          <Link
+            href="/reviews/calendar"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+          >
+            <CalendarDays className="size-4" aria-hidden />
+            Calendar view
+          </Link>
+        </div>
       </div>
+
+      <BulkScheduleReviewsModal
+        open={bulkOpen}
+        onClose={() => setBulkOpen(false)}
+      />
 
       <DataTable
         columns={columns}
