@@ -14,4 +14,11 @@ export const ENROLMENT_QUERY_KEYS = {
     id,
   ],
   journey: (orgId, id) => ["enrolments", "journey", orgId, id],
+  // F2.2.4 AC6 — the current break plus the history behind it.
+  breaksInLearning: (orgId, id) => [
+    "enrolments",
+    "breaks-in-learning",
+    orgId,
+    id,
+  ],
 };

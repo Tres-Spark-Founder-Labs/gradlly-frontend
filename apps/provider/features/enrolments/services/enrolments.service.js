@@ -164,3 +164,38 @@ export async function recordEpaOutcome({ id, payload }) {
     throw normalizeApiClientError(e);
   }
 }
+
+// ─── Break in learning (F2.2.4 AC6) ──────────────────────────────────────────
+
+export async function listBreaksInLearning(id) {
+  try {
+    const result = await $apiClient.get(ENROLMENT_PATHS.breakInLearning(id));
+    return unwrap(result);
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+export async function recordBreakInLearning({ id, payload }) {
+  try {
+    const result = await $apiClient.post(
+      ENROLMENT_PATHS.breakInLearning(id),
+      payload,
+    );
+    return unwrap(result);
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+export async function endBreakInLearning({ id, payload }) {
+  try {
+    const result = await $apiClient.post(
+      ENROLMENT_PATHS.breakInLearningEnd(id),
+      payload,
+    );
+    return unwrap(result);
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}

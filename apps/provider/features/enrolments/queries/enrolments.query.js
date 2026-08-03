@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-query";
 
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
+import { LEARNER_QUERY_KEYS } from "@/features/learners/queries/keys";
 import { toastError, toastSuccess } from "@/hooks/useToast";
 import { ERROR_CODES } from "@/lib/errors";
 
@@ -18,11 +19,14 @@ import {
   cancelEnrolment,
   completeEnrolment,
   createEnrolment,
+  endBreakInLearning,
   getEnrolment,
   getEnrolmentJourney,
   getParticipantOptions,
+  listBreaksInLearning,
   listEnrolments,
   lookupCounterpartOrganisation,
+  recordBreakInLearning,
   recordEpaOutcome,
   setEnrolmentJourney,
   setEnrolmentOrganisationLinks,
@@ -236,6 +240,59 @@ export function useRecordEpaOutcome() {
     mutationFn: ({ id, payload }) => recordEpaOutcome({ id, payload }),
     onSuccess: (data) => {
       toastSuccess(data?.message || "EPA outcome recorded.");
+      invalidate();
+    },
+    onError: toastUnlessValidation,
+  });
+}
+
+// ─── Break in learning (F2.2.4 AC6) ──────────────────────────────────────────
+
+export function useBreaksInLearning(id, options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: ENROLMENT_QUERY_KEYS.breaksInLearning(orgId, id),
+    queryFn: () => listBreaksInLearning(id),
+    enabled: !!orgId && !!id,
+    ...options,
+  });
+}
+
+/**
+ * Starting or ending a break changes the apprentice's status, which the
+ * learner profile, the cohort table and the intervention queue all read. Those
+ * live under the `learners` key, so invalidating enrolments alone would leave
+ * the profile showing a learner as active seconds after pausing them.
+ */
+function useInvalidateAfterBreakChange() {
+  const qc = useQueryClient();
+  return () => {
+    qc.invalidateQueries({ queryKey: ENROLMENT_QUERY_KEYS.all() });
+    qc.invalidateQueries({ queryKey: LEARNER_QUERY_KEYS.all() });
+  };
+}
+
+export function useRecordBreakInLearning() {
+  const invalidate = useInvalidateAfterBreakChange();
+
+  return useMutation({
+    mutationFn: ({ id, payload }) => recordBreakInLearning({ id, payload }),
+    onSuccess: (data) => {
+      toastSuccess(data?.message || "Break in learning recorded.");
+      invalidate();
+    },
+    onError: toastUnlessValidation,
+  });
+}
+
+export function useEndBreakInLearning() {
+  const invalidate = useInvalidateAfterBreakChange();
+
+  return useMutation({
+    mutationFn: ({ id, payload }) => endBreakInLearning({ id, payload }),
+    onSuccess: (data) => {
+      toastSuccess(data?.message || "Return from break recorded.");
       invalidate();
     },
     onError: toastUnlessValidation,

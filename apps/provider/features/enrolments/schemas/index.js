@@ -105,11 +105,77 @@ export function toCreateEnrolmentPayload(values) {
 
 export const journeySchema = z.object({
   epaDate: optionalDate,
+  // F2.2.4 AC1 — who is assessing, decided at the same point as when.
+  epaOrganisationName: z
+    .string()
+    .trim()
+    .max(255, "Must be 255 characters or fewer")
+    .optional()
+    .or(z.literal("")),
+  epaOrganisationUkprn: z
+    .union([
+      z.literal(""),
+      z.string().regex(/^\d{8}$/, "UKPRN must be exactly 8 digits"),
+    ])
+    .optional(),
+});
+
+export const journeyDefaults = Object.freeze({
+  epaDate: "",
+  epaOrganisationName: "",
+  epaOrganisationUkprn: "",
 });
 
 export function toJourneyPayload(values) {
-  // epaDate is optional; send it only when provided (clearing it is not exposed).
-  return isProvided(values.epaDate) ? { epaDate: values.epaDate } : {};
+  // Every field is optional and the endpoint patches only what it is sent, so
+  // a blank is "leave it alone" rather than "clear it". Clearing is not
+  // exposed — an EPAO that has been appointed does not get un-appointed by
+  // emptying a text box.
+  const payload = {};
+  if (isProvided(values.epaDate)) payload.epaDate = values.epaDate;
+  if (isProvided(values.epaOrganisationName))
+    payload.epaOrganisationName = values.epaOrganisationName.trim();
+  if (isProvided(values.epaOrganisationUkprn))
+    payload.epaOrganisationUkprn = values.epaOrganisationUkprn;
+  return payload;
+}
+
+// ─── Break in learning (F2.2.4 AC6) ──────────────────────────────────────────
+
+export const breakInLearningSchema = z.object({
+  reason: z.string().trim().min(1, "Select a reason"),
+  startedOn: optionalDate,
+  expectedReturnDate: optionalDate,
+});
+
+export const breakInLearningDefaults = Object.freeze({
+  reason: "",
+  startedOn: "",
+  expectedReturnDate: "",
+});
+
+export function toBreakInLearningPayload(values) {
+  const payload = { reason: values.reason.trim() };
+  if (isProvided(values.startedOn)) payload.startedOn = values.startedOn;
+  // Deliberately omitted when blank. A guessed return date on a funding record
+  // is worse than an honest gap — the backend says the same in its DTO.
+  if (isProvided(values.expectedReturnDate))
+    payload.expectedReturnDate = values.expectedReturnDate;
+  return payload;
+}
+
+export const endBreakInLearningSchema = z.object({
+  actualReturnDate: optionalDate,
+});
+
+export const endBreakInLearningDefaults = Object.freeze({
+  actualReturnDate: "",
+});
+
+export function toEndBreakInLearningPayload(values) {
+  return isProvided(values.actualReturnDate)
+    ? { actualReturnDate: values.actualReturnDate }
+    : {};
 }
 
 // ─── Record EPA outcome ──────────────────────────────────────────────────────
