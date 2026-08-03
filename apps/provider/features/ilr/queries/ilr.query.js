@@ -21,10 +21,12 @@ import {
   getIlrRecord,
   getIlrSubmission,
   getIlrValidationReport,
+  listFundingClaims,
   listIlrRecords,
   listMappingConfigs,
   listRecordSubmissions,
   publishMappingConfig,
+  setFundingClaimResolution,
   submitIlrRecord,
   updateIlrOverrides,
   validateIlrRecord,
@@ -234,5 +236,41 @@ export function usePublishMappingConfig() {
       invalidate();
     },
     onError: (error) => toastError(error.message),
+  });
+}
+
+// ─── Funding claim tracker (F2.3.2 AC7) ──────────────────────────────────────
+
+export function useFundingClaims(params = {}, options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: ILR_QUERY_KEYS.fundingClaims(orgId, params),
+    queryFn: () => listFundingClaims(params),
+    enabled: !!orgId,
+    placeholderData: keepPreviousData,
+    select: (response) => ({
+      claims: response?.data ?? [],
+      meta: response?.meta ?? null,
+    }),
+    ...options,
+  });
+}
+
+export function useSetFundingClaimResolution() {
+  const invalidate = useInvalidateIlr();
+
+  return useMutation({
+    mutationFn: ({ enrolmentId, payload }) =>
+      setFundingClaimResolution({ enrolmentId, payload }),
+    onSuccess: () => {
+      toastSuccess("Funding claim updated.");
+      invalidate();
+    },
+    // The backend rejects closing a claim without a note; the form renders
+    // that as a field error rather than a toast.
+    onError: (error) => {
+      if (error.code !== ERROR_CODES.VALIDATION) toastError(error.message);
+    },
   });
 }

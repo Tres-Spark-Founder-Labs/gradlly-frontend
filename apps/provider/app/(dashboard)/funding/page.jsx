@@ -4,6 +4,7 @@ import { PageSubheader } from "@/components/ui/PageSubheader";
 import { FundingPaymentsTable } from "@/features/das/components/FundingPaymentsTable";
 import { LevyBalanceCard } from "@/features/das/components/LevyBalanceCard";
 import { LevyForecastCard } from "@/features/das/components/LevyForecastCard";
+import { FundingClaimTracker } from "@/features/ilr/components/FundingClaimTracker";
 import { createPageSeo } from "@/utils/metadata";
 
 export const { metadata } = createPageSeo({
@@ -28,6 +29,8 @@ export default function FundingPage() {
         <LevyForecastCard />
       </div>
       <FundingPaymentsTable />
+      {/* F2.3.2 AC7 — claimed vs received, and what is being done about gaps. */}
+      <FundingClaimTracker />
     </div>
   );
 }

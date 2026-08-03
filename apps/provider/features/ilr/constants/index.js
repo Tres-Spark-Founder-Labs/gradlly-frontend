@@ -10,6 +10,11 @@ export const ILR_PATHS = Object.freeze({
   amend: (id) => `/api/v1/ilr/learner-records/${id}/amend`,
   recordSubmissions: (id) => `/api/v1/ilr/learner-records/${id}/submissions`,
 
+  // F2.3.2 AC7 — funding claim tracker.
+  fundingClaims: "/api/v1/ilr/funding-claims",
+  fundingClaimResolution: (enrolmentId) =>
+    `/api/v1/ilr/funding-claims/${enrolmentId}/resolution`,
+
   // Submissions (poll)
   submissionById: (id) => `/api/v1/ilr/submissions/${id}`,
 
@@ -108,3 +113,60 @@ export function getIlrRecordActions(
     inFlight,
   };
 }
+
+// ─── Funding claim tracker (F2.3.2 AC7) ──────────────────────────────────────
+
+export const FUNDING_DISCREPANCY = Object.freeze({
+  NONE: "none",
+  CLAWBACK: "clawback",
+  SHORTFALL: "shortfall",
+  OVERPAYMENT: "overpayment",
+});
+
+/**
+ * "None" deliberately reads as reconciled rather than as an absence. An active
+ * learner who has received part of their funding is on track, not unexamined —
+ * the backend only calls a shortfall a shortfall once the programme completes.
+ */
+export const FUNDING_DISCREPANCY_LABELS = Object.freeze({
+  none: "Reconciled",
+  clawback: "Clawback",
+  shortfall: "Shortfall",
+  overpayment: "Overpayment",
+});
+
+export const FUNDING_DISCREPANCY_CLASSES = Object.freeze({
+  none: "bg-neutral-100 text-neutral-600",
+  clawback: "bg-rose-50 text-rose-700",
+  shortfall: "bg-amber-50 text-amber-700",
+  overpayment: "bg-sky-50 text-sky-700",
+});
+
+export const FUNDING_RESOLUTION = Object.freeze({
+  OPEN: "open",
+  INVESTIGATING: "investigating",
+  RESOLVED: "resolved",
+  WRITTEN_OFF: "written_off",
+});
+
+export const FUNDING_RESOLUTION_LABELS = Object.freeze({
+  open: "Open",
+  investigating: "Investigating",
+  resolved: "Resolved",
+  written_off: "Written off",
+});
+
+export const FUNDING_RESOLUTION_VALUES = Object.values(FUNDING_RESOLUTION);
+
+export const FUNDING_RESOLUTION_OPTIONS = [
+  { value: FUNDING_RESOLUTION.OPEN, text: "Open" },
+  { value: FUNDING_RESOLUTION.INVESTIGATING, text: "Investigating" },
+  { value: FUNDING_RESOLUTION.RESOLVED, text: "Resolved" },
+  { value: FUNDING_RESOLUTION.WRITTEN_OFF, text: "Written off" },
+];
+
+// Statuses that close a claim, and so require a note. Mirrors the backend.
+export const FUNDING_RESOLUTION_CLOSING = [
+  FUNDING_RESOLUTION.RESOLVED,
+  FUNDING_RESOLUTION.WRITTEN_OFF,
+];
