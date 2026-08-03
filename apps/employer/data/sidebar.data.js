@@ -1,4 +1,5 @@
 import {
+  ClipboardCheck,
   AlertTriangle,
   BarChart3,
   Briefcase,
@@ -35,6 +36,9 @@ export const NAV_SECTIONS = [
     title: "Apprenticeships",
     items: [
       { label: "My Apprentices", href: "/apprentices", icon: Users },
+      // F2.2.3 AC6 — the employer is notified when a review completes, so
+      // they need somewhere to open it.
+      { label: "Progress Reviews", href: "/reviews", icon: ClipboardCheck },
       {
         label: "Commitments",
         href: "/commitments",

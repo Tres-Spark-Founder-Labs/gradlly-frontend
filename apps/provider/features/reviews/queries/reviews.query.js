@@ -15,9 +15,11 @@ import { ERROR_CODES } from "@/lib/errors";
 import { REVIEW_QUERY_KEYS } from "./keys";
 import {
   bulkScheduleReviews,
+  bulkScheduleReviewsFromEnrolments,
   cancelReview,
   createReview,
   enqueueReviewSnapshot,
+  getPreviousReviewGoals,
   getReview,
   getReviewRecord,
   listReviewCalendar,
@@ -121,6 +123,53 @@ export function useBulkScheduleReviews() {
       invalidate();
     },
     onError: (error) => toastError(error.message),
+  });
+}
+
+/**
+ * F2.2.3 AC2 — bulk schedule by enrolment.
+ *
+ * Reports per-learner failures rather than a bare count: "3 failed" sends
+ * someone hunting, "Amara Diallo — missing tutor" is actionable. The caller
+ * renders the detail; this keeps the toast short and honest.
+ */
+export function useBulkScheduleReviewsFromEnrolments() {
+  const invalidate = useInvalidateReviews();
+
+  return useMutation({
+    mutationFn: (input) => bulkScheduleReviewsFromEnrolments(input),
+    onSuccess: (result) => {
+      const succeeded = result?.succeeded ?? 0;
+      const failed = result?.failed ?? 0;
+      if (failed === 0 && succeeded > 0) {
+        toastSuccess(`${succeeded} reviews scheduled.`);
+      } else if (succeeded > 0) {
+        toastSuccess(`${succeeded} scheduled, ${failed} could not be.`);
+      } else {
+        toastError(`No reviews scheduled — ${failed} could not be.`);
+      }
+      invalidate();
+    },
+    onError: (error) => toastError(error.message),
+  });
+}
+
+/**
+ * F2.2.3 AC4 — the previous review's goals.
+ *
+ * `staleTime: Infinity` because a completed review's record is immutable; the
+ * goals cannot change while this form is open.
+ */
+export function usePreviousReviewGoals(reviewId, options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: REVIEW_QUERY_KEYS.previousGoals(orgId, reviewId),
+    queryFn: () => getPreviousReviewGoals(reviewId),
+    enabled: !!orgId && !!reviewId,
+    staleTime: Infinity,
+    select: (data) => (Array.isArray(data) ? data : []),
+    ...options,
   });
 }
 
