@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-query";
 
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
+import { LEARNER_QUERY_KEYS } from "@/features/learners/queries/keys";
 import { toastError, toastSuccess } from "@/hooks/useToast";
 import { STALE_TIMES } from "@/lib/react-query/query.config";
 
@@ -15,9 +16,11 @@ import { OTJ_QUERY_KEYS } from "./keys";
 import {
   bulkApproveOtj,
   bulkRejectOtj,
+  flagOtjEntry,
   getOtjEntry,
   listOtjCategories,
   listOtjEntries,
+  unflagOtjEntry,
 } from "../services/otj-log-entries.service";
 
 export function useOtjEntries(params = {}, options = {}) {
@@ -95,6 +98,48 @@ export function useBulkRejectOtj() {
   return useMutation({
     mutationFn: ({ ids, reason }) => bulkRejectOtj({ ids, reason }),
     onSuccess: (result) => handleBulkResult(qc, result, "rejected"),
+    onError: (error) => toastError(error.message),
+  });
+}
+
+// ─── Tutor flag (F2.2.4 AC3) ─────────────────────────────────────────────────
+
+/**
+ * A flag is rendered in two places — the OTJ review queue and the learner
+ * profile's off-the-job panel — so both key roots are invalidated. Flagging
+ * from the profile and seeing the badge fail to appear would read as the
+ * action having silently failed.
+ */
+function useInvalidateAfterFlag() {
+  const qc = useQueryClient();
+  return () => {
+    qc.invalidateQueries({ queryKey: OTJ_QUERY_KEYS.all() });
+    qc.invalidateQueries({ queryKey: LEARNER_QUERY_KEYS.all() });
+  };
+}
+
+export function useFlagOtjEntry() {
+  const invalidate = useInvalidateAfterFlag();
+
+  return useMutation({
+    mutationFn: ({ id, note }) => flagOtjEntry({ id, note }),
+    onSuccess: () => {
+      toastSuccess("Entry flagged for discussion.");
+      invalidate();
+    },
+    onError: (error) => toastError(error.message),
+  });
+}
+
+export function useUnflagOtjEntry() {
+  const invalidate = useInvalidateAfterFlag();
+
+  return useMutation({
+    mutationFn: (id) => unflagOtjEntry(id),
+    onSuccess: () => {
+      toastSuccess("Flag cleared.");
+      invalidate();
+    },
     onError: (error) => toastError(error.message),
   });
 }

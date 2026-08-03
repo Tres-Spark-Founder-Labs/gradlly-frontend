@@ -4,6 +4,9 @@ export const OTJ_PATHS = Object.freeze({
   categories: "/api/v1/otj-log-entries/categories",
   bulkApprove: "/api/v1/otj-log-entries/bulk-approve",
   bulkReject: "/api/v1/otj-log-entries/bulk-reject",
+  // F2.2.4 AC3 — a tutor's query, not an approval decision.
+  flag: (id) => `/api/v1/otj-log-entries/${id}/flag`,
+  unflag: (id) => `/api/v1/otj-log-entries/${id}/unflag`,
 });
 
 // ─── Status (`OtjLogStatus`) ─────────────────────────────────────────────────

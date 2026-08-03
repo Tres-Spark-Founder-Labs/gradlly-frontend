@@ -12,7 +12,26 @@ export const ENROLMENT_PATHS = Object.freeze({
   complete: (id) => `/api/v1/enrolments/${id}/complete`,
   epaOutcome: (id) => `/api/v1/enrolments/${id}/epa-outcome`,
   cancel: (id) => `/api/v1/enrolments/${id}/cancel`,
+  // F2.2.4 AC6 — start, end, and the history behind the current break.
+  breakInLearning: (id) => `/api/v1/enrolments/${id}/break-in-learning`,
+  breakInLearningEnd: (id) => `/api/v1/enrolments/${id}/break-in-learning/end`,
 });
+
+// ─── Break in learning (F2.2.4 AC6) ──────────────────────────────────────────
+/**
+ * The ESFA's own reason list. These are not free text on the ILR — a break is
+ * reported with a coded reason, so offering the tutor an open box here would
+ * only mean someone re-coding it by hand at submission time.
+ */
+export const BREAK_IN_LEARNING_REASONS = [
+  { value: "Illness", text: "Illness" },
+  { value: "Maternity leave", text: "Maternity leave" },
+  { value: "Paternity leave", text: "Paternity leave" },
+  { value: "Caring responsibilities", text: "Caring responsibilities" },
+  { value: "Employer circumstances", text: "Employer circumstances" },
+  { value: "Personal circumstances", text: "Personal circumstances" },
+  { value: "Other", text: "Other" },
+];
 
 // ─── Lifecycle status (`EnrolmentStatus`) ───────────────────────────────────
 export const ENROLMENT_STATUS = Object.freeze({

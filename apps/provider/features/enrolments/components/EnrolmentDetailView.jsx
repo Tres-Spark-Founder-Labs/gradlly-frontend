@@ -26,7 +26,7 @@ import { EnrolmentStatusBadge, PipelineStateBadge } from "./EnrolmentBadges";
 import { EnrolmentJourney } from "./EnrolmentJourney";
 import { OrganisationLinksModal } from "./OrganisationLinksModal";
 import { ParticipantsModal } from "./ParticipantsModal";
-import { SetEpaDateModal } from "./SetEpaDateModal";
+import { SetEpaDetailsModal } from "./SetEpaDetailsModal";
 import { useEnrolment, useEnrolmentJourney } from "../queries/enrolments.query";
 
 const GBP = new Intl.NumberFormat("en-GB", {
@@ -355,9 +355,11 @@ export function EnrolmentDetailView({ enrolmentId }) {
 
       {enrolment ? (
         <>
-          <SetEpaDateModal
+          <SetEpaDetailsModal
             enrolmentId={enrolment.id}
             currentEpaDate={enrolment.epaDate}
+            currentEpaOrganisationName={enrolment.epaOrganisationName}
+            currentEpaOrganisationUkprn={enrolment.epaOrganisationUkprn}
             open={epaOpen}
             onClose={() => setEpaOpen(false)}
           />

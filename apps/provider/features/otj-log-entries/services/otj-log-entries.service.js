@@ -73,3 +73,26 @@ export async function bulkRejectOtj({ ids, reason }) {
     throw normalizeApiClientError(e);
   }
 }
+
+// ─── Tutor flag (F2.2.4 AC3) ─────────────────────────────────────────────────
+//
+// Distinct from approve/reject: those are the employer deciding whether the
+// hours count. A flag keeps the hours and asks a question about them.
+
+export async function flagOtjEntry({ id, note }) {
+  try {
+    const result = await $apiClient.post(OTJ_PATHS.flag(id), { note });
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+export async function unflagOtjEntry(id) {
+  try {
+    const result = await $apiClient.post(OTJ_PATHS.unflag(id), {});
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
