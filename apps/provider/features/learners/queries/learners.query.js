@@ -12,6 +12,7 @@ import { toastError, toastSuccess } from "@/hooks/useToast";
 import { ERROR_CODES } from "@/lib/errors";
 
 import { LEARNER_QUERY_KEYS } from "./keys";
+import { INTERVENTION_QUEUE_REFRESH_MS } from "../constants";
 import {
   downloadCohortCsv,
   exportCohortPdf,
@@ -38,6 +39,20 @@ export function useCohort(params = {}, options = {}) {
   });
 }
 
+/**
+ * F2.2.2 AC4 — "queue updates in real time as underlying data changes".
+ *
+ * Read as: a tutor who leaves this open sees the queue change without
+ * reloading. Polling, not push — nothing in this platform has a socket or an
+ * event stream, and building one for a list that turns over on the order of
+ * hours would be a large piece of infrastructure for no extra freshness that
+ * anyone could act on. This matches the client's answered decision 6 on what
+ * "real time" means here.
+ *
+ * `refetchIntervalInBackground` stays false deliberately: a hidden tab
+ * polling all afternoon spends the request budget on a queue nobody is
+ * looking at, and window focus already triggers a refetch on return.
+ */
 export function useInterventionQueue(params = {}, options = {}) {
   const { orgId } = useAuthUser();
 
@@ -45,6 +60,11 @@ export function useInterventionQueue(params = {}, options = {}) {
     queryKey: LEARNER_QUERY_KEYS.interventionQueue(orgId, params),
     queryFn: () => getInterventionQueue(params),
     enabled: !!orgId,
+    refetchInterval: INTERVENTION_QUEUE_REFRESH_MS,
+    refetchIntervalInBackground: false,
+    // Anything older than the refresh cycle is stale by definition; without
+    // this the interval fires and react-query serves the cache instead.
+    staleTime: 0,
     select: (data) => ({
       atRiskCount: data?.atRiskCount ?? 0,
       items: data?.items ?? [],

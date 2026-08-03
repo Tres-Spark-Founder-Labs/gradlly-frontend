@@ -1,6 +1,13 @@
 "use client";
 
-import { Eye, Mail, Megaphone, ShieldAlert, User } from "lucide-react";
+import {
+  Eye,
+  Mail,
+  Megaphone,
+  RefreshCw,
+  ShieldAlert,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -9,6 +16,7 @@ import Button from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useRoleAccess } from "@/features/auth/hooks/useRoleAccess";
+import { cn } from "@/utils/helper";
 
 import { FlagChip, SeverityBadge } from "./LearnerBadges";
 import { LogInterventionModal } from "./LogInterventionModal";
@@ -82,9 +90,10 @@ export function InterventionQueue() {
   const [mine, setMine] = useState(false);
   const [logTarget, setLogTarget] = useState(null);
 
-  const { data, isLoading } = useInterventionQueue({
-    mine: mine ? "true" : undefined,
-  });
+  const { data, isLoading, isFetching, dataUpdatedAt, refetch } =
+    useInterventionQueue({
+      mine: mine ? "true" : undefined,
+    });
   const items = data?.items ?? [];
 
   return (
@@ -102,12 +111,37 @@ export function InterventionQueue() {
               </span>
             ) : null}
           </div>
-          <CheckboxField
-            name="mine"
-            label="My caseload"
-            checked={mine}
-            onChange={(e) => setMine(e.target.checked)}
-          />
+          <div className="flex items-center gap-3">
+            {/* F2.2.2 AC4. The queue refreshes itself, but a tutor deciding
+                who to ring next deserves to know how old the list is rather
+                than assuming it is live to the second. */}
+            <button
+              type="button"
+              onClick={() => refetch()}
+              disabled={isFetching}
+              title="Refresh now"
+              className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700 disabled:opacity-60"
+            >
+              <RefreshCw
+                className={cn("size-3.5", isFetching && "animate-spin")}
+                aria-hidden
+              />
+              {isFetching
+                ? "Updating…"
+                : dataUpdatedAt
+                  ? `Updated ${new Date(dataUpdatedAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}`
+                  : "Refresh"}
+            </button>
+            <CheckboxField
+              name="mine"
+              label="My caseload"
+              checked={mine}
+              onChange={(e) => setMine(e.target.checked)}
+            />
+          </div>
         </div>
 
         {isLoading ? (
