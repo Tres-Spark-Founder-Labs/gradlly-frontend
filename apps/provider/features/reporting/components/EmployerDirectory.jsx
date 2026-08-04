@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 
 import { InputField } from "@/components/form/InputField";
 import { DataTable } from "@/components/ui/DataTable";
-import { cn } from "@/utils/helper";
+import { cn, formatDate } from "@/utils/helper";
 
 import { CommitmentPipelineBadge } from "./CommitmentPipelineBadge";
 import { useEmployerDirectory } from "../queries/reporting.query";
@@ -130,6 +130,28 @@ export function EmployerDirectory() {
       cell: (row) => (
         <CommitmentPipelineBadge status={row.commitmentPipelineStatus} />
       ),
+    },
+    {
+      /**
+       * F2.4.1 / F2.4.2. This field was a hardcoded `null` on the API,
+       * honestly labelled "reserved for employer visit log", until the visit
+       * log existed to fill it.
+       *
+       * "Never visited" is spelled out rather than left as a dash: it is the
+       * state a provider preparing for inspection most needs to spot, and a
+       * dash reads as missing data rather than as an answer.
+       */
+      key: "lastVisitDate",
+      header: "Last visit",
+      mobileLabel: "Last visit",
+      cell: (row) =>
+        row.lastVisitDate ? (
+          <span className="tabular-nums text-neutral-700">
+            {formatDate(row.lastVisitDate)}
+          </span>
+        ) : (
+          <span className="text-xs text-amber-700">Never visited</span>
+        ),
     },
   ];
 

@@ -53,3 +53,33 @@ export async function listFundingPayments({
     throw normalizeApiClientError(e);
   }
 }
+
+// ─── Sync health and API activity (F2.3.1 AC5 / AC7) ─────────────────────────
+
+export async function getDasSyncStatus() {
+  try {
+    const result = await $apiClient.get(DAS_PATHS.syncStatus);
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+export async function listDasActivity({
+  page = 1,
+  perPage = 20,
+  operation,
+  failedOnly,
+} = {}) {
+  try {
+    const params = { page, perPage };
+    if (operation) params.operation = operation;
+    // Sent as a string: the backend validates with @IsBooleanString, and a
+    // real boolean serialises to "true"/"false" anyway.
+    if (failedOnly) params.failedOnly = "true";
+    const result = await $apiClient.get(DAS_PATHS.activity, { params });
+    return result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}

@@ -154,3 +154,32 @@ export async function publishMappingConfig(id) {
     throw normalizeApiClientError(e);
   }
 }
+
+// ─── Funding claim tracker (F2.3.2 AC7) ──────────────────────────────────────
+
+export async function listFundingClaims({
+  page = 1,
+  perPage = 20,
+  discrepanciesOnly,
+} = {}) {
+  try {
+    const params = { page, perPage };
+    if (discrepanciesOnly) params.discrepanciesOnly = "true";
+    const result = await $apiClient.get(ILR_PATHS.fundingClaims, { params });
+    return result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+export async function setFundingClaimResolution({ enrolmentId, payload }) {
+  try {
+    const result = await $apiClient.patch(
+      ILR_PATHS.fundingClaimResolution(enrolmentId),
+      payload,
+    );
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}

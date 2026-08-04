@@ -13,8 +13,10 @@ import { toastError, toastSuccess } from "@/hooks/useToast";
 import { DAS_QUERY_KEYS } from "./keys";
 import { DEFAULT_HORIZON_MONTHS } from "../constants";
 import {
+  getDasSyncStatus,
   getLevyBalance,
   getLevyForecast,
+  listDasActivity,
   listFundingPayments,
   triggerDasSync,
 } from "../services/das.service";
@@ -78,5 +80,43 @@ export function useTriggerDasSync() {
       qc.invalidateQueries({ queryKey: DAS_QUERY_KEYS.all() });
     },
     onError: (error) => toastError(error.message),
+  });
+}
+
+// ─── Sync health and API activity (F2.3.1 AC5 / AC7) ─────────────────────────
+
+/**
+ * F2.3.1 AC5 — the integration health band.
+ *
+ * Polled while the page is open, at the same 60s cadence as the intervention
+ * queue. A health indicator that only updates on reload is the one thing a
+ * health indicator must not be: someone watching it after a manual sync needs
+ * to see it change without knowing to refresh.
+ */
+export function useDasSyncStatus({ refreshMs = 60_000, ...options } = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: DAS_QUERY_KEYS.syncStatus(orgId),
+    queryFn: getDasSyncStatus,
+    enabled: !!orgId,
+    refetchInterval: refreshMs,
+    ...options,
+  });
+}
+
+export function useDasActivity(params = {}, options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: DAS_QUERY_KEYS.activity(orgId, params),
+    queryFn: () => listDasActivity(params),
+    enabled: !!orgId,
+    placeholderData: keepPreviousData,
+    select: (response) => ({
+      entries: response?.data ?? [],
+      meta: response?.meta ?? null,
+    }),
+    ...options,
   });
 }

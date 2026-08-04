@@ -1,6 +1,7 @@
 import { Building2 } from "lucide-react";
 
 import { PageSubheader } from "@/components/ui/PageSubheader";
+import { EmployerVisitLog } from "@/features/employer-visits/components/EmployerVisitLog";
 import { EmployerDirectory } from "@/features/reporting/components/EmployerDirectory";
 import { createPageSeo } from "@/utils/metadata";
 
@@ -22,6 +23,8 @@ export default function EmployersPage() {
         description="Employers linked to your enrolments — active learners, average OTJ, and commitment progress."
       />
       <EmployerDirectory />
+      {/* F2.4.2 — employer engagement, which is Ofsted evidence. */}
+      <EmployerVisitLog />
     </div>
   );
 }
