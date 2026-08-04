@@ -137,3 +137,28 @@ export async function getLearnerProfile(enrolmentId) {
     throw normalizeApiClientError(e);
   }
 }
+
+// ─── Tutor caseload (F2.2.5) ─────────────────────────────────────────────────
+
+export async function getTutorCaseload() {
+  try {
+    const result = await $apiClient.get(LEARNER_PATHS.caseload);
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+export async function assignTutorInBulk({ enrolmentIds, tutorUserId }) {
+  try {
+    const result = await $apiClient.post(LEARNER_PATHS.caseloadAssignTutor, {
+      enrolmentIds,
+      // Explicitly null rather than omitted: null un-assigns, which is a real
+      // action when a tutor leaves.
+      tutorUserId: tutorUserId || null,
+    });
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}

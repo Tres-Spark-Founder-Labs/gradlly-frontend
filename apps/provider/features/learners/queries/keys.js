@@ -9,4 +9,5 @@ export const LEARNER_QUERY_KEYS = {
     params,
   ],
   profile: (orgId, enrolmentId) => ["learners", "profile", orgId, enrolmentId],
+  caseload: (orgId) => ["learners", "caseload", orgId],
 };
