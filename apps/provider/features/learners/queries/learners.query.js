@@ -14,11 +14,13 @@ import { ERROR_CODES } from "@/lib/errors";
 import { LEARNER_QUERY_KEYS } from "./keys";
 import { INTERVENTION_QUEUE_REFRESH_MS } from "../constants";
 import {
+  assignTutorInBulk,
   downloadCohortCsv,
   exportCohortPdf,
   getCohortFilterOptions,
   getInterventionQueue,
   getLearnerProfile,
+  getTutorCaseload,
   listCohort,
   logIntervention,
 } from "../services/learners.service";
@@ -131,5 +133,47 @@ export function useCohortFilterOptions(options = {}) {
       tutors: data?.tutors ?? [],
     }),
     ...options,
+  });
+}
+
+// ─── Tutor caseload (F2.2.5) ─────────────────────────────────────────────────
+
+export function useTutorCaseload(options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: LEARNER_QUERY_KEYS.caseload(orgId),
+    queryFn: getTutorCaseload,
+    enabled: !!orgId,
+    ...options,
+  });
+}
+
+export function useAssignTutorInBulk() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ enrolmentIds, tutorUserId }) =>
+      assignTutorInBulk({ enrolmentIds, tutorUserId }),
+    onSuccess: (data) => {
+      /**
+       * The API reports how many it actually reassigned. Saying "12 learners
+       * reassigned" when the server wrote 9 — because three ids were not
+       * found — is the kind of quiet lie this project keeps finding, so the
+       * toast reports the server's number rather than the selection size.
+       */
+      const updated = data?.updated ?? 0;
+      toastSuccess(
+        updated === 1
+          ? "1 learner reassigned."
+          : `${updated} learners reassigned.`,
+      );
+      // The cohort table shows the tutor column, and the caseload and
+      // intervention queue both bucket by tutor.
+      qc.invalidateQueries({ queryKey: LEARNER_QUERY_KEYS.all() });
+    },
+    onError: (error) => {
+      if (error.code !== ERROR_CODES.VALIDATION) toastError(error.message);
+    },
   });
 }

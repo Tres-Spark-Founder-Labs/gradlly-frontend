@@ -8,6 +8,9 @@ export const LEARNER_PATHS = Object.freeze({
   interventions: (enrolmentId) =>
     `/api/v1/learners/${enrolmentId}/interventions`,
   profile: (enrolmentId) => `/api/v1/learners/${enrolmentId}/profile`,
+  // F2.2.5 — tutor caseload dashboard and bulk assignment.
+  caseload: "/api/v1/learners/caseload",
+  caseloadAssignTutor: "/api/v1/learners/caseload/assign-tutor",
 });
 
 // ─── Status badge (`LearnerStatusBadge`) — derived per learner ───────────────
