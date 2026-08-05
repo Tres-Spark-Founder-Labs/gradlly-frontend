@@ -1,3 +1,35 @@
 {
-  "checked": ["apps/employer/features/otj/services/otj.service.js"]
+  "checked": [
+    "apps/apprentice/features/auth/services/auth.service.js",
+    "apps/apprentice/features/enrolments/services/enrolments.service.js",
+    "apps/apprentice/features/invitations/services/invitations.service.js",
+    "apps/apprentice/features/portfolio/services/portfolio.service.js",
+    "apps/apprentice/features/reporting/services/reporting.service.js",
+    "apps/apprentice/features/reviews/services/reviews.service.js",
+    "apps/employer/features/auth/services/auth.service.js",
+    "apps/employer/features/invitations/services/invitations.service.js",
+    "apps/employer/features/organization/services/organizations.service.js",
+    "apps/employer/features/otj/services/otj.service.js",
+    "apps/employer/features/reporting/services/reporting.service.js",
+    "apps/flow/features/ai-programmes/services/ai-programmes.service.js",
+    "apps/flow/features/auth/services/auth.service.js",
+    "apps/flow/features/flowportal-registration/services/registration.service.js",
+    "apps/flow/features/invitations/services/invitations.service.js",
+    "apps/flow/features/levy-exchange/services/levy-exchange.service.js",
+    "apps/flow/features/organization/services/organizations.service.js",
+    "apps/flow/features/pdf/services/pdf.service.js",
+    "apps/flow/features/reporting/services/reporting.service.js",
+    "apps/flow/features/storage/services/storage.service.js",
+    "apps/provider/features/apprentices/services/apprentices.service.js",
+    "apps/provider/features/auth/services/auth.service.js",
+    "apps/provider/features/das-pushes/services/das-pushes.service.js",
+    "apps/provider/features/enrolments/services/enrolments.service.js",
+    "apps/provider/features/esignature/services/esignature.service.js",
+    "apps/provider/features/invitations/services/invitations.service.js",
+    "apps/provider/features/organization/services/organizations.service.js",
+    "apps/provider/features/pdf/services/pdf.service.js",
+    "apps/provider/features/programmes/services/programmes.service.js",
+    "apps/provider/features/standards/services/standards.service.js",
+    "apps/provider/features/storage/services/storage.service.js"
+  ]
 }

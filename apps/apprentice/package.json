@@ -9,7 +9,9 @@
     "start": "next start --port 3001",
     "lint": "eslint . --max-warnings 0",
     "type-check": "tsc --noEmit",
-    "clean": "rm -rf .next dist"
+    "clean": "rm -rf .next dist",
+    "check-types": "tsc --noEmit -p tsconfig.check.json",
+    "api:types": "openapi-typescript ../../../graddly-api/openapi.json -o types/api.d.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
