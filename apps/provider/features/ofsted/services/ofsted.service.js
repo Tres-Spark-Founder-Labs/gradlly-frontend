@@ -1,9 +1,14 @@
+// @ts-check
 "use client";
 
 import { $apiClient } from "@/lib/api/client";
 import { normalizeApiClientError } from "@/lib/errors";
 
 import { OFSTED_PATHS } from "../constants";
+
+/** @typedef {import("@/types/api").paths["/ofsted/evidence-packs"]["post"]["requestBody"]["content"]["application/json"]} CreateEvidencePackBody */
+
+/** @typedef {import("@/types/api").paths["/qip-actions"]["get"]["parameters"]["query"]} QipActionsQuery */
 
 // The active organisation is sent globally via the X-Organisation-Id cookie/
 // header (see lib/api/client), so none of these calls set it explicitly.
@@ -38,6 +43,7 @@ export async function getEifScoreTrend() {
 }
 
 // ─── QIP actions ─────────────────────────────────────────────────────────────
+/** @param {QipActionsQuery} [options] */
 export async function listQipActions({
   page = 1,
   perPage = 20,
@@ -231,6 +237,7 @@ export async function createProgrammeDocument({ programmeId, payload }) {
 }
 
 // ─── Evidence pack jobs (owner/admin) ────────────────────────────────────────
+/** @param {CreateEvidencePackBody} [options] */
 export async function createEvidencePackJob({ additionalStorageKeys } = {}) {
   try {
     const body = {};

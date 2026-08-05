@@ -1,3 +1,4 @@
+// @ts-check
 "use client";
 
 import { putToPresignedUrl } from "@/features/storage/services/storage.service";
@@ -5,6 +6,8 @@ import { $apiClient } from "@/lib/api/client";
 import { ApiClientError, normalizeApiClientError } from "@/lib/errors";
 
 import { MESSAGING_PATHS } from "../constants";
+
+/** @typedef {import("@/types/api").paths["/messaging/threads"]["get"]["parameters"]["query"]} ThreadsQuery */
 
 export async function getUnreadCount() {
   try {
@@ -15,6 +18,7 @@ export async function getUnreadCount() {
   }
 }
 
+/** @param {ThreadsQuery} [options] */
 export async function listThreads({ enrolmentId, apprenticeId } = {}) {
   try {
     const result = await $apiClient.get(MESSAGING_PATHS.THREADS, {

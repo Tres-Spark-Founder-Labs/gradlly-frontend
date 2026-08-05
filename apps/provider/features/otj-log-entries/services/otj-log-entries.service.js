@@ -1,3 +1,4 @@
+// @ts-check
 "use client";
 
 import { $apiClient } from "@/lib/api/client";
@@ -5,9 +6,12 @@ import { normalizeApiClientError } from "@/lib/errors";
 
 import { OTJ_PATHS } from "../constants";
 
+/** @typedef {import("@/types/api").paths["/otj-log-entries"]["get"]["parameters"]["query"]} OtjEntriesQuery */
+
 // The active organisation is sent globally via the X-Organisation-Id cookie/
 // header (see lib/api/client), so none of these calls set it explicitly.
 
+/** @param {OtjEntriesQuery} [options] */
 export async function listOtjEntries({
   page = 1,
   perPage = 20,

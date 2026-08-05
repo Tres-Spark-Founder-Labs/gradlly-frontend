@@ -1,9 +1,12 @@
+// @ts-check
 "use client";
 
 import { $apiClient } from "@/lib/api/client";
 import { normalizeApiClientError } from "@/lib/errors";
 
 import { REPORTING_PATHS } from "../constants";
+
+/** @typedef {import("@/types/api").paths["/reporting/employer-directory"]["get"]["parameters"]["query"]} EmployerDirectoryQuery */
 
 // The active organisation is sent globally via the X-Organisation-Id cookie/
 // header (see lib/api/client), so none of these calls set it explicitly.
@@ -17,6 +20,7 @@ export async function getProviderDashboard() {
   }
 }
 
+/** @param {EmployerDirectoryQuery} [options] */
 export async function listEmployerDirectory({
   page = 1,
   perPage = 20,

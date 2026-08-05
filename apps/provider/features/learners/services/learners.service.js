@@ -1,3 +1,4 @@
+// @ts-check
 "use client";
 
 import { $apiClient } from "@/lib/api/client";
@@ -5,9 +6,19 @@ import { normalizeApiClientError } from "@/lib/errors";
 
 import { LEARNER_PATHS } from "../constants";
 
+/**
+ * Query shapes are derived from the generated OpenAPI types rather than
+ * restated here, so a filter the API stops accepting becomes a build failure
+ * instead of a parameter the server silently ignores.
+ *
+ * @typedef {import("@/types/api").paths["/learners/cohort"]["get"]["parameters"]["query"]} CohortQuery
+ * @typedef {import("@/types/api").paths["/learners/intervention-queue"]["get"]["parameters"]["query"]} InterventionQueueQuery
+ */
+
 // The active organisation is sent globally via the X-Organisation-Id cookie/
 // header (see lib/api/client), so none of these calls set it explicitly.
 
+/** @param {CohortQuery} [options] */
 export async function listCohort({
   page = 1,
   perPage = 20,
@@ -102,6 +113,7 @@ export async function exportCohortPdf(filters = {}) {
   }
 }
 
+/** @param {InterventionQueueQuery} [options] */
 export async function getInterventionQueue({ tutorUserId, mine } = {}) {
   try {
     const params = {};
