@@ -1,0 +1,44 @@
+{
+  "//": [
+    "Contract type-checking, separate from jsconfig.json because Next.js owns",
+    "that file and regenerates it (its `ignoreDeprecations` value is not even",
+    "accepted by the tsc in this workspace).",
+    "",
+    "`checkJs` is false on purpose: this is an opt-in gate, not a migration.",
+    "Files carrying `// @ts-check` are checked; everything else is only parsed",
+    "so imports resolve. That lets the API boundary be made safe today without",
+    "first fixing every untyped component in the app.",
+    "",
+    "Run with `npm run check-types`. Added for the apprentice app in security pass item 8.",
+    "",
+    "`strict` is deliberately off. Turning it on produced 18 errors on the",
+    "first annotated service, 16 of them implicit-any on parameters that have",
+    "nothing to do with response shapes. A gate that noisy gets switched off,",
+    "and then catches nothing at all. What remains is the failure mode this",
+    "exists for — reading a property the API does not return (TS2339) — plus",
+    "strictNullChecks for the other half, using a nullable DTO field without",
+    "handling null. Tighten once the boundary is fully annotated."
+  ],
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["types/**/*.d.ts", "features/**/*.js", "components/**/*.js"],
+  "exclude": ["node_modules", ".next", "dist", "**/*.test.js", "**/*.test.jsx"]
+}
