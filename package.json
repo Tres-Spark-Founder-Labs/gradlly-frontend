@@ -38,7 +38,9 @@
     "docker:shell:main": "docker compose exec main-app sh",
     "docker:shell:employer": "docker compose exec employer-app sh",
     "docker:reset": "docker compose down --remove-orphans && docker compose up --build",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "verify:ts-check-ratchet": "node scripts/verify-ts-check-ratchet.mjs",
+    "verify:ts-check-ratchet:update": "node scripts/verify-ts-check-ratchet.mjs --update"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",

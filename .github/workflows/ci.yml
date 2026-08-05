@@ -45,6 +45,12 @@ jobs:
       - name: Typecheck
         run: npm run check-types
 
+      # Security pass item 8. @ts-check is opt-in per file, which makes it
+      # adoptable — and also opt-out. Deleting one comment silently drops a
+      # file from the gate. This pins the set so it can only grow.
+      - name: Type-check ratchet
+        run: npm run verify:ts-check-ratchet
+
       - name: Build (affected only)
         run: npm run build -- --filter=...[origin/main] --parallel
 
