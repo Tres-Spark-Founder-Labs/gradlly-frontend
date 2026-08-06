@@ -1,9 +1,12 @@
+// @ts-check
 "use client";
 
 import { $apiClient } from "@/lib/api/client";
 import { normalizeApiClientError } from "@/lib/errors";
 
 import { EMPLOYER_VISIT_PATHS } from "../constants";
+
+/** @typedef {import("@/types/api").paths["/employer-visits"]["get"]["parameters"]["query"]} EmployerVisitsQuery */
 
 // The active organisation is sent globally via the X-Organisation-Id cookie/
 // header (see lib/api/client), so none of these calls set it explicitly.
@@ -12,6 +15,7 @@ function unwrap(result) {
   return result.data?.data ?? result.data;
 }
 
+/** @param {EmployerVisitsQuery} [options] */
 export async function listEmployerVisits({
   page = 1,
   perPage = 20,

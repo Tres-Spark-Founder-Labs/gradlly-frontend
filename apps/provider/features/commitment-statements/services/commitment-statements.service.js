@@ -1,3 +1,4 @@
+// @ts-check
 "use client";
 
 import { $apiClient } from "@/lib/api/client";
@@ -5,9 +6,12 @@ import { normalizeApiClientError } from "@/lib/errors";
 
 import { COMMITMENT_PATHS } from "../constants";
 
+/** @typedef {import("@/types/api").paths["/commitment-statements"]["get"]["parameters"]["query"]} CommitmentStatementsQuery */
+
 // The active organisation is sent globally via the X-Organisation-Id cookie/
 // header (see lib/api/client), so none of these calls set it explicitly.
 
+/** @param {CommitmentStatementsQuery} [options] */
 export async function listCommitmentStatements({
   page = 1,
   perPage = 20,

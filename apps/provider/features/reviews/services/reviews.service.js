@@ -1,9 +1,12 @@
+// @ts-check
 "use client";
 
 import { $apiClient } from "@/lib/api/client";
 import { ApiClientError, normalizeApiClientError } from "@/lib/errors";
 
 import { REVIEW_PATHS } from "../constants";
+
+/** @typedef {import("@/types/api").paths["/reviews/calendar"]["get"]["parameters"]["query"]} ReviewCalendarQuery */
 
 // The active organisation is sent globally via the X-Organisation-Id cookie/
 // header (see lib/api/client), so none of these calls set it explicitly.
@@ -18,6 +21,7 @@ export async function listReviews(params = {}) {
 }
 
 // from + to are required by the backend for the calendar view.
+/** @param {ReviewCalendarQuery} [options] */
 export async function listReviewCalendar({ from, to, ...rest } = {}) {
   try {
     const result = await $apiClient.get(REVIEW_PATHS.calendar, {

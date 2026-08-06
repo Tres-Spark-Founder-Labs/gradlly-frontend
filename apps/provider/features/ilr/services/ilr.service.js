@@ -1,9 +1,14 @@
+// @ts-check
 "use client";
 
 import { $apiClient } from "@/lib/api/client";
 import { normalizeApiClientError } from "@/lib/errors";
 
 import { ILR_PATHS } from "../constants";
+
+/** @typedef {import("@/types/api").paths["/ilr/learner-records"]["get"]["parameters"]["query"]} IlrRecordsQuery */
+
+/** @typedef {import("@/types/api").paths["/ilr/funding-claims"]["get"]["parameters"]["query"]} FundingClaimsQuery */
 
 // The active organisation is sent globally via the X-Organisation-Id cookie/
 // header (see lib/api/client), so none of these calls set it explicitly.
@@ -18,6 +23,7 @@ export async function buildIlrRecord(payload) {
   }
 }
 
+/** @param {IlrRecordsQuery} [options] */
 export async function listIlrRecords({
   page = 1,
   perPage = 20,
@@ -157,6 +163,7 @@ export async function publishMappingConfig(id) {
 
 // ─── Funding claim tracker (F2.3.2 AC7) ──────────────────────────────────────
 
+/** @param {FundingClaimsQuery} [options] */
 export async function listFundingClaims({
   page = 1,
   perPage = 20,

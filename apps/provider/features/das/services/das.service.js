@@ -1,9 +1,16 @@
+// @ts-check
 "use client";
 
 import { $apiClient } from "@/lib/api/client";
 import { normalizeApiClientError } from "@/lib/errors";
 
 import { DAS_PATHS } from "../constants";
+
+/** @typedef {import("@/types/api").paths["/das/activity"]["get"]["parameters"]["query"]} DasActivityQuery */
+
+/** @typedef {import("@/types/api").paths["/das/funding-payments"]["get"]["parameters"]["query"]} FundingPaymentsQuery */
+
+/** @typedef {import("@/types/api").paths["/das/levy-forecast"]["get"]["parameters"]["query"]} LevyForecastQuery */
 
 // The active organisation is sent globally via the X-Organisation-Id cookie/
 // header (see lib/api/client), so none of these calls set it explicitly.
@@ -26,6 +33,7 @@ export async function getLevyBalance() {
   }
 }
 
+/** @param {LevyForecastQuery} [options] */
 export async function getLevyForecast({ horizonMonths } = {}) {
   try {
     const params = {};
@@ -37,6 +45,7 @@ export async function getLevyForecast({ horizonMonths } = {}) {
   }
 }
 
+/** @param {FundingPaymentsQuery} [options] */
 export async function listFundingPayments({
   page = 1,
   perPage = 20,
@@ -65,6 +74,7 @@ export async function getDasSyncStatus() {
   }
 }
 
+/** @param {DasActivityQuery} [options] */
 export async function listDasActivity({
   page = 1,
   perPage = 20,

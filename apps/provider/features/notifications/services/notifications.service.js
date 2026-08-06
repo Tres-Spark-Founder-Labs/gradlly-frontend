@@ -1,3 +1,4 @@
+// @ts-check
 "use client";
 
 import { $apiClient } from "@/lib/api/client";
@@ -5,6 +6,11 @@ import { normalizeApiClientError } from "@/lib/errors";
 
 import { NOTIFICATION_PATHS } from "../constants";
 
+/** @typedef {import("@/types/api").paths["/notifications/read-all"]["patch"]["requestBody"]["content"]["application/json"]} MarkAllReadBody */
+
+/** @typedef {import("@/types/api").paths["/notifications"]["get"]["parameters"]["query"]} NotificationsQuery */
+
+/** @param {NotificationsQuery} [options] */
 export async function listNotifications({
   organisationId,
   unreadOnly = false,
@@ -31,6 +37,7 @@ export async function markNotificationRead({ id }) {
   }
 }
 
+/** @param {MarkAllReadBody} [options] */
 export async function markAllNotificationsRead({ organisationId } = {}) {
   try {
     const result = await $apiClient.patch(NOTIFICATION_PATHS.READ_ALL, {

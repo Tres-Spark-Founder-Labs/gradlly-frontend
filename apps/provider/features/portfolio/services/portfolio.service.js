@@ -1,9 +1,12 @@
+// @ts-check
 "use client";
 
 import { $apiClient } from "@/lib/api/client";
 import { normalizeApiClientError } from "@/lib/errors";
 
 import { PORTFOLIO_PATHS } from "../constants";
+
+/** @typedef {import("@/types/api").paths["/ksb-evidence-items"]["get"]["parameters"]["query"]} EvidenceItemsQuery */
 
 // The active organisation is sent globally via the X-Organisation-Id cookie/
 // header (see lib/api/client), so none of these calls set it explicitly.
@@ -82,6 +85,7 @@ export async function upsertKsbCoverage({
 }
 
 // ─── Evidence items (provider review side) ───────────────────────────────────
+/** @param {EvidenceItemsQuery} [options] */
 export async function listEvidenceItems({
   page = 1,
   perPage = 20,
