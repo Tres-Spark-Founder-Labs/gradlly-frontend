@@ -40,7 +40,8 @@
     "docker:reset": "docker compose down --remove-orphans && docker compose up --build",
     "test": "turbo run test",
     "verify:ts-check-ratchet": "node scripts/verify-ts-check-ratchet.mjs",
-    "verify:ts-check-ratchet:update": "node scripts/verify-ts-check-ratchet.mjs --update"
+    "verify:ts-check-ratchet:update": "node scripts/verify-ts-check-ratchet.mjs --update",
+    "verify:fab-coverage": "node scripts/verify-fab-coverage.mjs"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",

@@ -9,6 +9,7 @@ import { AUTH_REDIRECTS } from "@/features/auth/constants";
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
 import { BottomNav } from "@/layout/dashboard/BottomNav";
 import { Header } from "@/layout/dashboard/Header";
+import { QuickLogFab } from "@/layout/dashboard/QuickLogFab";
 import { Sidebar } from "@/layout/dashboard/Sidebar";
 import { cn } from "@/utils/helper";
 
@@ -39,6 +40,8 @@ export function DashboardLayout({ children }) {
   return (
     <div className="h-dvh overflow-hidden bg-neutral-50">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      {/* F3.1.1 AC6 — persistent across every dashboard route by construction. */}
+      <QuickLogFab />
       <div
         suppressHydrationWarning
         className={cn(

@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 
+import { QuickOtjLogSheet } from "@/features/otj/components/QuickOtjLogSheet";
+
 import { OTJHeader } from "./OTJHeader";
 import { OTJInfoCard } from "./OTJInfoCard";
-import { OTJLogModal } from "./OTJLogModal";
 import { OTJProgressBar } from "./OTJProgressBar";
 import { OTJSessionsList } from "./OTJSessionsList";
 import { OTJStatCards } from "./OTJStatCards";
@@ -43,7 +44,9 @@ export function OTJLogs() {
         </div>
       </div>
 
-      <OTJLogModal open={logOpen} onClose={() => setLogOpen(false)} />
+      {/* F3.1.1 AC3 — the three-step wizard this replaced contradicted
+          "single tap — no multi-step flow" outright. */}
+      <QuickOtjLogSheet open={logOpen} onClose={() => setLogOpen(false)} />
     </>
   );
 }

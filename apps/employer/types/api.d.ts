@@ -4179,7 +4179,6 @@ export interface components {
       /** @example false */
       hasPreviousPage: boolean;
     };
-    Object: Record<string, never>;
     AuthResponseDto: {
       /**
        * @description Short-lived JWT access token (default 15 minutes)
@@ -6635,6 +6634,16 @@ export interface components {
     };
     ListLearnerCohortQueryDto: {
       /**
+       * @description One-based page number.
+       * @default 1
+       */
+      page: number;
+      /**
+       * @description Items per page.
+       * @default 20
+       */
+      perPage: number;
+      /**
        * Format: uuid
        * @description Filter by employer organisation
        */
@@ -6690,10 +6699,6 @@ export interface components {
        * @enum {string}
        */
       format: "json" | "csv";
-      /** @default 1 */
-      page: Record<string, never>;
-      /** @default 20 */
-      perPage: Record<string, never>;
     };
     InterventionQueueEntryResponseDto: {
       /** Format: uuid */
@@ -7733,14 +7738,20 @@ export interface components {
       updatedAt: string;
     };
     ListMatchApplicationsQueryDto: {
+      /**
+       * @description One-based page number.
+       * @default 1
+       */
+      page: number;
+      /**
+       * @description Items per page.
+       * @default 20
+       */
+      perPage: number;
       /** @enum {string} */
       role?: "donor" | "recipient";
       /** @enum {string} */
       status?: "pending" | "confirmed" | "rejected" | "withdrawn";
-      /** @default 1 */
-      page: Record<string, never>;
-      /** @default 20 */
-      perPage: Record<string, never>;
     };
     LevyTransferResponseDto: {
       /** Format: uuid */
@@ -7829,6 +7840,16 @@ export interface components {
       signatureImageKey: string;
     };
     ListTransfersQueryDto: {
+      /**
+       * @description One-based page number.
+       * @default 1
+       */
+      page: number;
+      /**
+       * @description Items per page.
+       * @default 20
+       */
+      perPage: number;
       /** @enum {string} */
       role?: "donor" | "recipient";
       /** @enum {string} */
@@ -7839,10 +7860,6 @@ export interface components {
         | "confirmed"
         | "active"
         | "failed";
-      /** @default 1 */
-      page: Record<string, never>;
-      /** @default 20 */
-      perPage: Record<string, never>;
     };
     IlrMappingConfigResponseDto: {
       /** Format: uuid */
@@ -8610,9 +8627,11 @@ export interface operations {
   };
   BullmqOpsController_listFailedJobs: {
     parameters: {
-      query: {
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
       };
       header: {
         /** @description Shared secret for internal queue operations */
@@ -9773,9 +9792,11 @@ export interface operations {
   };
   InvitationsController_list: {
     parameters: {
-      query: {
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
       };
       header?: {
         /** @description Optional. Overrides the JWT default active organisation when you are a member. */
@@ -10159,9 +10180,11 @@ export interface operations {
   };
   EnrolmentsController_findAll: {
     parameters: {
-      query: {
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
       };
       header: {
         "x-portal-type": string;
@@ -11159,9 +11182,11 @@ export interface operations {
   };
   WithdrawalPushController_listFailed: {
     parameters: {
-      query: {
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -11294,9 +11319,11 @@ export interface operations {
   };
   CompletionPushController_listFailed: {
     parameters: {
-      query: {
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -11473,7 +11500,11 @@ export interface operations {
   };
   DasController_listActivity: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         /** @description Restrict to one DAS operation. */
         operation?:
           | "oauth_token"
@@ -11485,8 +11516,6 @@ export interface operations {
           | "transfer_status";
         /** @description Show only calls that failed. */
         failedOnly?: boolean;
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -11665,11 +11694,13 @@ export interface operations {
   };
   DasController_listFundingPayments: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         from?: string;
         to?: string;
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -11714,13 +11745,15 @@ export interface operations {
   };
   NotificationsController_list: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         /** @description When true, return only unread notifications */
         unreadOnly?: boolean;
         /** @description Filter by organisation; defaults to JWT active org when set */
         organisationId?: string;
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: never;
       path?: never;
@@ -12097,9 +12130,11 @@ export interface operations {
   };
   MessagesController_list: {
     parameters: {
-      query: {
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -12448,7 +12483,11 @@ export interface operations {
   };
   OtjLogEntriesController_findAll: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         status?: "draft" | "submitted" | "approved" | "rejected";
         apprenticeId?: string;
         enrolmentId?: string;
@@ -12462,8 +12501,6 @@ export interface operations {
           | "other";
         from?: string;
         to?: string;
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -13129,15 +13166,17 @@ export interface operations {
   };
   QipActionsController_findAll: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         /** @description Filter by stored status (overdue is computed separately on read). */
         status?: "not_started" | "in_progress" | "completed";
         /** @description Filter by EIF criterion slug from GET /ofsted/eif-criteria. */
         eifCriterionSlug?: string;
         /** @description When true, return only actions whose targetCompletionDate is before today and status is not completed. */
         overdue?: boolean;
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -15131,7 +15170,11 @@ export interface operations {
   };
   CommitmentsController_findAll: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         enrolmentId?: string;
         status?:
           | "draft"
@@ -15140,8 +15183,6 @@ export interface operations {
           | "signed"
           | "superseded"
           | "cancelled";
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -15660,7 +15701,11 @@ export interface operations {
   };
   AuditController_export: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         format?: "json" | "csv";
         entityType?: string;
         action?:
@@ -15673,8 +15718,6 @@ export interface operations {
           | "version_change";
         from?: string;
         to?: string;
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -15962,13 +16005,15 @@ export interface operations {
   };
   KsEvidenceItemsController_findAll: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         enrolmentId?: string;
         apprenticeId?: string;
         status?: "draft" | "submitted" | "reviewed" | "accepted";
         ksbDefinitionId?: string;
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -16694,7 +16739,11 @@ export interface operations {
   };
   LearnersController_listCohort: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         /** @description Filter by employer organisation */
         employerOrganisationId?: string;
         /** @description Filter by apprenticeship standard */
@@ -16725,8 +16774,6 @@ export interface operations {
         sortOrder?: "asc" | "desc";
         /** @description Response format; csv returns attachment */
         format?: "json" | "csv";
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -16820,7 +16867,11 @@ export interface operations {
   };
   LearnersController_exportCohortPdf: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         /** @description Filter by employer organisation */
         employerOrganisationId?: string;
         /** @description Filter by apprenticeship standard */
@@ -16851,8 +16902,6 @@ export interface operations {
         sortOrder?: "asc" | "desc";
         /** @description Response format; csv returns attachment */
         format?: "json" | "csv";
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -17526,15 +17575,17 @@ export interface operations {
   };
   EmployerDirectoryController_list: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         /** @description Filter by employer organisation city (case-insensitive contains) */
         region?: string;
         /** @description Minimum active learner count per employer row */
         minActiveLearners?: number;
         /** @description Minimum average OTJ % across active learners */
         minAverageOtjPercent?: number;
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -17712,11 +17763,13 @@ export interface operations {
   };
   EmployerVisitsController_list: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         /** @description Restrict to one employer — the employer profile view. */
         employerOrganisationId?: string;
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -18355,15 +18408,17 @@ export interface operations {
   };
   RecipientDirectoryController_search: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         /** @description Filter by SME sector */
         sector?: string;
         /** @description Filter by SME region */
         region?: string;
         /** @description Filter by apprenticeship programme type */
         programmeType?: string;
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -18872,11 +18927,13 @@ export interface operations {
   };
   MatchApplicationsController_list: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         role?: "donor" | "recipient";
         status?: "pending" | "confirmed" | "rejected" | "withdrawn";
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -19065,7 +19122,11 @@ export interface operations {
   };
   TransfersController_list: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         role?: "donor" | "recipient";
         status?:
           | "draft"
@@ -19074,8 +19135,6 @@ export interface operations {
           | "confirmed"
           | "active"
           | "failed";
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -19638,12 +19697,14 @@ export interface operations {
   };
   IlrLearnerRecordsController_findAll: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         enrolmentId?: string;
         collectionPeriod?: string;
         status?: "draft" | "validated" | "validation_failed";
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -20099,11 +20160,13 @@ export interface operations {
   };
   FundingClaimsController_list: {
     parameters: {
-      query: {
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
         /** @description Show only claims with a discrepancy. The question a finance lead arrives with is "what is wrong", not "list every learner". */
         discrepanciesOnly?: boolean;
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -20207,9 +20270,11 @@ export interface operations {
   };
   EnrolmentPushController_listFailed: {
     parameters: {
-      query: {
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -20801,9 +20866,11 @@ export interface operations {
   };
   ApprenticesController_findAll: {
     parameters: {
-      query: {
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -21097,9 +21164,11 @@ export interface operations {
   };
   ProgrammesController_findAll: {
     parameters: {
-      query: {
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -21393,9 +21462,11 @@ export interface operations {
   };
   StandardsController_findAll: {
     parameters: {
-      query: {
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
       };
       header?: {
         /** @description Active organisation UUID (optional override) */
@@ -22040,9 +22111,11 @@ export interface operations {
   };
   PlatformRetentionController_listRuns: {
     parameters: {
-      query: {
-        page: components["schemas"]["Object"];
-        perPage: components["schemas"]["Object"];
+      query?: {
+        /** @description One-based page number. */
+        page?: number;
+        /** @description Items per page. */
+        perPage?: number;
       };
       header: {
         /** @description Shared secret for internal platform operations */
