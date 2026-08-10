@@ -51,6 +51,10 @@ jobs:
       - name: Type-check ratchet
         run: npm run verify:ts-check-ratchet
 
+      # F3.1.1 AC6 — the FAB must reach every route, including ones added later.
+      - name: FAB coverage (AC6)
+        run: npm run verify:fab-coverage
+
       - name: Build (affected only)
         run: npm run build -- --filter=...[origin/main] --parallel
 
