@@ -131,3 +131,43 @@ export const EPA_BAND_PRESENTATION = Object.freeze({
 /** F3.2.3 AC3 — the exact copy the PRD specifies when no date is set. */
 export const EPA_DATE_UNSET_MESSAGE =
   "EPA date not yet confirmed — speak to your tutor";
+
+/**
+ * Mirrors `OtjProgressBand` in the API
+ * (`src/otj/enums/otj-progress-band.enum.ts`).
+ *
+ * F3.1.2 AC2 sets the ring colours. As with the EPA bands, the thresholds are
+ * evaluated server-side (`src/otj/otj-progress.ts`) and only read here.
+ */
+export const PROGRESS_BAND = Object.freeze({
+  GREEN: "green",
+  AMBER: "amber",
+  RED: "red",
+  UNKNOWN: "unknown",
+});
+
+export const PROGRESS_BAND_PRESENTATION = Object.freeze({
+  [PROGRESS_BAND.GREEN]: {
+    ring: "text-success-500",
+    bar: "bg-success-500",
+    value: "text-success-700",
+  },
+  [PROGRESS_BAND.AMBER]: {
+    ring: "text-warning-500",
+    bar: "bg-warning-500",
+    value: "text-warning-700",
+  },
+  [PROGRESS_BAND.RED]: {
+    ring: "text-error-500",
+    bar: "bg-error-500",
+    value: "text-error-700",
+  },
+  [PROGRESS_BAND.UNKNOWN]: {
+    ring: "text-neutral-300",
+    bar: "bg-neutral-300",
+    value: "text-neutral-600",
+  },
+});
+
+/** F3.1.2 AC4 — the weekly chart covers the last 8 weeks. */
+export const OTJ_WEEKS_SHOWN = 8;
