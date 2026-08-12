@@ -162,3 +162,10 @@ CLAUDE.md
 **/CLAUDE.md
 
 .doc
+# Playwright
+/test-results/
+/playwright-report/
+/e2e/.auth/
+
+# Local env backups (e.g. .env.railway.bak) — never tracked
+.env.*.bak
