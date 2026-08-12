@@ -59,4 +59,18 @@ export default [
       globals: globals.node,
     },
   },
+
+  /**
+   * Playwright specs and config run in Node, not the browser — they read
+   * `process.env`, use `node:fs` and `node:path`. Same root cause as the
+   * `scripts/` block above: the browser-globals default does not fit tooling.
+   */
+  {
+    files: ["e2e/**/*.js", "playwright.config.js"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: globals.node,
+    },
+  },
 ];

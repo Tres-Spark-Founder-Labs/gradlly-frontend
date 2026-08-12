@@ -162,3 +162,7 @@ CLAUDE.md
 **/CLAUDE.md
 
 .doc
+# Playwright
+/test-results/
+/playwright-report/
+/e2e/.auth/

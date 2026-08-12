@@ -1,6 +1,6 @@
 import { ApiClientError } from "@/lib/errors";
 
-import { getActiveOrgId } from "./active-org";
+import { getActiveOrgId, setActiveOrgId } from "./active-org";
 import { parseFetchResponse } from "./parse-response";
 
 const BFF = "/api/proxy";
@@ -68,6 +68,35 @@ async function send(path, method, body, opts = {}) {
     credentials: "include",
     signal,
   });
+
+  /**
+   * A 403 that names organisation membership means the active-org cookie
+   * points at an organisation this user is not in — most often because the
+   * cookie outlived the session that set it (switching the app between API
+   * environments does exactly this, and the cookie persists for a year).
+   *
+   * Left alone it is unrecoverable from the UI: `useMe` fails, the session
+   * error screen appears, and its primary action is "Refresh page", which
+   * re-sends the same bad cookie forever. Clearing it here means the next
+   * request goes out unscoped and the API resolves the user's real
+   * organisation, so a reload recovers instead of looping.
+   *
+   * Deliberately narrow — matched on status *and* message. A blanket "clear
+   * the org on any 403" would silently drop the header on genuine permission
+   * failures and turn an authorisation error into confusing behaviour
+   * elsewhere.
+   */
+  if (response.status === 403 && activeOrgId) {
+    const cloned = response.clone();
+    try {
+      const payload = await cloned.json();
+      if (/not a member of this organisation/i.test(payload?.message ?? "")) {
+        setActiveOrgId(null);
+      }
+    } catch {
+      // Body was not JSON — nothing to match on, so leave the cookie alone.
+    }
+  }
 
   return parseFetchResponse(response, {
     throwError: ({ message, status, data }) => {
