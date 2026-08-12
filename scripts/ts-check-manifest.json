@@ -3,6 +3,8 @@
     "apps/apprentice/features/auth/services/auth.service.js",
     "apps/apprentice/features/enrolments/services/enrolments.service.js",
     "apps/apprentice/features/invitations/services/invitations.service.js",
+    "apps/apprentice/features/journey/queries/journey.query.js",
+    "apps/apprentice/features/journey/services/journey.service.js",
     "apps/apprentice/features/portfolio/services/portfolio.service.js",
     "apps/apprentice/features/reporting/services/reporting.service.js",
     "apps/apprentice/features/reviews/services/reviews.service.js",

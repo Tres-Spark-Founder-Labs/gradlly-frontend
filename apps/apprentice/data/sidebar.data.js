@@ -8,6 +8,7 @@ import {
   FolderOpen,
   LayoutDashboard,
   MessageCircle,
+  Route,
   Settings,
   TrendingUp,
   UserCircle,
@@ -18,6 +19,7 @@ export const NAV_SECTIONS = [
     title: "My Learning",
     items: [
       { label: "Dashboard", href: "/", icon: LayoutDashboard },
+      { label: "My journey", href: "/journey", icon: Route },
       { label: "My Courses", href: "/courses", icon: BookMarked },
       { label: "OTJ log", href: "/otj-logs", icon: BookOpen },
       {
