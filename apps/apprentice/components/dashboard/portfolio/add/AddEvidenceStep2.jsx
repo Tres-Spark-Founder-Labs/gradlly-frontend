@@ -3,24 +3,23 @@
 import { useState } from "react";
 import { useWatch } from "react-hook-form";
 
-import { KSB_DATA } from "@/data/portfolio.data";
+import { useKsbCells } from "@/features/portfolio/queries/useKsbCells";
+import {
+  KSB_KINDS,
+  KSB_STRENGTH,
+} from "@/features/portfolio/utils/ksb-summary";
 import { cn } from "@/utils/helper";
 
-const TABS = [
-  { key: "K", label: "Knowledge" },
-  { key: "S", label: "Skills" },
-  { key: "B", label: "Behaviours" },
-];
+const TABS = KSB_KINDS.map(({ key, label }) => ({ key, label }));
 
-const NOT_STARTED = KSB_DATA.filter((k) => k.state === "not_started").map(
-  (k) => k.code,
-);
+/** How many unevidenced KSBs to name before summarising the rest. */
+const NUDGE_LIMIT = 6;
 
 function KsbChip({ ksb, selected, onToggle }) {
   return (
     <button
       type="button"
-      title={ksb.label}
+      title={ksb.title}
       onClick={() => onToggle(ksb.code)}
       className={cn(
         "px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all",
@@ -35,7 +34,16 @@ function KsbChip({ ksb, selected, onToggle }) {
 }
 
 export function AddEvidenceStep2({ control, setValue, errors }) {
-  const [tab, setTab] = useState("K");
+  const [tab, setTab] = useState(TABS[0].key);
+  /**
+   * The real KSBs for this learner's standard. Previously a hardcoded list,
+   * which meant the picker offered KSB codes that might not exist on the
+   * standard the apprentice is actually enrolled on (OQ-15).
+   */
+  const { cells, isLoading } = useKsbCells();
+  const notStarted = cells
+    .filter((k) => !k.strength || k.strength === KSB_STRENGTH.NONE)
+    .map((k) => k.code);
 
   const selected = useWatch({ control, name: "ksbDefinitionIds" }) ?? [];
 
@@ -46,11 +54,31 @@ export function AddEvidenceStep2({ control, setValue, errors }) {
     setValue("ksbDefinitionIds", updated, { shouldValidate: true });
   }
 
-  const tabKsbs = KSB_DATA.filter((k) => k.group === tab);
+  const tabKsbs = cells.filter((k) => k.kind === tab);
   const selectedInTab = selected.filter(
-    (c) => KSB_DATA.find((k) => k.code === c)?.group === tab,
+    (c) => cells.find((k) => k.code === c)?.kind === tab,
   );
-  const nudge = NOT_STARTED.filter((c) => !selected.includes(c));
+  const nudge = notStarted.filter((c) => !selected.includes(c));
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3" aria-busy="true">
+        <div className="h-8 w-48 animate-pulse rounded-lg bg-neutral-100" />
+        <div className="h-24 animate-pulse rounded-lg bg-neutral-100" />
+      </div>
+    );
+  }
+
+  if (!cells.length) {
+    // Better to say the standard has not loaded than to present an empty
+    // picker that looks like "this standard has no KSBs".
+    return (
+      <p className="rounded-lg bg-neutral-50 p-4 text-xs text-neutral-600">
+        We could not load the KSBs for your apprenticeship standard. You can
+        still upload the evidence and map it later.
+      </p>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -73,7 +101,7 @@ export function AddEvidenceStep2({ control, setValue, errors }) {
                 : "text-neutral-500 hover:text-neutral-700",
             )}
           >
-            {t.label} ({KSB_DATA.filter((k) => k.group === t.key).length})
+            {t.label} ({cells.filter((k) => k.kind === t.key).length})
           </button>
         ))}
       </div>
@@ -94,10 +122,10 @@ export function AddEvidenceStep2({ control, setValue, errors }) {
       {selectedInTab.length > 0 && (
         <div className="space-y-1.5 p-3 rounded-lg bg-primary-50 border border-primary-100">
           {selectedInTab.map((code) => {
-            const ksb = KSB_DATA.find((k) => k.code === code);
+            const ksb = cells.find((k) => k.code === code);
             return (
               <p key={code} className="text-xs text-primary-700 leading-snug">
-                <strong>{code}</strong> — {ksb?.label}
+                <strong>{code}</strong> — {ksb?.title}
               </p>
             );
           })}
@@ -120,12 +148,20 @@ export function AddEvidenceStep2({ control, setValue, errors }) {
         </p>
       )}
 
-      {/* Smart nudge */}
+      {/*
+        Smart nudge. Capped, because this list used to come from a hardcoded
+        set of five and now comes from the learner's real coverage — an
+        apprentice at the start of their programme has every KSB unevidenced,
+        and naming all forty is noise rather than a nudge.
+      */}
       {selected.length > 0 && nudge.length > 0 && (
         <div className="p-3 rounded-lg bg-info-50 border border-info-100">
           <p className="text-xs text-info-700 leading-snug">
-            💡 <strong>{nudge.join(", ")}</strong> still have no evidence — does
-            this piece cover any of them too?
+            💡 <strong>{nudge.slice(0, NUDGE_LIMIT).join(", ")}</strong>
+            {nudge.length > NUDGE_LIMIT
+              ? ` and ${nudge.length - NUDGE_LIMIT} more`
+              : ""}{" "}
+            still have no evidence — does this piece cover any of them too?
           </p>
         </div>
       )}

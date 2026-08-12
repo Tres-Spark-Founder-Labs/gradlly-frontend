@@ -5,8 +5,8 @@ import toast from "react-hot-toast";
 
 import Button from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { KSB_DATA } from "@/data/portfolio.data";
 import { RATINGS_DATA } from "@/data/ratings.data";
+import { useKsbCells } from "@/features/portfolio/queries/useKsbCells";
 
 import { RatingsBand } from "./RatingsBand";
 import { RatingsGroup } from "./RatingsGroup";
@@ -23,6 +23,8 @@ const GROUPS = [
 ];
 
 export function RatingsModal({ open, onClose, onSave }) {
+  // Real KSB titles for the codes being rated; previously a hardcoded lookup.
+  const { cells } = useKsbCells();
   const [ratings, setRatings] = useState(INIT_RATINGS);
   const [reflection, setReflection] = useState("");
   const [dirty, setDirty] = useState(false);
@@ -49,7 +51,7 @@ export function RatingsModal({ open, onClose, onSave }) {
 
   // Merge ratings with KSB labels and states
   const enriched = RATINGS_DATA.map((r) => {
-    const ksb = KSB_DATA.find((k) => k.code === r.code);
+    const ksb = cells.find((k) => k.code === r.code);
     return {
       ...r,
       label: ksb?.label ?? r.code,
