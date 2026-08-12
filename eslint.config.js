@@ -1,4 +1,5 @@
 import js from "@eslint/js";
+import globals from "globals";
 
 import {
   sharedLanguageOptions,
@@ -38,5 +39,24 @@ export default [
     },
     plugins: sharedPlugins,
     rules: sharedRules,
+  },
+
+  /**
+   * Repository tooling under `scripts/` runs in Node, not the browser.
+   *
+   * The block above matches `*.{js,mjs,cjs}` at the repository root only, so
+   * `scripts/*.mjs` fell through to the browser-globals defaults and failed
+   * `no-undef` on `process`, `console` and `URL`. Both CI gate scripts
+   * (`verify-fab-coverage`, `verify-ts-check-ratchet`) were affected, which
+   * meant `npm run lint` — itself a CI step — had been failing since they were
+   * added.
+   */
+  {
+    files: ["scripts/**/*.{js,mjs,cjs}"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: globals.node,
+    },
   },
 ];

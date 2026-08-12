@@ -55,6 +55,14 @@ jobs:
       - name: FAB coverage (AC6)
         run: npm run verify:fab-coverage
 
+      # The root `test` script and the turbo `test` task both existed from the
+      # start, correctly wired, and nothing ever invoked them — so the employer
+      # app's suites had never gated a pull request. Added when the apprentice
+      # app got a runner, at which point "we have tests" stopped being true only
+      # in principle.
+      - name: Unit tests
+        run: npm run test
+
       - name: Build (affected only)
         run: npm run build -- --filter=...[origin/main] --parallel
 

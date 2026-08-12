@@ -25,6 +25,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TextBadge from "@/components/ui/TextBadge";
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
+import { HomeEpaCountdown } from "@/features/journey/components/HomeEpaCountdown";
 import { OTJ_PACE_LABELS } from "@/features/reporting/constants";
 import { useLearnerSummary } from "@/features/reporting/queries/reporting.query";
 import {
@@ -819,6 +820,12 @@ export function DashboardHome() {
         </div>
 
         <div className="space-y-6">
+          {/*
+            F3.2.3 AC1 — the EPA countdown belongs on the home screen. It reads
+            the same journey payload as `/journey`; react-query dedupes the two
+            renders, so mounting it here does not cost a second request.
+          */}
+          <HomeEpaCountdown />
           <OrganisationCard activeOrganisation={activeOrganisation} />
           <ProfileCard
             user={user}
