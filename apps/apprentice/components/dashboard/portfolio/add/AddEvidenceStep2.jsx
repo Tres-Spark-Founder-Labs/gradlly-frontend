@@ -12,6 +12,9 @@ import { cn } from "@/utils/helper";
 
 const TABS = KSB_KINDS.map(({ key, label }) => ({ key, label }));
 
+/** How many unevidenced KSBs to name before summarising the rest. */
+const NUDGE_LIMIT = 6;
+
 function KsbChip({ ksb, selected, onToggle }) {
   return (
     <button
@@ -122,7 +125,7 @@ export function AddEvidenceStep2({ control, setValue, errors }) {
             const ksb = cells.find((k) => k.code === code);
             return (
               <p key={code} className="text-xs text-primary-700 leading-snug">
-                <strong>{code}</strong> — {ksb?.label}
+                <strong>{code}</strong> — {ksb?.title}
               </p>
             );
           })}
@@ -145,12 +148,20 @@ export function AddEvidenceStep2({ control, setValue, errors }) {
         </p>
       )}
 
-      {/* Smart nudge */}
+      {/*
+        Smart nudge. Capped, because this list used to come from a hardcoded
+        set of five and now comes from the learner's real coverage — an
+        apprentice at the start of their programme has every KSB unevidenced,
+        and naming all forty is noise rather than a nudge.
+      */}
       {selected.length > 0 && nudge.length > 0 && (
         <div className="p-3 rounded-lg bg-info-50 border border-info-100">
           <p className="text-xs text-info-700 leading-snug">
-            💡 <strong>{nudge.join(", ")}</strong> still have no evidence — does
-            this piece cover any of them too?
+            💡 <strong>{nudge.slice(0, NUDGE_LIMIT).join(", ")}</strong>
+            {nudge.length > NUDGE_LIMIT
+              ? ` and ${nudge.length - NUDGE_LIMIT} more`
+              : ""}{" "}
+            still have no evidence — does this piece cover any of them too?
           </p>
         </div>
       )}
