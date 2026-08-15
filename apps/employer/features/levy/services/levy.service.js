@@ -174,3 +174,38 @@ export async function getTransferDocument({ orgId, id }) {
     throw normalizeApiClientError(e);
   }
 }
+
+/**
+ * F4.1.3 — transfer preferences.
+ *
+ * A donor that has never saved preferences has no row, and the API answers 404
+ * rather than an empty object. That is not an error condition here: "no
+ * preferences yet" is the starting state of every donor, and the settings form
+ * must open on defaults rather than on an error screen. Translated to `null` so
+ * the caller can tell "not set yet" from "the request failed".
+ */
+export async function getTransferPreferences({ orgId } = {}) {
+  try {
+    const result = await $apiClient.get(LEVY_PATHS.TRANSFER_PREFERENCES, {
+      headers: buildHeaders(orgId),
+    });
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    const normalized = normalizeApiClientError(e);
+    if (normalized.status === 404) return null;
+    throw normalized;
+  }
+}
+
+export async function updateTransferPreferences({ orgId, payload }) {
+  try {
+    const result = await $apiClient.put(
+      LEVY_PATHS.TRANSFER_PREFERENCES,
+      payload,
+      { headers: buildHeaders(orgId) },
+    );
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}

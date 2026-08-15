@@ -20,11 +20,13 @@ import {
   getRecipientDirectory,
   getTransfer,
   getTransferDocument,
+  getTransferPreferences,
   getTransfers,
   signTransfer,
   submitTransferToDas,
   syncDonorLink,
   updateMatchApplicationStatus,
+  updateTransferPreferences,
 } from "../services/levy.service";
 
 // GET /levy-exchange/surplus returns one row per linked donor DAS account
@@ -298,6 +300,45 @@ export function useSubmitTransferToDas(id) {
     },
     onError: (error) => {
       toastError(error.message || "DAS submission failed.");
+    },
+  });
+}
+
+// ─── F4.1.3 Transfer preferences ─────────────────────────────────────────────
+
+export function useTransferPreferences(options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: LEVY_QUERY_KEYS.transferPreferences(orgId),
+    queryFn: () => getTransferPreferences({ orgId }),
+    enabled: Boolean(orgId),
+    ...options,
+  });
+}
+
+export function useUpdateTransferPreferences() {
+  const qc = useQueryClient();
+  const { orgId } = useAuthUser();
+
+  return useMutation({
+    mutationFn: (payload) => updateTransferPreferences({ orgId, payload }),
+    onSuccess: () => {
+      toastSuccess("Matching preferences saved.");
+      qc.invalidateQueries({
+        queryKey: LEVY_QUERY_KEYS.transferPreferences(orgId),
+      });
+      /**
+       * F4.1.3 AC3 — preferences apply to all future matching suggestions.
+       * The recipient directory is scored against these preferences server-side,
+       * so a cached directory would keep showing matches ranked by the *old*
+       * preferences until it happened to refetch. Invalidating here is what
+       * makes "applied until changed" true rather than eventually true.
+       */
+      qc.invalidateQueries({ queryKey: ["levy", "recipient-directory"] });
+    },
+    onError: (error) => {
+      toastError(error.message || "Could not save your preferences.");
     },
   });
 }
