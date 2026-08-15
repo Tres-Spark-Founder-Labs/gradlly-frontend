@@ -13,6 +13,7 @@ import { HistoryDrawer } from "./HistoryDrawer";
 import { PendingMatchApplications } from "./PendingMatchApplications";
 import { PolicyAlert } from "./PolicyAlert";
 import { SmeDirectory } from "./SmeDirectory";
+import { TransferPreferences } from "./TransferPreferences";
 import { TransferStatCards } from "./TransferStatCards";
 
 export function LevyTransferDashboard() {
@@ -103,6 +104,16 @@ export function LevyTransferDashboard() {
           <SmeDirectory />
         </div>
         <ActiveTransfers />
+      </div>
+
+      {/*
+        F4.1.3 — the preferences that decide which SMEs are suggested above.
+        Placed after the directory rather than before it: the donor's first
+        question is "who is available", and the settings that filter that list
+        make more sense once they have seen it.
+      */}
+      <div id="transfer-preferences">
+        <TransferPreferences />
       </div>
 
       <ESFAModal open={esfa} onClose={() => setEsfa(false)} />
