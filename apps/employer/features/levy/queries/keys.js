@@ -19,4 +19,10 @@ export const LEVY_QUERY_KEYS = {
   transfers: (orgId, params = {}) => ["levy", "transfers", orgId, params],
   transfer: (orgId, id) => ["levy", "transfer", orgId, id],
   transferDocument: (orgId, id) => ["levy", "transfer-document", orgId, id],
+  donorAnalytics: (orgId) => ["levy", "donor-analytics", orgId],
+  donorAnalyticsBreakdown: (orgId) => [
+    "levy",
+    "donor-analytics-breakdown",
+    orgId,
+  ],
 };

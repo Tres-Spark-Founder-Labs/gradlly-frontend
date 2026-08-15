@@ -12,6 +12,7 @@ import {
   MessageCircle,
   PoundSterling,
   Settings,
+  TrendingUp,
   UserCircle,
   UserPlus,
   Users,
@@ -64,6 +65,12 @@ export const NAV_SECTIONS = [
     items: [
       { label: "Levy Dashboard", href: "/levy-dashboard", icon: PoundSterling },
       { label: "Levy Transfer", href: "/levy-transfer", icon: Briefcase },
+      // F4.1.4 — reachable from the nav, not just by typing the URL.
+      {
+        label: "Donor Analytics",
+        href: "/donor-analytics",
+        icon: TrendingUp,
+      },
       { label: "Reports", href: "/reports", icon: FileText },
     ],
   },

@@ -20,6 +20,8 @@ import {
   getRecipientDirectory,
   getTransfer,
   getTransferDocument,
+  getDonorAnalytics,
+  getDonorAnalyticsBreakdown,
   getTransferPreferences,
   getTransfers,
   signTransfer,
@@ -340,5 +342,29 @@ export function useUpdateTransferPreferences() {
     onError: (error) => {
       toastError(error.message || "Could not save your preferences.");
     },
+  });
+}
+
+// ─── F4.1.4 Donor analytics ──────────────────────────────────────────────────
+
+export function useDonorAnalytics(options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: LEVY_QUERY_KEYS.donorAnalytics(orgId),
+    queryFn: () => getDonorAnalytics({ orgId }),
+    enabled: Boolean(orgId),
+    ...options,
+  });
+}
+
+export function useDonorAnalyticsBreakdown(options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: LEVY_QUERY_KEYS.donorAnalyticsBreakdown(orgId),
+    queryFn: () => getDonorAnalyticsBreakdown({ orgId }),
+    enabled: Boolean(orgId),
+    ...options,
   });
 }

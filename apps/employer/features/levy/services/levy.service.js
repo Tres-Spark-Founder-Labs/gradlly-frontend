@@ -209,3 +209,27 @@ export async function updateTransferPreferences({ orgId, payload }) {
     throw normalizeApiClientError(e);
   }
 }
+
+// ─── F4.1.4 Donor analytics ──────────────────────────────────────────────────
+
+export async function getDonorAnalytics({ orgId } = {}) {
+  try {
+    const result = await $apiClient.get(LEVY_PATHS.DONOR_ANALYTICS, {
+      headers: buildHeaders(orgId),
+    });
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+export async function getDonorAnalyticsBreakdown({ orgId } = {}) {
+  try {
+    const result = await $apiClient.get(LEVY_PATHS.DONOR_ANALYTICS_BREAKDOWN, {
+      headers: buildHeaders(orgId),
+    });
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
