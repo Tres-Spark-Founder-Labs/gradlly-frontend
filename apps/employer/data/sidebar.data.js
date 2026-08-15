@@ -55,7 +55,9 @@ export const NAV_SECTIONS = [
         label: "At-Risk Management",
         href: "/at-risk",
         icon: AlertTriangle,
-        badge: 5,
+        // No static badge. It was hardcoded to 5 and shown to every employer,
+        // including brand-new ones with no apprentices. The live count comes
+        // from `liveBadges` in Sidebar.jsx.
       },
       { label: "Messages", href: "/messages", icon: MessageCircle },
     ],

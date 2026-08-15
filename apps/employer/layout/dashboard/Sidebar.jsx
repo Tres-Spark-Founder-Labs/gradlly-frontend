@@ -8,6 +8,7 @@ import { useMemo, useState } from "react";
 import { GradllyLogo } from "@/assets/svgs/GradllyLogo";
 import { Avatar } from "@/components/ui/Avatar";
 import { NAV_SECTIONS } from "@/data/sidebar.data";
+import { useAtRiskBadgeCount } from "@/features/at-risk/queries/at-risk.query";
 import { LogoutButton } from "@/features/auth/components/LogoutButton";
 import { OrgSwitcher } from "@/features/auth/components/OrgSwitcher";
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
@@ -60,6 +61,7 @@ export function Sidebar({ isOpen, onClose }) {
   // so the badge and the table are computed from one query and cannot
   // disagree.
   const commitmentBoard = useCommitmentBoard();
+  const atRiskBadge = useAtRiskBadgeCount();
 
   /**
    * Live counts override the static `badge` values in sidebar.data.js.
@@ -69,10 +71,22 @@ export function Sidebar({ isOpen, onClose }) {
    * waiting. A red badge that never changes trains people to ignore it, so
    * anything still on a static number should be treated as unfinished rather
    * than as a working feature.
+   *
+   * At-Risk was the last one left on a static 5. It showed "5 apprentices need
+   * attention" to a brand-new employer with no organisation and no apprentices
+   * at all — found by signing up as a real user against an empty database,
+   * which is the only way a permanently-wrong badge is visible.
+   *
+   * Its count comes from `GET /learners/intervention-queue`, not from
+   * `useAtRiskList`. The whole At-Risk *dashboard* is still mock-backed — its
+   * service returns a static array and says so at the top of the file — so
+   * reading the badge from there would have swapped one fabricated number for
+   * another that merely looked live.
    */
   const liveBadges = {
     "/otj-approvals": otjPendingCount.data ?? 0,
     "/commitments": commitmentBoard.data?.actionRequiredCount ?? 0,
+    "/at-risk": atRiskBadge.data ?? 0,
   };
 
   // Active matching for nested routes (e.g. Settings sub-pages). Bare /settings
