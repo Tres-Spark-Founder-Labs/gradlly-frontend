@@ -12,6 +12,7 @@ import {
   MessageCircle,
   PoundSterling,
   Settings,
+  TrendingUp,
   UserCircle,
   UserPlus,
   Users,
@@ -54,7 +55,9 @@ export const NAV_SECTIONS = [
         label: "At-Risk Management",
         href: "/at-risk",
         icon: AlertTriangle,
-        badge: 5,
+        // No static badge. It was hardcoded to 5 and shown to every employer,
+        // including brand-new ones with no apprentices. The live count comes
+        // from `liveBadges` in Sidebar.jsx.
       },
       { label: "Messages", href: "/messages", icon: MessageCircle },
     ],
@@ -64,6 +67,12 @@ export const NAV_SECTIONS = [
     items: [
       { label: "Levy Dashboard", href: "/levy-dashboard", icon: PoundSterling },
       { label: "Levy Transfer", href: "/levy-transfer", icon: Briefcase },
+      // F4.1.4 — reachable from the nav, not just by typing the URL.
+      {
+        label: "Donor Analytics",
+        href: "/donor-analytics",
+        icon: TrendingUp,
+      },
       { label: "Reports", href: "/reports", icon: FileText },
     ],
   },

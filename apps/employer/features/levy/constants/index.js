@@ -16,6 +16,11 @@ export const LEVY_PATHS = Object.freeze({
   transferSign: (id) => `/api/v1/levy-exchange/transfers/${id}/sign`,
   transferSubmit: (id) => `/api/v1/levy-exchange/transfers/${id}/submit`,
   transferDocument: (id) => `/api/v1/levy-exchange/transfers/${id}/document`,
+  // F4.1.4 — donor analytics. Under `reporting`, not `levy-exchange`: it is a
+  // report assembled from levy data, and it needs the EPA metrics service that
+  // lives in the reporting module.
+  DONOR_ANALYTICS: "/api/v1/reporting/donor-analytics",
+  DONOR_ANALYTICS_BREAKDOWN: "/api/v1/reporting/donor-analytics/breakdown",
 });
 
 export const DONOR_LINK_STATUSES = Object.freeze({
