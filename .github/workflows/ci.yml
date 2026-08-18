@@ -60,8 +60,17 @@ jobs:
       # app's suites had never gated a pull request. Added when the apprentice
       # app got a runner, at which point "we have tests" stopped being true only
       # in principle.
+
+      # `turbo run test` SKIPS packages that do not define the task, so an app
+      # without a test script is silently excluded while this step still passes.
+      # This fails if any app is missing one and is not explicitly exempt.
+      - name: App test-task coverage
+        run: npm run verify:app-test-tasks
+
+      # Runs the suites AND asserts they executed something. `npm run test`
+      # alone goes green when a test script matches zero spec files.
       - name: Unit tests
-        run: npm run test
+        run: npm run test:verified
 
       - name: Build (affected only)
         run: npm run build -- --filter=...[origin/main] --parallel

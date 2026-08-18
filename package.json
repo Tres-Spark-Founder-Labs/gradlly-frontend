@@ -42,6 +42,8 @@
     "verify:ts-check-ratchet": "node scripts/verify-ts-check-ratchet.mjs",
     "verify:ts-check-ratchet:update": "node scripts/verify-ts-check-ratchet.mjs --update",
     "verify:fab-coverage": "node scripts/verify-fab-coverage.mjs",
+    "verify:app-test-tasks": "node scripts/verify-app-test-tasks.mjs",
+    "test:verified": "node scripts/verify-test-execution.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:a11y": "playwright test e2e/accessibility.spec.js"
