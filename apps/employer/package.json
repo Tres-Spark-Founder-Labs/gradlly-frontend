@@ -11,7 +11,7 @@
     "check-types": "tsc --noEmit -p tsconfig.check.json",
     "api:types": "openapi-typescript ../../../graddly-api/openapi.json -o types/api.d.ts",
     "type-check": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --reporter=default --reporter=json --outputFile.json=.vitest/report.json",
     "test:watch": "vitest",
     "clean": "rm -rf .next dist"
   },

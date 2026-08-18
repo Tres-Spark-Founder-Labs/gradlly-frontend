@@ -16,116 +16,90 @@
  * executed. `vitest --passWithNoTests` produces exactly that, and so does a
  * glob that stops matching after a directory rename.
  *
+ * ── WHY IT READS FILES INSTEAD OF PARSING TURBO'S OUTPUT ────────────────────
+ *
+ * The first version scraped turbo's stdout for vitest's ` Test Files N passed`
+ * line, keyed on turbo's `<package>:test: ` line prefix. It worked locally,
+ * under `CI=true`, and under `--log-order=grouped`. It failed on GitHub
+ * Actions, because turbo detects Actions and switches to workflow-command
+ * grouping — `::group::@gradlly/employer:test` followed by the task body with
+ * **no per-line prefix**. Zero lines matched, and the gate reported that no
+ * tests had run when in fact both summaries were sitting in the log,
+ * unattributed.
+ *
+ * Log formatting is not a stable contract, and that was the second time in one
+ * stage that parsing human-readable output bit us. So each app now writes a
+ * machine-readable vitest report to a known path and this reads those files.
+ * Attribution comes from the filesystem: the report at `apps/employer/...`
+ * describes the employer app, whatever turbo prints.
+ *
+ * turbo's own `--summarize` JSON was the first choice and does not work — it
+ * carries `cache`, `execution` (start/end/exitCode), `logFile`, `hash` and
+ * `inputs`, but no test counts. turbo never parses its subprocess output, so it
+ * cannot know what vitest did.
+ *
+ * ── WHY --force ─────────────────────────────────────────────────────────────
+ *
+ * A cache hit tells you a task succeeded on some machine, for some tree, at
+ * some point. It is not evidence that anything executed for the commit under
+ * test, and this script exists precisely to observe execution — replaying a
+ * cached result would make it self-defeating. Plain `npm run test` keeps the
+ * cache and stays fast for local use; this path always executes.
+ *
+ * ── WHY A STALE REPORT CANNOT PASS ──────────────────────────────────────────
+ *
+ * The report files are gitignored and are not in the `test` task's `outputs`,
+ * so turbo neither caches nor restores them. Belt and braces on top of that:
+ * every report is deleted before the run, and each one must carry a
+ * `startTime` at or after the moment this script started. A file left behind by
+ * an earlier run fails both checks.
+ *
  * ── WHAT IS ASSERTED ────────────────────────────────────────────────────────
  *
  *   1. turbo's own exit code is propagated first — a real test failure stays a
  *      test failure and is not masked by anything here.
- *   2. Every non-exempt app reported a test-file count, and that count is >= 1.
- *   3. The number of apps that executed tests is not fewer than the number of
+ *   2. Every non-exempt app produced a report, written by this run.
+ *   3. That report contains at least one test file and at least one test.
+ *   4. The number of apps that executed is not fewer than the number of
  *      non-exempt apps.
- *
- * (2) and (3) overlap deliberately. (2) catches an app that ran and found
- * nothing; (3) catches an app whose output never appeared at all — a task that
- * was skipped, filtered out, or silently dropped from the graph.
- *
- * ── PARSING TURBO ───────────────────────────────────────────────────────────
- *
- * turbo prefixes each line with `<package-name>:<task>: `, and vitest prints
- * ` Test Files  17 passed (17)`. The parenthesised number is the total, which
- * is the one that matters: `2 failed | 3 passed (5)` still executed five files.
- *
- * This holds on a cache hit — turbo replays the captured logs, verified against
- * a `FULL TURBO` run showing `2 cached, 2 total` with both summaries intact.
- * If that ever stops being true the counts go missing and this fails closed,
- * which is the correct direction to be wrong in.
  */
-import { spawn } from 'node:child_process';
+import { spawn } from "node:child_process";
+import { readFile, rm } from "node:fs/promises";
+import { join } from "node:path";
 
-import { EXEMPT, readApps } from './lib/app-test-policy.mjs';
+import { APPS_DIR, EXEMPT, readApps } from "./lib/app-test-policy.mjs";
 
-// Matching the ESC character is the entire point of stripping ANSI, so the
-// control-character rule is switched off here rather than worked around.
-// eslint-disable-next-line no-control-regex
-const ANSI = /\u001b\[[0-9;]*m/g;
-/** `@gradlly/employer:test: <rest>` */
-const TURBO_LINE = /^(\S+):test:\s?(.*)$/;
-/** ` Test Files  2 failed | 3 passed (5)` -> 5 */
-const TEST_FILES = /Test Files\b.*\((\d+)\)/;
-/** vitest's wording when a run matches nothing at all. */
-const NO_TEST_FILES = /No test files found/i;
+/** Where each app's test task is expected to write its report. */
+const REPORT_RELATIVE = join(".vitest", "report.json");
+/** Same path in POSIX form, for messages. */
+const REPORT_DISPLAY = ".vitest/report.json";
+const reportPathFor = (app) => join(APPS_DIR, app, REPORT_RELATIVE);
+
+const runStart = Date.now();
 
 let apps;
 try {
   apps = await readApps();
 } catch (error) {
-  console.error(`\n✗ ${error instanceof Error ? error.message : String(error)}\n`);
+  console.error(
+    `\n✗ ${error instanceof Error ? error.message : String(error)}\n`,
+  );
   process.exit(1);
 }
 
-/** package name -> app directory, so turbo's prefix can be attributed. */
-const byPackageName = new Map(
-  apps.filter((a) => a.packageName).map((a) => [a.packageName, a.name]),
-);
+const expected = apps.filter((a) => !EXEMPT.has(a.name));
 
-/** app directory -> number of test files it reported. */
-const counts = new Map();
-
-function consume(chunk) {
-  for (const rawLine of chunk.split(/\r?\n/)) {
-    const line = rawLine.replace(ANSI, '');
-    const m = TURBO_LINE.exec(line);
-    if (!m) continue;
-
-    const app = byPackageName.get(m[1]);
-    if (!app) continue;
-
-    const rest = m[2];
-    const files = TEST_FILES.exec(rest);
-    if (files) {
-      counts.set(app, Number(files[1]));
-    } else if (NO_TEST_FILES.test(rest)) {
-      counts.set(app, 0);
-    }
-  }
-}
+// Delete first, so nothing left over from an earlier run can be mistaken for
+// evidence of this one.
+await Promise.all(apps.map((a) => rm(reportPathFor(a.name), { force: true })));
 
 const turboExit = await new Promise((resolve) => {
-  const child = spawn('npx', ['turbo', 'run', 'test'], {
+  const child = spawn("npx", ["turbo", "run", "test", "--force"], {
     shell: true,
-    env: { ...process.env, FORCE_COLOR: '0' },
+    stdio: "inherit",
   });
-
-  let stdoutTail = '';
-  let stderrTail = '';
-
-  // Streamed through so the developer sees the run live, and captured so it can
-  // be asserted on afterwards. Partial lines are buffered — a summary split
-  // across two chunks would otherwise be missed and read as "no count".
-  child.stdout.on('data', (d) => {
-    const s = String(d);
-    process.stdout.write(s);
-    const merged = stdoutTail + s;
-    const idx = merged.lastIndexOf('\n');
-    consume(merged.slice(0, idx + 1));
-    stdoutTail = merged.slice(idx + 1);
-  });
-
-  child.stderr.on('data', (d) => {
-    const s = String(d);
-    process.stderr.write(s);
-    const merged = stderrTail + s;
-    const idx = merged.lastIndexOf('\n');
-    consume(merged.slice(0, idx + 1));
-    stderrTail = merged.slice(idx + 1);
-  });
-
-  child.on('close', (code) => {
-    consume(stdoutTail);
-    consume(stderrTail);
-    resolve(code ?? 1);
-  });
-
-  child.on('error', (error) => {
+  child.on("close", (code) => resolve(code ?? 1));
+  child.on("error", (error) => {
     console.error(`\n✗ Could not run turbo: ${error.message}\n`);
     resolve(1);
   });
@@ -138,33 +112,52 @@ if (turboExit !== 0) {
   process.exit(turboExit);
 }
 
-const expected = apps.filter((a) => !EXEMPT.has(a.name));
 const failures = [];
 const executed = [];
 
 for (const app of expected) {
-  const count = counts.get(app.name);
+  const path = reportPathFor(app.name);
 
-  if (count === undefined) {
+  let report;
+  try {
+    report = JSON.parse(await readFile(path, "utf8"));
+  } catch {
     failures.push(
-      `${app.name}: ran no tests that this check could see. No "Test Files" ` +
-        `summary appeared in turbo's output for ${app.packageName ?? app.name}.\n` +
-        `      Either the task did not run, or its runner does not report a ` +
-        `file count — both mean "Unit tests" is passing without evidence.`,
+      `${app.name}: no test report at ${path}.\n` +
+        `      Either the task never ran — \`turbo run test\` skips a package ` +
+        `that does not define the task — or its \`test\` script does not write ` +
+        `one. Expected \`vitest run --reporter=json ` +
+        `--outputFile.json=${REPORT_DISPLAY}\`.`,
     );
     continue;
   }
 
-  if (count === 0) {
+  // Proves this run produced it, not a leftover file.
+  if (typeof report.startTime !== "number" || report.startTime < runStart) {
     failures.push(
-      `${app.name}: executed 0 test files. The task ran and exited clean ` +
-        `having asserted nothing.\n` +
+      `${app.name}: the report at ${path} predates this run ` +
+        `(startTime ${report.startTime}, run started ${runStart}). ` +
+        `It is stale and is not evidence that anything executed.`,
+    );
+    continue;
+  }
+
+  const files = Array.isArray(report.testResults)
+    ? report.testResults.length
+    : 0;
+  const tests =
+    typeof report.numTotalTests === "number" ? report.numTotalTests : 0;
+
+  if (files === 0 || tests === 0) {
+    failures.push(
+      `${app.name}: executed ${files} test file(s) and ${tests} test(s). ` +
+        `The task ran and exited clean having asserted nothing.\n` +
         `      A test script that matches no specs is not a passing test suite.`,
     );
     continue;
   }
 
-  executed.push({ app: app.name, count });
+  executed.push({ app: app.name, files, tests });
 }
 
 if (executed.length < expected.length) {
@@ -175,15 +168,18 @@ if (executed.length < expected.length) {
 }
 
 if (failures.length > 0) {
-  console.error('\n✗ Test execution\n');
+  console.error("\n✗ Test execution\n");
   for (const f of failures) console.error(`  ${f}\n`);
   process.exit(1);
 }
 
-const total = executed.reduce((sum, e) => sum + e.count, 0);
+const totalFiles = executed.reduce((sum, e) => sum + e.files, 0);
+const totalTests = executed.reduce((sum, e) => sum + e.tests, 0);
 console.log(
   `\n✓ Test execution — ${executed.length}/${expected.length} non-exempt app(s) ` +
-    `executed ${total} test file(s): ` +
-    executed.map((e) => `${e.app} (${e.count})`).join(', ') +
+    `executed ${totalFiles} test file(s) and ${totalTests} test(s): ` +
+    executed
+      .map((e) => `${e.app} (${e.files} files, ${e.tests} tests)`)
+      .join(", ") +
     `; ${EXEMPT.size} exempt.`,
 );

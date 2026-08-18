@@ -169,3 +169,8 @@ CLAUDE.md
 
 # Local env backups (e.g. .env.railway.bak) — never tracked
 .env.*.bak
+
+# vitest machine-readable run reports, read by scripts/verify-test-execution.mjs.
+# Build artifacts: never committed, and gitignoring them also keeps them out of
+# turbo's input hashing so a report cannot influence its own cache key.
+.vitest/
