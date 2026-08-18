@@ -14,7 +14,6 @@
     "clean": "turbo run clean && rm -rf .turbo **/.next **/node_modules/.cache",
     "clean:full": "rm -rf node_modules",
     "check-types": "turbo run check-types",
-    "dead-code": "echo 'Dead code check: not yet configured'",
     "build": "turbo run build",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix --max-warnings 0",
