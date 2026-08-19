@@ -97,7 +97,7 @@ export function ExpiryModal({ open, onClose, levy }) {
           badge="Recommended"
           badgeColor={T.blue}
           badgeBg={T.blueLight}
-          href="/billing"
+          href="/levy-transfer"
           onClose={onClose}
           btnLabel="Go to Transfers"
           btnColor={T.blue}

@@ -1,7 +1,6 @@
 "use client";
 
-import { ChevronRight, TrendingUp } from "lucide-react";
-import Link from "next/link";
+import { TrendingUp } from "lucide-react";
 import { useState } from "react";
 
 import { fmt } from "./helpers";
@@ -80,17 +79,6 @@ export function MonthlyCard({ levy }) {
               No breakdown available
             </p>
           )}
-          <Link
-            href="/billing"
-            onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-1 text-xs font-semibold hover:underline pt-1"
-            style={{
-              color: T.blue,
-              borderTop: `1px solid ${T.border}`,
-            }}
-          >
-            Payroll settings <ChevronRight className="h-3 w-3" />
-          </Link>
         </div>
       </div>
     </div>

@@ -23,7 +23,7 @@ function buildActions(levy) {
       label: `Allocate ${fmt(expiring)} before expiry`,
       detail: `${expiringDays} days · action required`,
       btn: "Transfer now",
-      href: "/billing",
+      href: "/levy-transfer",
       color: T.red,
     });
   }

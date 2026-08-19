@@ -468,12 +468,6 @@ function GettingStartedCard({ user, activeOrganisation, profileStatus }) {
       href: "/settings",
     },
     {
-      id: "job",
-      label: "Post your first job",
-      done: false,
-      href: "/jobs",
-    },
-    {
       id: "apprentice",
       label: "Invite an apprentice",
       done: false,

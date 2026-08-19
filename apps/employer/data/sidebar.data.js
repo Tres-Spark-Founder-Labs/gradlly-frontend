@@ -15,13 +15,6 @@ import {
   UserCircle,
   UserPlus,
   Users,
-  // ── Icons for not-yet-built sections (kept for when they are re-enabled) ──
-  // BarChart3,
-  // Briefcase,
-  // ClipboardList,
-  // CreditCard,
-  // GraduationCap,
-  // UsersRound,
 } from "lucide-react";
 
 export const NAV_SECTIONS = [
@@ -69,37 +62,8 @@ export const NAV_SECTIONS = [
   },
   {
     title: "Recruitment",
-    items: [
-      {
-        label: "Jobs",
-        href: "/jobs",
-        icon: Briefcase,
-        children: [
-          { label: "Job Posts", href: "/jobs" },
-          { label: "Applications", href: "/applications" },
-        ],
-      },
-      { label: "Onboarding", href: "/onboarding", icon: UserPlus },
-    ],
+    items: [{ label: "Onboarding", href: "/onboarding", icon: UserPlus }],
   },
-  // ── Talent section: pages not yet built. Re-enable when ready. ──
-  // {
-  //   title: "Talent",
-  //   items: [
-  //     { label: "Apprentices", href: "/apprentices", icon: GraduationCap },
-  //     {
-  //       label: "Recruitment",
-  //       href: "/jobs",
-  //       icon: Briefcase,
-  //       children: [
-  //         { label: "Job Posts", href: "/jobs" },
-  //         { label: "Applications", href: "/applications" },
-  //       ],
-  //     },
-  //     { label: "Onboarding", href: "/onboarding", icon: UserPlus },
-  //     { label: "Assessments", href: "/assessments", icon: ClipboardList },
-  //   ],
-  // },
   {
     title: "Account",
     items: [
@@ -127,7 +91,6 @@ export const NAV_SECTIONS = [
           },
         ],
       },
-      // { label: "Billing", href: "/billing", icon: CreditCard },
     ],
   },
 ];

@@ -97,7 +97,7 @@ export function TransferCard({ levy, transfers = [] }) {
             ))
           )}
           <Link
-            href="/billing"
+            href="/levy-transfer"
             onClick={(e) => e.stopPropagation()}
             className="flex items-center gap-1 text-xs font-semibold hover:underline"
             style={{ color: T.blue }}
