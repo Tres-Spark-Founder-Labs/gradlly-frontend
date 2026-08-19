@@ -174,3 +174,7 @@ CLAUDE.md
 # Build artifacts: never committed, and gitignoring them also keeps them out of
 # turbo's input hashing so a report cannot influence its own cache key.
 .vitest/
+
+# Temporary .env backups (e.g. the local API port move). Never commit these:
+# they hold the same secrets as .env, which is ignored above.
+.env.bak-*

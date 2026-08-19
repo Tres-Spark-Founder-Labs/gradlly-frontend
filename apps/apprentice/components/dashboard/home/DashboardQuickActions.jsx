@@ -45,7 +45,7 @@ const ACTIONS = [
     icon: ClipboardList,
     label: "Prep next review",
     sub: "Due 10 Apr",
-    href: "/curriculum",
+    href: "/portfolio",
     color: "warning",
   },
   {

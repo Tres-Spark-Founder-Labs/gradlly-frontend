@@ -31,6 +31,23 @@ const nextConfig = {
     ],
   },
 
+  /**
+   * `/curriculum` rendered the evidence library under an authoring-tool name.
+   * It is now `/portfolio` — the PRD §5.2.3 term — and the old path redirects
+   * so bookmarks and any link still pointing at it keep working.
+   *
+   * Permanent (308): the rename is a correction, not an experiment.
+   */
+  async redirects() {
+    return [
+      {
+        source: "/curriculum",
+        destination: "/portfolio",
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     return [
       {

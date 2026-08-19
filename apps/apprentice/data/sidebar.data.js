@@ -4,7 +4,6 @@ import {
   BookOpen,
   ClipboardCheck,
   ClipboardList,
-  FileText,
   FolderOpen,
   LayoutDashboard,
   MessageCircle,
@@ -23,7 +22,7 @@ export const NAV_SECTIONS = [
       { label: "My Courses", href: "/courses", icon: BookMarked },
       { label: "OTJ log", href: "/otj-logs", icon: BookOpen },
       {
-        label: "Portfolio & KSBs",
+        label: "Portfolio",
         href: "/portfolio",
         icon: ClipboardCheck,
       },
@@ -40,16 +39,18 @@ export const NAV_SECTIONS = [
       { label: "Messages", href: "/messages", icon: MessageCircle },
     ],
   },
-  {
-    title: "Curriculum",
-    items: [
-      { label: "Curriculum", href: "/curriculum", icon: FileText },
-      { label: "Analytics", href: "/analytics", icon: BarChart3 },
-    ],
-  },
+  /**
+   * The "Curriculum" section is gone. It held two entries: "Curriculum", which
+   * was a second link to the evidence library now reached at /portfolio, and
+   * "Analytics", which belongs with the rest of the learner's own data.
+   * "Curriculum" is authoring-tool language and names nothing in the PRD.
+   */
   {
     title: "Reporting",
-    items: [{ label: "Documents", href: "/reports", icon: FolderOpen }],
+    items: [
+      { label: "Analytics", href: "/analytics", icon: BarChart3 },
+      { label: "Documents", href: "/reports", icon: FolderOpen },
+    ],
   },
   {
     title: "Account",

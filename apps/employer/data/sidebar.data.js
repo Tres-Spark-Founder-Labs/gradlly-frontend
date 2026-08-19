@@ -1,6 +1,5 @@
 import {
   ClipboardCheck,
-  AlertTriangle,
   BarChart3,
   Briefcase,
   CheckSquare,
@@ -50,14 +49,6 @@ export const NAV_SECTIONS = [
         label: "OTJ Approvals",
         href: "/otj-approvals",
         icon: CheckSquare,
-      },
-      {
-        label: "At-Risk Management",
-        href: "/at-risk",
-        icon: AlertTriangle,
-        // No static badge. It was hardcoded to 5 and shown to every employer,
-        // including brand-new ones with no apprentices. The live count comes
-        // from `liveBadges` in Sidebar.jsx.
       },
       { label: "Messages", href: "/messages", icon: MessageCircle },
     ],

@@ -107,7 +107,7 @@ const QUICK_ACTIONS = [
   {
     label: "Curriculum",
     description: "Course content",
-    href: "/curriculum",
+    href: "/portfolio",
     icon: FileText,
     iconBg: "bg-info-50 group-hover:bg-info-100",
     iconColor: "text-info-700",
