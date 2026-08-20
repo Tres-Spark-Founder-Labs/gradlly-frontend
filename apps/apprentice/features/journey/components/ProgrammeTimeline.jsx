@@ -205,7 +205,7 @@ function MilestoneDetailModal({ milestone, onClose }) {
             Signed records are not attached to timeline milestones yet. Review
             records are in{" "}
             <a
-              href="/progress"
+              href="/otj-logs"
               className="font-medium text-primary-600 underline"
             >
               your reviews

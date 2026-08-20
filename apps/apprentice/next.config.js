@@ -32,19 +32,47 @@ const nextConfig = {
   },
 
   /**
-   * `/curriculum` rendered the evidence library under an authoring-tool name.
-   * It is now `/portfolio` — the PRD §5.2.3 term — and the old path redirects
-   * so bookmarks and any link still pointing at it keep working.
+   * Portal 3's routes now carry the names PRD §5.2 gives them. Every old path
+   * redirects, so nothing that worked before 404s — bookmarks, emailed links
+   * and any internal link missed in the sweep all keep working.
    *
-   * Permanent (308): the rename is a correction, not an experiment.
+   * Permanent (308) throughout: these are corrections, not experiments.
+   *
+   *   §5.2.1 OTJ Tracker               /progress    -> /otj-logs
+   *   §5.2.2 Journey Milestones        /assessments -> /journey
+   *                                    /courses     -> /journey
+   *   §5.2.3 KSB Portfolio             /curriculum  -> /portfolio
+   *   §5.2.4 Communications & Documents /reports    -> /documents
+   *                                    /analytics   -> /
+   *
+   * The `/courses` and `/reports` children are listed explicitly rather than
+   * wildcarded. `/courses/live`, `/courses/archived` and `/courses/drafts`
+   * were an invented status split over one component, and
+   * `/reports/completion` and `/reports/engagement` were one component behind
+   * two names — so each lands on the single surviving screen rather than on a
+   * sub-path that no longer exists.
    */
   async redirects() {
     return [
+      { source: "/curriculum", destination: "/portfolio", permanent: true },
+      { source: "/progress", destination: "/otj-logs", permanent: true },
+      { source: "/assessments", destination: "/journey", permanent: true },
+      { source: "/courses", destination: "/journey", permanent: true },
+      { source: "/courses/live", destination: "/journey", permanent: true },
+      { source: "/courses/archived", destination: "/journey", permanent: true },
+      { source: "/courses/drafts", destination: "/journey", permanent: true },
+      { source: "/reports", destination: "/documents", permanent: true },
       {
-        source: "/curriculum",
-        destination: "/portfolio",
+        source: "/reports/completion",
+        destination: "/documents",
         permanent: true,
       },
+      {
+        source: "/reports/engagement",
+        destination: "/documents",
+        permanent: true,
+      },
+      { source: "/analytics", destination: "/", permanent: true },
     ];
   },
 

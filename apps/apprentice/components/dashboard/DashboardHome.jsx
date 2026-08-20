@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Clock,
   BarChart3,
   BookOpen,
   Building2,
@@ -28,6 +29,7 @@ import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
 import { HomeEpaCountdown } from "@/features/journey/components/HomeEpaCountdown";
 import { OTJ_PACE_LABELS } from "@/features/reporting/constants";
 import { useLearnerSummary } from "@/features/reporting/queries/reporting.query";
+import { useReviews } from "@/features/reviews/queries/reviews.query";
 import {
   capitalise,
   cn,
@@ -77,13 +79,38 @@ const STAT_CARDS = [
     accentBg: "bg-info-600",
     hint: "Pace status",
   },
+  /**
+   * These two came from /analytics, which is folded into this page. They were
+   * the only figures that screen showed and this one did not — the other two
+   * of its four cards (OTJ progress, pace alert) were already here, over the
+   * same `useLearnerSummary` data. Carried over rather than dropped so the
+   * fold loses nothing.
+   */
+  {
+    id: "hours",
+    label: "Approved OTJ Hours",
+    icon: Clock,
+    iconBg: "bg-success-50",
+    iconColor: "text-success-700",
+    accentBg: "bg-success-600",
+    hint: "Counting towards 20%",
+  },
+  {
+    id: "openReviews",
+    label: "Open Reviews",
+    icon: ClipboardList,
+    iconBg: "bg-warning-50",
+    iconColor: "text-warning-700",
+    accentBg: "bg-warning-600",
+    hint: "Awaiting completion",
+  },
 ];
 
 const QUICK_ACTIONS = [
   {
     label: "My Courses",
     description: "Browse enrolled courses",
-    href: "/courses",
+    href: "/journey",
     icon: BookOpen,
     iconBg: "bg-primary-50 group-hover:bg-primary-100",
     iconColor: "text-primary-700",
@@ -91,7 +118,7 @@ const QUICK_ACTIONS = [
   {
     label: "Assessments",
     description: "View & complete tasks",
-    href: "/assessments",
+    href: "/journey",
     icon: ClipboardList,
     iconBg: "bg-warning-50 group-hover:bg-warning-100",
     iconColor: "text-warning-700",
@@ -99,7 +126,7 @@ const QUICK_ACTIONS = [
   {
     label: "Progress",
     description: "Track your journey",
-    href: "/progress",
+    href: "/otj-logs",
     icon: TrendingUp,
     iconBg: "bg-success-50 group-hover:bg-success-100",
     iconColor: "text-success-700",
@@ -123,7 +150,7 @@ const QUICK_ACTIONS = [
   {
     label: "Reports",
     description: "Learning analytics",
-    href: "/reports",
+    href: "/documents",
     icon: BarChart3,
     iconBg: "bg-neutral-100 group-hover:bg-neutral-200",
     iconColor: "text-neutral-700",
@@ -558,19 +585,19 @@ function GettingStartedCard({ user, profileStatus }) {
       id: "course",
       label: "Start your first course",
       done: false,
-      href: "/courses",
+      href: "/journey",
     },
     {
       id: "assessment",
       label: "Complete an assessment",
       done: false,
-      href: "/assessments",
+      href: "/journey",
     },
     {
       id: "progress",
       label: "Check your progress report",
       done: false,
-      href: "/progress",
+      href: "/otj-logs",
     },
   ];
 
@@ -754,6 +781,16 @@ function ProfileCard({ user, activeOrganisation, profileStatus }) {
 export function DashboardHome() {
   const { user, activeOrganisation } = useAuthUser();
   const { data: summary, isLoading: summaryLoading } = useLearnerSummary();
+
+  /**
+   * Open reviews, carried over from /analytics. There is no count field on the
+   * learner summary, so this is derived exactly as that screen derived it:
+   * everything not completed and not cancelled.
+   */
+  const { data: reviewData } = useReviews({ page: 1, perPage: 100 });
+  const pendingReviews = (reviewData?.reviews ?? []).filter(
+    (r) => r.status !== "completed" && r.status !== "cancelled",
+  ).length;
   const greeting = getGreeting(user?.timezone);
   const profileStatus = getProfileStatus(user);
 
@@ -779,6 +816,14 @@ export function DashboardHome() {
           summary.otjPace?.alertLevel ??
           null
         );
+      // Approved minutes only, per D2 — the same field F3.1.4's pace maths uses.
+      case "hours":
+        return summary.otjPace?.approvedMinutes !== null &&
+          summary.otjPace?.approvedMinutes !== undefined
+          ? `${Math.round(summary.otjPace.approvedMinutes / 60)}h`
+          : null;
+      case "openReviews":
+        return String(pendingReviews);
       default:
         return null;
     }
@@ -795,7 +840,7 @@ export function DashboardHome() {
         greeting={greeting}
       />
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         {STAT_CARDS.map((stat, i) => (
           <div
             key={stat.id}

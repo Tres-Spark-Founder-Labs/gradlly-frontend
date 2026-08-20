@@ -14,9 +14,9 @@ import { cn } from "@/utils/helper";
 
 const NAV_ITEMS = [
   { label: "Home", href: "/", icon: LayoutDashboard },
-  { label: "Courses", href: "/courses", icon: BookOpen },
-  { label: "Assessments", href: "/assessments", icon: ClipboardCheck },
-  { label: "Progress", href: "/progress", icon: TrendingUp },
+  { label: "Courses", href: "/journey", icon: BookOpen },
+  { label: "Assessments", href: "/journey", icon: ClipboardCheck },
+  { label: "Progress", href: "/otj-logs", icon: TrendingUp },
   { label: "Profile", href: "/profile", icon: UserCircle },
 ];
 

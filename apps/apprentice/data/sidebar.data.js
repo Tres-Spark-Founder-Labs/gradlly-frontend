@@ -1,15 +1,11 @@
 import {
-  BarChart3,
-  BookMarked,
   BookOpen,
   ClipboardCheck,
-  ClipboardList,
   FolderOpen,
   LayoutDashboard,
   MessageCircle,
   Route,
   Settings,
-  TrendingUp,
   UserCircle,
 } from "lucide-react";
 
@@ -19,38 +15,28 @@ export const NAV_SECTIONS = [
     items: [
       { label: "Dashboard", href: "/", icon: LayoutDashboard },
       { label: "My journey", href: "/journey", icon: Route },
-      { label: "My Courses", href: "/courses", icon: BookMarked },
       { label: "OTJ log", href: "/otj-logs", icon: BookOpen },
       {
         label: "Portfolio",
         href: "/portfolio",
         icon: ClipboardCheck,
       },
-      {
-        label: "Assessments",
-        href: "/assessments",
-        icon: ClipboardList,
-      },
-      {
-        label: "Progress",
-        href: "/progress",
-        icon: TrendingUp,
-      },
       { label: "Messages", href: "/messages", icon: MessageCircle },
     ],
   },
   /**
-   * The "Curriculum" section is gone. It held two entries: "Curriculum", which
-   * was a second link to the evidence library now reached at /portfolio, and
-   * "Analytics", which belongs with the rest of the learner's own data.
-   * "Curriculum" is authoring-tool language and names nothing in the PRD.
+   * The "Curriculum" section is gone — authoring-tool language naming nothing
+   * in the PRD. Its two entries were a second link to the evidence library
+   * (now /portfolio) and "Analytics", which is folded into the dashboard.
+   *
+   * "My Courses", "Assessments" and "Progress" are gone from this list for the
+   * same reason: after the §5.2 renames they pointed at /journey, /journey and
+   * /otj-logs — pages already listed above them. The routes still resolve via
+   * redirects; only the duplicate rows are removed.
    */
   {
     title: "Reporting",
-    items: [
-      { label: "Analytics", href: "/analytics", icon: BarChart3 },
-      { label: "Documents", href: "/reports", icon: FolderOpen },
-    ],
+    items: [{ label: "Documents", href: "/documents", icon: FolderOpen }],
   },
   {
     title: "Account",

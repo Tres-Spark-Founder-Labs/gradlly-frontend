@@ -14,13 +14,10 @@ import { UserMenu } from "./UserMenu";
 
 const BREADCRUMBS = {
   "/": { parent: "My Learning", current: "Dashboard" },
-  "/courses": { parent: "My Learning", current: "My Courses" },
-  "/assessments": { parent: "My Learning", current: "Assessments" },
+  "/journey": { parent: "My Learning", current: "My journey" },
   "/otj-logs": { parent: "My Learning", current: "OTJ log" },
   "/portfolio": { parent: "My Learning", current: "Portfolio" },
-  "/progress": { parent: "My Learning", current: "Progress" },
-  "/analytics": { parent: "My Learning", current: "Analytics" },
-  "/reports": { parent: "Reporting", current: "Documents" },
+  "/documents": { parent: "Reporting", current: "Documents" },
   "/learners": { parent: "Reporting", current: "Learners" },
   "/profile": { parent: "Account", current: "Profile" },
   "/settings": { parent: "Account", current: "Settings" },
