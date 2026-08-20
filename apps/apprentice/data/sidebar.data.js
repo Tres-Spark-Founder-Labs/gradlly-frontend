@@ -1,6 +1,7 @@
 import {
   BookOpen,
   ClipboardCheck,
+  FileSignature,
   FolderOpen,
   LayoutDashboard,
   MessageCircle,
@@ -20,6 +21,11 @@ export const NAV_SECTIONS = [
         label: "Portfolio",
         href: "/portfolio",
         icon: ClipboardCheck,
+      },
+      {
+        label: "Commitment statement",
+        href: "/commitment-statement",
+        icon: FileSignature,
       },
       { label: "Messages", href: "/messages", icon: MessageCircle },
     ],
