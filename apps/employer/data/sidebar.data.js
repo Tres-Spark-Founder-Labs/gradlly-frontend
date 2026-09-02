@@ -22,7 +22,30 @@ export const NAV_SECTIONS = [
     title: "Overview",
     items: [
       { label: "Dashboard", href: "/", icon: LayoutDashboard },
-      { label: "Analytics", href: "/analytics", icon: BarChart3 },
+      {
+        label: "Analytics",
+        href: "/analytics",
+        icon: BarChart3,
+        /**
+         * Both children are built features that were reachable only by typing
+         * the URL: F1.4.1 Levy ROI Report and F1.4.2 Provider Performance
+         * Comparison. Labelled for what they show rather than by their route
+         * segment — "Cost" and "Performance" say nothing about which numbers
+         * are inside.
+         */
+        children: [
+          {
+            label: "Levy ROI report",
+            href: "/analytics/cost",
+            icon: PoundSterling,
+          },
+          {
+            label: "Provider performance",
+            href: "/analytics/performance",
+            icon: TrendingUp,
+          },
+        ],
+      },
     ],
   },
   {
