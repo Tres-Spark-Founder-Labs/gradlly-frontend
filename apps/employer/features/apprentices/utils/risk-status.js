@@ -4,7 +4,9 @@
  * The API's `otjPaceAlertLevel` has three values: `on_track`, `at_risk` and
  * `off_track`. The employer UI was written against a different set —
  * `on_track`, `at_risk`, `overdue`, `epa_ready` — which came from the mock
- * fixtures in `components/apprentices/data.js`, not from any endpoint.
+ * fixtures in `components/apprentices/data.js`, not from any endpoint. That
+ * file has since been deleted; the vocabulary it introduced is why this
+ * translation layer exists.
  *
  * The consequence was not cosmetic. `off_track` is the most serious level
  * (F1.2.4 AC3: more than 30% behind), and because nothing in the UI knew that

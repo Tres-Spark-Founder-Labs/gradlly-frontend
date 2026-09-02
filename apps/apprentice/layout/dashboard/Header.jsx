@@ -18,7 +18,6 @@ const BREADCRUMBS = {
   "/otj-logs": { parent: "My Learning", current: "OTJ log" },
   "/portfolio": { parent: "My Learning", current: "Portfolio" },
   "/documents": { parent: "Reporting", current: "Documents" },
-  "/learners": { parent: "Reporting", current: "Learners" },
   "/profile": { parent: "Account", current: "Profile" },
   "/settings": { parent: "Account", current: "Settings" },
 };

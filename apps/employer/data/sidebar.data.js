@@ -61,10 +61,6 @@ export const NAV_SECTIONS = [
     ],
   },
   {
-    title: "Recruitment",
-    items: [{ label: "Onboarding", href: "/onboarding", icon: UserPlus }],
-  },
-  {
     title: "Account",
     items: [
       { label: "Profile", href: "/profile", icon: UserCircle },

@@ -13,6 +13,7 @@ import {
   FUNDING_CLAIM_META,
   SME_KPI_LINKS,
 } from "../constants";
+import { SmeApprenticeRoster } from "./SmeApprenticeRoster";
 import { useSmeOverview } from "../queries/reporting.query";
 
 function KpiTile({ href, icon: Icon, label, value, tone, isLoading }) {
@@ -105,56 +106,9 @@ const PENDING_OTJ_COLUMNS = [
   },
 ];
 
-const APPRENTICE_COLUMNS = [
-  {
-    key: "learnerName",
-    header: "Apprentice",
-    primary: true,
-    sortable: true,
-    cell: (row) => (
-      <Link
-        href={`/learners/${row.enrolmentId}`}
-        className="font-medium text-primary-700 hover:underline"
-      >
-        {row.learnerName}
-      </Link>
-    ),
-  },
-  {
-    key: "programmeTitle",
-    header: "Programme",
-    cell: (row) => row.programmeTitle ?? "—",
-  },
-  {
-    key: "otjPercent",
-    header: "OTJ %",
-    align: "right",
-    sortable: true,
-    cell: (row) =>
-      row.otjPercent !== null && row.otjPercent !== undefined
-        ? `${row.otjPercent.toFixed(1)}%`
-        : "—",
-  },
-  {
-    key: "nextReviewDate",
-    header: "Next review",
-    cell: (row) => (row.nextReviewDate ? formatDate(row.nextReviewDate) : "—"),
-  },
-  {
-    key: "statusBadge",
-    header: "Status",
-    cell: (row) => (
-      <TextBadge variant="light" color="gray" size="xs">
-        {row.statusBadge?.replace(/_/g, " ") ?? "—"}
-      </TextBadge>
-    ),
-  },
-];
-
 export function SmeDashboard() {
   const { data, isLoading } = useSmeOverview();
   const summary = data?.summary;
-  const apprentices = data?.apprentices ?? [];
   const pendingOtj = data?.pendingOtjApprovals ?? [];
 
   const funding = FUNDING_CLAIM_META[summary?.fundingClaimStatus] ?? null;
@@ -238,28 +192,8 @@ export function SmeDashboard() {
         </CardContent>
       </Card>
 
-      {/* Cohort roster */}
-      <Card>
-        <CardHeader>
-          <h2 className="text-sm font-semibold text-neutral-900">
-            Your apprentices
-          </h2>
-        </CardHeader>
-        <CardContent className="p-0 sm:p-0">
-          <DataTable
-            columns={APPRENTICE_COLUMNS}
-            data={apprentices}
-            isLoading={isLoading}
-            rowKey={(row) => row.enrolmentId}
-            empty={{
-              icon: Users,
-              title: "No active apprentices",
-              description:
-                "Enrol an apprentice from the AI programme catalogue.",
-            }}
-          />
-        </CardContent>
-      </Card>
+      {/* Cohort roster — shared with /learners so the two cannot disagree. */}
+      <SmeApprenticeRoster />
     </div>
   );
 }

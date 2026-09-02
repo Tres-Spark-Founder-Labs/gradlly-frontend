@@ -18,7 +18,6 @@ import {
   Phone,
   Sparkles,
   TrendingUp,
-  Users,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -138,14 +137,6 @@ const QUICK_ACTIONS = [
     icon: FileText,
     iconBg: "bg-info-50 group-hover:bg-info-100",
     iconColor: "text-info-700",
-  },
-  {
-    label: "Learners",
-    description: "Cohort overview",
-    href: "/learners",
-    icon: Users,
-    iconBg: "bg-danger-50 group-hover:bg-danger-100",
-    iconColor: "text-danger-700",
   },
   {
     label: "Reports",

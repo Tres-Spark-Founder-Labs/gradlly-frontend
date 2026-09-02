@@ -15,9 +15,12 @@ import { UserMenu } from "./UserMenu";
 const BREADCRUMBS = {
   "/": { parent: "Overview", current: "Dashboard" },
   "/apprentices": { parent: "Apprenticeships", current: "Apprentices" },
-  "/onboarding": { parent: "Apprenticeships", current: "Onboarding" },
   "/analytics": { parent: "Apprenticeships", current: "Analytics" },
   "/analytics/cost": { parent: "Analytics", current: "Levy ROI" },
+  "/analytics/performance": {
+    parent: "Analytics",
+    current: "Provider performance",
+  },
   "/profile": { parent: "Account", current: "Profile" },
   "/settings": { parent: "Account", current: "Settings" },
   "/settings/organisation": { parent: "Settings", current: "Organisation" },
