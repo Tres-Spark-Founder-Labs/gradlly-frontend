@@ -62,12 +62,17 @@ export const DAS_SYNC_STATUS = Object.freeze({
   IDLE: "idle", // never synced — show "connect DAS" state
   SUCCESS: "success",
   FAILED: "failed",
+  // A temporary mode flag, not a sync outcome: the figure was typed in by an
+  // administrator because this deployment has no ESFA credentials. Rendered in
+  // a neutral tone rather than the success green, because nothing was synced.
+  MANUAL: "manual",
 });
 
 export const DAS_SYNC_STATUS_LABELS = Object.freeze({
   idle: "Not synced",
   success: "Synced",
   failed: "Sync failed",
+  manual: "Manually entered",
 });
 
 // Default forecast horizon.

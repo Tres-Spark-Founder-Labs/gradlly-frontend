@@ -69,6 +69,9 @@ export function LevyBalanceCard() {
   const status = balance?.lastSyncStatus ?? DAS_SYNC_STATUS.IDLE;
   const isIdle = status === DAS_SYNC_STATUS.IDLE;
   const isFailed = status === DAS_SYNC_STATUS.FAILED;
+  // A hand-entered figure is neither a success nor a failure. It gets a neutral
+  // tone so the badge does not read as a green tick over data nobody synced.
+  const isManual = status === DAS_SYNC_STATUS.MANUAL;
   const formatted = money(balance?.balance, balance?.currency);
   const busy = sync.isPending || syncing;
 
@@ -119,7 +122,9 @@ export function LevyBalanceCard() {
                   "inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold ring-1 ring-inset",
                   isFailed
                     ? "bg-danger-50 text-danger-600 ring-danger-200"
-                    : "bg-emerald-50 text-emerald-700 ring-emerald-200",
+                    : isManual
+                      ? "bg-neutral-100 text-neutral-600 ring-neutral-200"
+                      : "bg-emerald-50 text-emerald-700 ring-emerald-200",
                 )}
               >
                 {syncing ? (
