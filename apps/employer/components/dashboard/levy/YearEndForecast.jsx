@@ -57,7 +57,7 @@ export function YearEndForecast({ forecast, segments, isLoading, onExport }) {
           <p className="text-sm" style={{ color: T.muted }}>
             {isLoading
               ? "Loading forecast…"
-              : "Forecast is unavailable until DAS data has synced."}
+              : "Forecast is unavailable until levy data is available — either synced from the ESFA or entered manually."}
           </p>
         </CardContent>
       </Card>

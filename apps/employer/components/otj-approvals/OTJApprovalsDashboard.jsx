@@ -78,6 +78,38 @@ export function OTJApprovalsDashboard() {
   const { mutate: bulkApprove, isPending: isApproving } = useBulkApproveOtj();
   const { mutate: bulkReject, isPending: isRejecting } = useBulkRejectOtj();
 
+  /**
+   * Which entries are actually being actioned right now.
+   *
+   * ── WHY NOT THE MUTATION'S OWN isPending ──────────────────────────────────
+   *
+   * `useMutation` exposes one `isPending` for the hook, not one per call. This
+   * screen passed that single flag to every row, so approving one entry put
+   * every Approve and Reject button on the page into a disabled, pending state.
+   * On a full queue of twenty that reads as the whole screen having locked up,
+   * and it hides which row is actually in flight — the one thing the operator
+   * needs to know.
+   *
+   * Tracking ids instead means the flag is per entry. The bulk toolbar still
+   * uses the hook-level flag, correctly: a bulk action really is one operation.
+   */
+  const [approvingIds, setApprovingIds] = useState(new Set());
+  const [rejectingIds, setRejectingIds] = useState(new Set());
+
+  const markInFlight = (setIds, ids) =>
+    setIds((current) => {
+      const next = new Set(current);
+      for (const id of ids) next.add(id);
+      return next;
+    });
+
+  const clearInFlight = (setIds, ids) =>
+    setIds((current) => {
+      const next = new Set(current);
+      for (const id of ids) next.delete(id);
+      return next;
+    });
+
   const visible = search
     ? entries.filter((e) =>
         e.note?.toLowerCase().includes(search.toLowerCase()),
@@ -108,12 +140,24 @@ export function OTJApprovalsDashboard() {
 
   // No `reason` on approve: only rejection carries a comment, and the API
   // rejects unknown properties, so sending an empty one is a 400.
+  //
+  // `onSettled` rather than `onSuccess`: a row whose request failed must become
+  // actionable again, or a transient error leaves that button disabled until
+  // the page is reloaded.
   const handleApprove = (id) => {
-    bulkApprove({ ids: [id] });
+    markInFlight(setApprovingIds, [id]);
+    bulkApprove(
+      { ids: [id] },
+      { onSettled: () => clearInFlight(setApprovingIds, [id]) },
+    );
   };
 
   const handleReject = (id, reason) => {
-    bulkReject({ ids: [id], reason });
+    markInFlight(setRejectingIds, [id]);
+    bulkReject(
+      { ids: [id], reason },
+      { onSettled: () => clearInFlight(setRejectingIds, [id]) },
+    );
   };
 
   const handleBulkApprove = () => {
@@ -123,12 +167,29 @@ export function OTJApprovalsDashboard() {
     // page the moment that changed.
     const ids = [...selected];
     if (ids.length === 0) return;
-    bulkApprove({ ids }, { onSuccess: () => setSelected(new Set()) });
+    // The selected rows are genuinely in flight, so they show it individually
+    // as well as through the toolbar.
+    markInFlight(setApprovingIds, ids);
+    bulkApprove(
+      { ids },
+      {
+        onSuccess: () => setSelected(new Set()),
+        onSettled: () => clearInFlight(setApprovingIds, ids),
+      },
+    );
   };
 
   const handleBulkReject = (reason) => {
     const ids = [...selected];
-    bulkReject({ ids, reason }, { onSuccess: () => setSelected(new Set()) });
+    if (ids.length === 0) return;
+    markInFlight(setRejectingIds, ids);
+    bulkReject(
+      { ids, reason },
+      {
+        onSuccess: () => setSelected(new Set()),
+        onSettled: () => clearInFlight(setRejectingIds, ids),
+      },
+    );
   };
 
   const handleTabChange = (next) => {
@@ -218,8 +279,8 @@ export function OTJApprovalsDashboard() {
               onApprove={handleApprove}
               onReject={handleReject}
               onEvidence={setEvidence}
-              isApproving={isApproving}
-              isRejecting={isRejecting}
+              isApproving={approvingIds.has(entry.id)}
+              isRejecting={rejectingIds.has(entry.id)}
             />
           ))
         )}

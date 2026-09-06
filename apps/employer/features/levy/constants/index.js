@@ -28,6 +28,17 @@ export const DONOR_LINK_STATUSES = Object.freeze({
   ACTIVE: "active",
   ERROR: "error",
   REVOKED: "revoked",
+  /**
+   * The account was recorded by hand because this deployment has no ESFA
+   * credentials (DasDonorLinkStatus.MANUAL). No OAuth consent happened and no
+   * sync ever ran.
+   *
+   * This value was missing here while the API had returned it all along, so
+   * every screen reading these constants treated a hand-entered account as an
+   * ordinary one — which is how the dashboard came to report a typed balance
+   * as DAS-synced.
+   */
+  MANUAL: "manual",
 });
 
 export const MATCH_APPLICATION_STATUSES = Object.freeze({

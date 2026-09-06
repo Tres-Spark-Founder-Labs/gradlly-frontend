@@ -8,6 +8,9 @@ import { ChartExportButton, useChartPng } from "./ChartExportButton";
 import { fmtGBP } from "./helpers";
 import { T } from "./tokens";
 
+/** A levy year. The chart axis is always this wide, however many months exist. */
+const MONTHS_IN_LEVY_YEAR = 12;
+
 const CHART_H = 180;
 const PAIR_GAP = 4;
 
@@ -79,7 +82,19 @@ export function MonthlyChart({ monthlySeries, isLoading }) {
     busy: pngBusy,
   } = useChartPng("levy-monthly-flow");
 
-  const slot = rows.length > 0 ? 100 / rows.length : 100;
+  /**
+   * The axis is always a full levy year, even when the series is shorter.
+   *
+   * This used to be `100 / rows.length`, which spread whatever months existed
+   * across the whole width. Seven months then drew an identical chart to
+   * twelve — same bar width, same spacing, axis full — so an employer part-way
+   * through a levy year saw what looked like a complete one, and a trend
+   * covering seven months read as covering twelve.
+   *
+   * Fixing the divisor at twelve leaves the remaining slots empty, which is
+   * what a part-year looks like. A gap renders as a gap.
+   */
+  const slot = 100 / MONTHS_IN_LEVY_YEAR;
   const barW = Math.max((slot - PAIR_GAP) / 2, 1);
 
   return (
@@ -112,12 +127,12 @@ export function MonthlyChart({ monthlySeries, isLoading }) {
         ) : (
           <figure
             data-chart="monthly-levy-flow"
-            aria-label={`Monthly levy contributions versus spend for the last ${rows.length} months`}
+            aria-label={`Monthly levy contributions versus spend, ${rows.length} of ${MONTHS_IN_LEVY_YEAR} months recorded`}
           >
             <svg
               width="100%"
-              height={CHART_H + 28}
-              viewBox={`0 0 100 ${CHART_H + 28}`}
+              height={CHART_H}
+              viewBox={`0 0 100 ${CHART_H}`}
               preserveAspectRatio="none"
               role="img"
             >
@@ -163,19 +178,57 @@ export function MonthlyChart({ monthlySeries, isLoading }) {
                     >
                       <title>{`${row.month} spend: ${fmtGBP(row.spend)}`}</title>
                     </rect>
-                    <text
-                      x={x + slot / 2}
-                      y={CHART_H + 18}
-                      textAnchor="middle"
-                      fontSize="7"
-                      fill={T.muted}
-                    >
-                      {shortMonth(row.month)}
-                    </text>
                   </g>
                 );
               })}
             </svg>
+
+            {/*
+              ── WHY THE AXIS LABELS ARE HTML, NOT SVG ─────────────────────────
+
+              They were <text> inside an svg with preserveAspectRatio="none".
+              That stretches the drawing to the container width on a different
+              scale from the height, and glyphs stretch with it — so the labels
+              were both distorted and wider than the 100/12 = 8.33 user units a
+              month slot has. Three-letter names ran into their neighbours at
+              every width, which at the default one read as a single unbroken
+              line of characters.
+
+              In HTML each label owns a cell exactly one twelfth of the axis
+              wide, with its own overflow. A label cannot encroach on the next
+              one no matter how narrow the viewport gets, because the boxes do
+              not overlap — the guarantee is structural rather than a font size
+              that happens to fit. Text also renders at its true aspect ratio.
+
+              Twelve cells are always laid out, not rows.length: the bars are
+              positioned against a fixed twelve-month axis, so the labels have
+              to be too, or a seven-month series would spread its labels across
+              the full width beneath bars that stop at seven twelfths.
+            */}
+            <div
+              className="flex w-full"
+              aria-hidden
+              data-testid="monthly-chart-axis"
+            >
+              {Array.from({ length: MONTHS_IN_LEVY_YEAR }, (_, i) => (
+                <span
+                  key={rows[i]?.month ?? `empty-${i}`}
+                  data-axis-cell
+                  /* 8px at the narrowest viewport, where a cell is only 320/12 = 26.7px
+                     wide. Nine left "Sep" with no headroom under a conservative
+                     glyph estimate, and a label that only just fits is one
+                     rounding away from clipping. */
+                  className="overflow-hidden text-ellipsis whitespace-nowrap text-center text-[8px] leading-4 sm:text-[9px]"
+                  style={{
+                    width: `${100 / MONTHS_IN_LEVY_YEAR}%`,
+                    color: T.muted,
+                  }}
+                >
+                  {rows[i] ? shortMonth(rows[i].month) : ""}
+                </span>
+              ))}
+            </div>
+
             <figcaption className="sr-only">
               Peak monthly value {fmtGBP(max)}.
             </figcaption>

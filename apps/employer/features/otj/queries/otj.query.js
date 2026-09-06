@@ -106,6 +106,26 @@ function normalizeBulkInput(input) {
   };
 }
 
+/**
+ * Every OTJ list, whether or not it is on screen.
+ *
+ * ── WHY refetchType: "all" ──────────────────────────────────────────────────
+ *
+ * `invalidateQueries` refetches ACTIVE queries and merely marks inactive ones
+ * stale. Approving from the Pending tab leaves the Approved tab's query
+ * inactive, so it kept its pre-approval cache; combined with
+ * `keepPreviousData`, switching tabs showed the stale list first and the entry
+ * appeared to have gone nowhere. Refetching all of them means the entry has
+ * left Pending and arrived in Approved by the time the operator looks.
+ *
+ * The prefix `["otj"]` covers the tab lists, the sidebar's pending badge and
+ * the summary banner's total, since all three are keyed under it — the counts
+ * update with the list rather than a beat behind it.
+ */
+function invalidateOtjViews(qc) {
+  qc.invalidateQueries({ queryKey: OTJ_QUERY_KEYS.all(), refetchType: "all" });
+}
+
 export function useBulkApproveOtj() {
   const qc = useQueryClient();
   const { orgId } = useAuthUser();
@@ -123,7 +143,7 @@ export function useBulkApproveOtj() {
       } else {
         toastSuccess("OTJ entries approved.");
       }
-      qc.invalidateQueries({ queryKey: OTJ_QUERY_KEYS.all() });
+      invalidateOtjViews(qc);
       qc.invalidateQueries({ queryKey: REPORTING_QUERY_KEYS.all() });
     },
     onError: (error) => {
@@ -141,7 +161,7 @@ export function useBulkRejectOtj() {
     onSuccess: (data) => {
       const count = data?.succeeded ?? 0;
       toastSuccess(`${count} ${count === 1 ? "entry" : "entries"} rejected.`);
-      qc.invalidateQueries({ queryKey: OTJ_QUERY_KEYS.all() });
+      invalidateOtjViews(qc);
     },
     onError: (error) => {
       toastError(error.message || "Failed to reject. Please try again.");

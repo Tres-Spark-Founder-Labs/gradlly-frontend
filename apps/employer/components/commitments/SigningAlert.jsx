@@ -7,17 +7,66 @@ import { T } from "@/components/dashboard/levy/tokens";
 
 const KEY = "signing_alert_v1";
 
+/**
+ * sessionStorage does not exist while this renders on the server.
+ *
+ * "use client" marks the component as interactive; it does not stop Next from
+ * server-rendering it first. Reading the store directly in the state
+ * initialiser therefore threw a ReferenceError on the server pass — a second
+ * way this banner could take the page down, independent of the property bug
+ * below.
+ */
+function readDismissedId() {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.sessionStorage.getItem(KEY);
+  } catch {
+    // Private browsing and blocked storage both throw on access. A banner that
+    // cannot remember a dismissal is a small annoyance; one that crashes the
+    // commitment board is not.
+    return null;
+  }
+}
+
 export function SigningAlert({ statement, onSignNow, onViewDoc }) {
+  /**
+   * ── THE CRASH THIS FIXES ──────────────────────────────────────────────────
+   *
+   * This read `statement.apprentice.name`. `CommitmentBoardRowDto` has no
+   * `apprentice` object — it is flat, with `apprenticeName: string | null` —
+   * so the property access threw and took the whole route down through
+   * app/error.jsx. It only surfaced once the seed produced a statement
+   * awaiting the employer, because the banner renders only for
+   * `actionRequired` rows: every employer with something to sign lost the
+   * entire board, which is exactly the group the screen exists to serve.
+   *
+   * The same component also read `statement.id`, which the DTO does not carry
+   * either (it is `statementId`). That one did not throw — it quietly stored
+   * the string "undefined", so dismissing the banner never persisted and it
+   * returned on every reload.
+   */
+  const statementId = statement?.statementId ?? null;
   const [dismissed, setDismissed] = useState(
-    () => sessionStorage.getItem(KEY) === statement?.id,
+    () => statementId !== null && readDismissedId() === statementId,
   );
 
   if (!statement || dismissed) return null;
 
   const dismiss = () => {
-    sessionStorage.setItem(KEY, statement.id);
+    if (typeof window !== "undefined" && statementId) {
+      try {
+        window.sessionStorage.setItem(KEY, statementId);
+      } catch {
+        // Dismissal is then per-render rather than per-session. Still better
+        // than throwing out of an onClick.
+      }
+    }
     setDismissed(true);
   };
+
+  // Nullable on the DTO. Named as missing rather than filled with a stand-in,
+  // and the heading still says what needs doing.
+  const apprenticeName = statement.apprenticeName;
 
   return (
     <div
@@ -38,8 +87,14 @@ export function SigningAlert({ statement, onSignNow, onViewDoc }) {
           </span>
           <div className="min-w-0">
             <p className="text-sm font-semibold" style={{ color: T.blue }}>
-              Action required — {statement.apprentice.name}
+              Action required
+              {apprenticeName ? ` — ${apprenticeName}` : ""}
             </p>
+            {!apprenticeName && (
+              <p className="text-[11px] mt-0.5" style={{ color: T.muted }}>
+                The apprentice&apos;s name is not recorded on this statement.
+              </p>
+            )}
             <p
               className="mt-1 text-xs leading-relaxed"
               style={{ color: T.subtle }}

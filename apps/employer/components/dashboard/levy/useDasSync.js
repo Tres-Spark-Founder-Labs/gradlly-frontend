@@ -44,6 +44,17 @@ export function useDasSync() {
       }, 0)
     : null;
 
+  /**
+   * Whether any part of the displayed balance was typed in rather than synced.
+   *
+   * `.some()`, matching isDegraded above and for the same reason. The balance
+   * is a SUM across accounts: if one account's figure was entered by hand, the
+   * total is not a DAS-sourced number, and labelling it "DAS synced" is the
+   * false claim being removed. Over-disclose rather than under-disclose.
+   */
+  const isManual =
+    hasLink && donorLinks.some((l) => l.status === DONOR_LINK_STATUSES.MANUAL);
+
   // Most recent successful sync across all linked accounts.
   const lastSynced = donorLinks.reduce((latest, l) => {
     if (!l?.lastSyncedAt) return latest;
@@ -67,6 +78,7 @@ export function useDasSync() {
           ? "error"
           : "idle",
     isDegraded,
+    isManual,
     hasLink,
     balance,
     sync,

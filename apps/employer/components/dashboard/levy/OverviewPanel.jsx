@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   Clock,
   Download,
+  PencilLine,
   TrendingUp,
 } from "lucide-react";
 
@@ -94,12 +95,28 @@ export function OverviewPanel({ das, levy, onExpiryModal, onExport }) {
             bg={T.redLight}
             onClick={onExpiryModal}
           />
+          {/* F1.1.1 AC3/AC4 — where the figure came from, not an assumption
+              about it. This said "DAS synced" with a green tick unconditionally
+              and never read any sync state, so a balance an administrator typed
+              in by hand was reported to the employer as synced from the ESFA.
+              A neutral tone, because a hand-entered figure is neither a
+              successful sync nor a failed one. */}
           <HealthSignal
-            icon={<CheckCircle2 className="h-3.5 w-3.5" />}
-            label="DAS synced"
-            detail={das?.fmtLastSynced?.() ?? "—"}
-            color={T.green}
-            bg={T.greenLight}
+            icon={
+              das?.isManual ? (
+                <PencilLine className="h-3.5 w-3.5" />
+              ) : (
+                <CheckCircle2 className="h-3.5 w-3.5" />
+              )
+            }
+            label={das?.isManual ? "Manually entered" : "DAS synced"}
+            detail={
+              das?.isManual
+                ? "Not synced from the ESFA"
+                : (das?.fmtLastSynced?.() ?? "—")
+            }
+            color={das?.isManual ? T.subtle : T.green}
+            bg={das?.isManual ? T.card : T.greenLight}
           />
         </div>
 
@@ -129,9 +146,11 @@ export function OverviewPanel({ das, levy, onExpiryModal, onExport }) {
           /* F1.1.1 AC3: last-synced timestamp sits with the balance itself,
              not only in the separate health-signal row. */
           sub={
-            das?.hasLink
-              ? `DAS · synced ${das.fmtSyncedAt?.()}`
-              : "No DAS account linked"
+            !das?.hasLink
+              ? "No DAS account linked"
+              : das?.isManual
+                ? `Entered manually · ${das.fmtSyncedAt?.()}`
+                : `DAS · synced ${das.fmtSyncedAt?.()}`
           }
         />
         <OverviewStat

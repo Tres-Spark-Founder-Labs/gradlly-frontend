@@ -4,6 +4,7 @@ import { Bell, Download, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { T } from "@/components/dashboard/levy/tokens";
+import { SectionBoundary } from "@/components/ui/SectionBoundary";
 import { useCommitmentBoard } from "@/features/commitments/queries/commitments.query";
 import {
   cleanBoardFilters,
@@ -95,15 +96,25 @@ export function CommitmentsDashboard() {
         </div>
       </div>
 
-      {pendingSignature && (
-        <SigningAlert
-          statement={pendingSignature}
-          onSignNow={() =>
-            setModal({ type: "sign", statement: pendingSignature })
-          }
-          onViewDoc={() => setPanel(pendingSignature)}
-        />
-      )}
+      {/*
+        The banner is a shortcut to a row that also appears in the table below,
+        so if it ever fails to render the board is still complete and still
+        usable. Before this, a throw here reached app/error.jsx and replaced the
+        whole route — every employer with a statement awaiting signature lost
+        the entire commitment board, which is the one group the screen exists
+        for. The failure is now confined to the shortcut.
+      */}
+      <SectionBoundary name="SigningAlert">
+        {pendingSignature && (
+          <SigningAlert
+            statement={pendingSignature}
+            onSignNow={() =>
+              setModal({ type: "sign", statement: pendingSignature })
+            }
+            onViewDoc={() => setPanel(pendingSignature)}
+          />
+        )}
+      </SectionBoundary>
 
       <div className="space-y-3">
         {/* AC4 */}
