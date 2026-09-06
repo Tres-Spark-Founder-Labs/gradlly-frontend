@@ -11,6 +11,7 @@ import {
   MessageCircle,
   PoundSterling,
   Settings,
+  SlidersHorizontal,
   TrendingUp,
   UserCircle,
   UserPlus,
@@ -81,6 +82,21 @@ export const NAV_SECTIONS = [
         icon: TrendingUp,
       },
       { label: "Reports", href: "/reports", icon: FileText },
+      /**
+       * Manual entry of the figures DAS would otherwise supply, for
+       * deployments with no ESFA connection (F1.1.1, F1.1.2, F1.1.5, F4.1.1).
+       *
+       * It sits here rather than under Settings because the route is
+       * /levy-data: a breadcrumb that disagrees with the sidebar is worse than
+       * either placement on its own. "admin" is hierarchy-aware — owners
+       * satisfy it — and matches @Roles(OWNER, ADMIN) on the API.
+       */
+      {
+        label: "Levy Data",
+        href: "/levy-data",
+        icon: SlidersHorizontal,
+        requiresRole: "admin",
+      },
     ],
   },
   {

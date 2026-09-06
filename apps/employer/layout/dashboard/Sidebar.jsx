@@ -275,142 +275,147 @@ export function Sidebar({ isOpen, onClose }) {
                 {section.title}
               </p>
 
-              {section.items.map((item) => {
-                // Hide child links the user's role is not permitted to see.
-                const visibleChildren = (item.children ?? []).filter(
-                  (c) => !c.requiresRole || can(c.requiresRole),
-                );
-                const hasChildren = visibleChildren.length > 0;
-                const isActive =
-                  pathname === item.href ||
-                  (hasChildren &&
-                    visibleChildren.some((c) => isHrefActive(c.href)));
-                const isExpanded = openDropdown === item.label;
-                const Icon = item.icon;
+              {section.items
+                .filter((item) => !item.requiresRole || can(item.requiresRole))
+                .map((item) => {
+                  // Hide child links the user's role is not permitted to see.
+                  const visibleChildren = (item.children ?? []).filter(
+                    (c) => !c.requiresRole || can(c.requiresRole),
+                  );
+                  const hasChildren = visibleChildren.length > 0;
+                  const isActive =
+                    pathname === item.href ||
+                    (hasChildren &&
+                      visibleChildren.some((c) => isHrefActive(c.href)));
+                  const isExpanded = openDropdown === item.label;
+                  const Icon = item.icon;
 
-                if (hasChildren) {
-                  return (
-                    <div key={item.label}>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setOpenDropdown((p) =>
-                            p === item.label ? null : item.label,
-                          )
-                        }
-                        aria-expanded={isExpanded}
-                        className={cn(
-                          "group mx-2 flex w-[calc(100%-1rem)] items-center gap-3 rounded-lg px-3 py-3.5",
-                          "text-[13px] font-medium transition-colors duration-150",
-                          "focus-visible:outline-2 focus-visible:outline-[#5ea478] focus-visible:-outline-offset-2",
-                          isActive
-                            ? "bg-primary-400/14 text-white"
-                            : "text-white/55 hover:bg-primary-400/8 hover:text-white/85",
-                        )}
-                        style={
-                          isActive
-                            ? {
-                                borderLeft: "3px solid #5ea478",
-                                paddingLeft: "9px",
-                              }
-                            : undefined
-                        }
-                      >
-                        <Icon
-                          aria-hidden
-                          strokeWidth={1.75}
+                  if (hasChildren) {
+                    return (
+                      <div key={item.label}>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setOpenDropdown((p) =>
+                              p === item.label ? null : item.label,
+                            )
+                          }
+                          aria-expanded={isExpanded}
                           className={cn(
-                            "h-4 w-4 shrink-0",
+                            "group mx-2 flex w-[calc(100%-1rem)] items-center gap-3 rounded-lg px-3 py-3.5",
+                            "text-[13px] font-medium transition-colors duration-150",
+                            "focus-visible:outline-2 focus-visible:outline-[#5ea478] focus-visible:-outline-offset-2",
                             isActive
-                              ? "text-primary-400"
-                              : "text-white/40 group-hover:text-primary-400/70",
+                              ? "bg-primary-400/14 text-white"
+                              : "text-white/55 hover:bg-primary-400/8 hover:text-white/85",
                           )}
-                        />
-                        <span className="flex-1 text-left">{item.label}</span>
-                        <ChevronDown
-                          aria-hidden
-                          className={cn(
-                            "h-3.5 w-3.5 text-white/30 transition-transform duration-200",
-                            isExpanded && "rotate-180",
-                          )}
-                        />
-                      </button>
+                          style={
+                            isActive
+                              ? {
+                                  borderLeft: "3px solid #5ea478",
+                                  paddingLeft: "9px",
+                                }
+                              : undefined
+                          }
+                        >
+                          <Icon
+                            aria-hidden
+                            strokeWidth={1.75}
+                            className={cn(
+                              "h-4 w-4 shrink-0",
+                              isActive
+                                ? "text-primary-400"
+                                : "text-white/40 group-hover:text-primary-400/70",
+                            )}
+                          />
+                          <span className="flex-1 text-left">{item.label}</span>
+                          <ChevronDown
+                            aria-hidden
+                            className={cn(
+                              "h-3.5 w-3.5 text-white/30 transition-transform duration-200",
+                              isExpanded && "rotate-180",
+                            )}
+                          />
+                        </button>
 
-                      <div
-                        className={cn("sidebar-submenu", isExpanded && "open")}
-                      >
-                        <div className="sidebar-submenu-inner py-0.5 pl-10 pr-2">
-                          {visibleChildren.map((child) => {
-                            const ChildIcon = child.icon;
-                            return (
-                              <Link
-                                key={child.href}
-                                href={child.href}
-                                className={cn(
-                                  "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[12.5px] font-medium transition-colors duration-150",
-                                  "focus-visible:outline-2 focus-visible:outline-[#5ea478] focus-visible:-outline-offset-2",
-                                  isHrefActive(child.href)
-                                    ? "text-white"
-                                    : "text-white/45 hover:text-white/75",
-                                )}
-                              >
-                                {ChildIcon ? (
-                                  <ChildIcon
-                                    aria-hidden
-                                    strokeWidth={1.75}
-                                    className="h-3.5 w-3.5 shrink-0"
-                                  />
-                                ) : null}
-                                <span>{child.label}</span>
-                              </Link>
-                            );
-                          })}
+                        <div
+                          className={cn(
+                            "sidebar-submenu",
+                            isExpanded && "open",
+                          )}
+                        >
+                          <div className="sidebar-submenu-inner py-0.5 pl-10 pr-2">
+                            {visibleChildren.map((child) => {
+                              const ChildIcon = child.icon;
+                              return (
+                                <Link
+                                  key={child.href}
+                                  href={child.href}
+                                  className={cn(
+                                    "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[12.5px] font-medium transition-colors duration-150",
+                                    "focus-visible:outline-2 focus-visible:outline-[#5ea478] focus-visible:-outline-offset-2",
+                                    isHrefActive(child.href)
+                                      ? "text-white"
+                                      : "text-white/45 hover:text-white/75",
+                                  )}
+                                >
+                                  {ChildIcon ? (
+                                    <ChildIcon
+                                      aria-hidden
+                                      strokeWidth={1.75}
+                                      className="h-3.5 w-3.5 shrink-0"
+                                    />
+                                  ) : null}
+                                  <span>{child.label}</span>
+                                </Link>
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                }
+                    );
+                  }
 
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      "group mx-2 flex items-center gap-3 rounded-lg px-3 py-3.5 mb-0.5",
-                      "text-[13px] font-medium transition-colors duration-150",
-                      "focus-visible:outline-2 focus-visible:outline-[#5ea478] focus-visible:-outline-offset-2",
-                      isActive
-                        ? "bg-primary-400/14 text-white"
-                        : "text-white/55 hover:bg-primary-400/8 hover:text-white/85",
-                    )}
-                    style={
-                      isActive
-                        ? {
-                            borderLeft: "3px solid #5ea478",
-                            paddingLeft: "9px",
-                          }
-                        : undefined
-                    }
-                  >
-                    <Icon
-                      aria-hidden
-                      strokeWidth={1.75}
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
                       className={cn(
-                        "h-4 w-4 shrink-0",
+                        "group mx-2 flex items-center gap-3 rounded-lg px-3 py-3.5 mb-0.5",
+                        "text-[13px] font-medium transition-colors duration-150",
+                        "focus-visible:outline-2 focus-visible:outline-[#5ea478] focus-visible:-outline-offset-2",
                         isActive
-                          ? "text-primary-400"
-                          : "text-white/40 group-hover:text-primary-400/70",
+                          ? "bg-primary-400/14 text-white"
+                          : "text-white/55 hover:bg-primary-400/8 hover:text-white/85",
                       )}
-                    />
-                    <span className="flex-1">{item.label}</span>
-                    {(liveBadges[item.href] ?? item.badge ?? 0) > 0 && (
-                      <span className="flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white leading-none">
-                        {liveBadges[item.href] ?? item.badge}
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
+                      style={
+                        isActive
+                          ? {
+                              borderLeft: "3px solid #5ea478",
+                              paddingLeft: "9px",
+                            }
+                          : undefined
+                      }
+                    >
+                      <Icon
+                        aria-hidden
+                        strokeWidth={1.75}
+                        className={cn(
+                          "h-4 w-4 shrink-0",
+                          isActive
+                            ? "text-primary-400"
+                            : "text-white/40 group-hover:text-primary-400/70",
+                        )}
+                      />
+                      <span className="flex-1">{item.label}</span>
+                      {(liveBadges[item.href] ?? item.badge ?? 0) > 0 && (
+                        <span className="flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white leading-none">
+                          {liveBadges[item.href] ?? item.badge}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
             </div>
           ))}
         </nav>
