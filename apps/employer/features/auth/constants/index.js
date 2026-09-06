@@ -15,9 +15,29 @@ export const AUTH_API_PATHS = Object.freeze({
   MFA_VERIFY: "/api/v1/auth/mfa/verify",
 });
 
+/**
+ * The portal this build serves, used to scope every cookie the app owns.
+ *
+ * ── WHY COOKIE NAMES CARRY THE PORTAL ───────────────────────────────────────
+ *
+ * Browsers scope cookies by host and ignore the port. On localhost all four
+ * portals are `localhost`, so one set of names means one cookie jar: signing
+ * into the provider portal overwrites the employer session, and the employer
+ * tab is silently signed out. That is OQ-16, and it is why the Playwright suite
+ * had to run a single worker with parallelism disabled.
+ *
+ * The suffix comes from `NEXT_PUBLIC_PORTAL`, which Next inlines at build time
+ * so the same expression resolves in the browser, on the server and in the
+ * proxy's edge runtime. The fallback is this app's own portal rather than a
+ * generic default: an unset variable then degrades to a name that is still
+ * unique to this portal, instead of putting every portal back in one jar —
+ * which is the failure this whole change exists to remove.
+ */
+export const COOKIE_PORTAL_SCOPE = process.env.NEXT_PUBLIC_PORTAL || "employer";
+
 export const AUTH_COOKIES = Object.freeze({
-  ACCESS: "gradlly_at",
-  REFRESH: "gradlly_rt",
+  ACCESS: `gradlly_at_${COOKIE_PORTAL_SCOPE}`,
+  REFRESH: `gradlly_rt_${COOKIE_PORTAL_SCOPE}`,
 });
 
 export const AUTH_REDIRECTS = Object.freeze({

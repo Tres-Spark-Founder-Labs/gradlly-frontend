@@ -35,11 +35,13 @@ const APPS = {
 
 export default defineConfig({
   testDir: "./e2e",
-  // Portals share a cookie jar by host on localhost, so parallel workers would
-  // sign each other out. This is the same defect recorded as OQ-16 — the tests
-  // run serially until it is addressed rather than pretending it isn't there.
-  workers: 1,
-  fullyParallel: false,
+  // Runs parallel. It previously could not: every portal wrote `gradlly_at` and
+  // `gradlly_rt`, and because browsers scope cookies by host and ignore the
+  // port, all four localhost portals shared one jar — so a second worker
+  // signing in would sign the first one out mid-test. Cookie names now carry
+  // the portal (`gradlly_at_employer` and so on, see COOKIE_PORTAL_SCOPE in
+  // each app's features/auth/constants), which closes OQ-16 and removes the
+  // reason for `workers: 1` and `fullyParallel: false`.
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",

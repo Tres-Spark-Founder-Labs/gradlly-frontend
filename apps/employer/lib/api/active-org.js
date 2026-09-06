@@ -15,7 +15,13 @@
 // switcher writes it directly before refetching `me`. An explicit per-call
 // header still overrides it (see invitations).
 
-const ACTIVE_ORG_COOKIE = "gradlly_active_org";
+import { COOKIE_PORTAL_SCOPE } from "@/features/auth/constants";
+
+// Scoped to the portal for the same reason the session cookies are: an
+// unscoped name is shared across all four portals on localhost, so switching
+// organisation in one portal silently changes which organisation another
+// portal's requests are made against. See COOKIE_PORTAL_SCOPE.
+const ACTIVE_ORG_COOKIE = `gradlly_active_org_${COOKIE_PORTAL_SCOPE}`;
 // Persist for a year; the value is non-sensitive (an org id the user belongs to)
 // and the backend still authorises every request against the session.
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;

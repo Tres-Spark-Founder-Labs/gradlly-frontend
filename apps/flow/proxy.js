@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const REFRESH_TOKEN_COOKIE = "gradlly_rt";
+import { AUTH_COOKIES } from "@/features/auth/constants";
 
 // Public auth pages. Authenticated users are bounced away from these.
 // NOTE: /accept-invitation is intentionally NOT here — accepting an invitation
@@ -26,7 +26,7 @@ const matchesAny = (pathname, paths) =>
 export function proxy(request) {
   const { pathname, search } = request.nextUrl;
   const isAuthenticated = Boolean(
-    request.cookies.get(REFRESH_TOKEN_COOKIE)?.value,
+    request.cookies.get(AUTH_COOKIES.REFRESH)?.value,
   );
 
   // ── Public funnel pages (always allowed) ────────────────────────────────────
