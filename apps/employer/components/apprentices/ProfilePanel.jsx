@@ -9,6 +9,7 @@ import {
   isCriticallyBehind,
 } from "@/features/apprentices/utils/risk-status";
 import { PipelineStateBadge } from "@/features/enrolments/components/EnrolmentBadges";
+import { useLearnerProfile } from "@/features/learners/queries/learners.query";
 
 import { ApprenticeAvatar } from "./ApprenticeAvatar";
 import { ProfileActivity } from "./ProfileActivity";
@@ -33,8 +34,37 @@ const TABS = [
 
 export function ProfilePanel({ apprentice, onClose, onContact }) {
   const [tab, setTab] = useState("Overview");
+
+  /**
+   * One request behind six of the seven tabs.
+   *
+   * Overview is the exception: it renders roster fields the table already
+   * loaded, so it stays useful while the profile is in flight or has failed.
+   *
+   * The hook runs before the early return because hooks cannot be called
+   * conditionally; it no-ops without an enrolment id.
+   */
+  const enrolmentId = apprentice?.enrolmentId ?? null;
+  const {
+    data: profile,
+    isLoading,
+    isError,
+    error,
+  } = useLearnerProfile(enrolmentId);
+
   if (!apprentice) return null;
   const a = apprentice;
+
+  // Every profile-backed tab gets the same four, and decides for itself what to
+  // render — so a failed request shows up in the tab being read rather than
+  // blanking the drawer.
+  const tabState = {
+    profile,
+    isLoading,
+    isError,
+    error,
+    unavailable: !enrolmentId,
+  };
 
   return (
     <>
@@ -159,16 +189,12 @@ export function ProfilePanel({ apprentice, onClose, onContact }) {
           {tab === "Overview" && (
             <ProfileOverview a={a} onContact={onContact} />
           )}
-          {tab === "Timeline" && <ProfileTimeline a={a} />}
-          {tab === "Milestones" && (
-            <ProfileMilestones milestones={a.milestones} />
-          )}
-          {tab === "Reviews" && <ProfileReviews />}
-          {tab === "Activity" && (
-            <ProfileActivity recentActivity={a.recentActivity} />
-          )}
-          {tab === "Documents" && <ProfileDocuments a={a} />}
-          {tab === "Messages" && <ProfileMessages />}
+          {tab === "Timeline" && <ProfileTimeline {...tabState} />}
+          {tab === "Milestones" && <ProfileMilestones {...tabState} />}
+          {tab === "Reviews" && <ProfileReviews {...tabState} />}
+          {tab === "Activity" && <ProfileActivity {...tabState} />}
+          {tab === "Documents" && <ProfileDocuments {...tabState} />}
+          {tab === "Messages" && <ProfileMessages {...tabState} />}
         </div>
       </div>
     </>

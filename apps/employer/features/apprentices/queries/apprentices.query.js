@@ -112,8 +112,11 @@ function normalizeApprentice(apprentice, enrolment) {
     otjHoursCompleted: null,
     otjHoursRequired: null,
     commitmentSigned: false,
-    milestones: [],
-    recentActivity: [],
+    // milestones and recentActivity used to be hardcoded to [] here, which the
+    // profile drawer rendered as "this apprentice has done nothing" while the
+    // real data sat behind GET /learners/:enrolmentId/profile. The drawer now
+    // reads that endpoint directly (features/learners), so there is nothing for
+    // this shape to stand in for.
   };
 }
 
