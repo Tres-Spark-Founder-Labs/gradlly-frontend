@@ -1,8 +1,9 @@
 "use client";
 
-import { ExternalLink } from "lucide-react";
+import { Download, ExternalLink, Loader2 } from "lucide-react";
 
 import { LEARNER_DOC_TYPE_LABELS } from "@/features/learners/constants";
+import { useDownloadObject } from "@/features/storage/queries/storage.query";
 import { formatDate } from "@/utils/helper";
 
 import { ProfileTabState } from "./ProfileTabState";
@@ -18,14 +19,25 @@ import { T } from "./tokens";
  * invented files: "Commitment statement (CS-001), 01 Mar 2024" and "6-month
  * review record, 03 Sep 2024", each with a Download button that did nothing.
  *
- * ── THE DOWNLOAD BUTTON IS GONE FOR STORED FILES ────────────────────────────
+ * ── BOTH KINDS OF DOCUMENT OPEN ─────────────────────────────────────────────
  *
  * `LearnerDocumentItemDto` gives `storageKey` for stored files and
- * `externalUrl` for link evidence. A storage key is not a URL — downloading
- * needs a presigned-URL endpoint this app does not have — so a button that
- * cannot work has been removed rather than left to fail silently, and the row
- * says the file is held on the provider record. `externalUrl` entries do get a
- * real link, because that one is genuinely openable.
+ * `externalUrl` for link evidence, and they need different treatment.
+ *
+ * A storage key is an S3 key, not a URL, so it is exchanged for a short-lived
+ * signed URL through POST /storage/download-url first. An earlier version of
+ * this component said no such endpoint existed and rendered "Held on the
+ * provider record" instead — the endpoint was there all along, and the
+ * provider app had been resolving keys through it since its own document
+ * library was built. F1.2.2 AC5 asks for a library rather than a list, and a
+ * list you cannot open anything from is a list.
+ *
+ * `externalUrl` rows keep their direct link: there is no key to exchange, and
+ * routing them through the presigner would fail.
+ *
+ * A row with neither still says so plainly rather than offering a control that
+ * cannot work — which is the fault the earlier version was avoiding, correctly,
+ * with the wrong remedy.
  */
 
 const TYPE_COLOR = {
@@ -53,6 +65,7 @@ export function ProfileDocuments({
   error,
   unavailable,
 }) {
+  const { download, downloadingKey } = useDownloadObject();
   const docs = Array.isArray(profile?.documents) ? profile.documents : [];
   const ordered = docs
     .slice()
@@ -105,12 +118,28 @@ export function ProfileDocuments({
                 >
                   <ExternalLink className="h-3 w-3" aria-hidden /> Open
                 </a>
+              ) : d.storageKey ? (
+                <button
+                  type="button"
+                  onClick={() => download(d.storageKey)}
+                  disabled={downloadingKey === d.storageKey}
+                  aria-label={`Download ${d.title}`}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold hover:opacity-80 disabled:opacity-50"
+                  style={{ backgroundColor: T.blueLight, color: T.blue }}
+                >
+                  {downloadingKey === d.storageKey ? (
+                    <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+                  ) : (
+                    <Download className="h-3 w-3" aria-hidden />
+                  )}{" "}
+                  Download
+                </button>
               ) : (
                 <span
                   className="text-[10px] whitespace-nowrap"
                   style={{ color: T.muted }}
                 >
-                  Held on the provider record
+                  No file attached
                 </span>
               )}
             </div>

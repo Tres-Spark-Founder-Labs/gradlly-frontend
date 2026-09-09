@@ -20,6 +20,10 @@ import { ApiClientError, normalizeApiClientError } from "@/lib/errors";
 
 const STORAGE_PATHS = Object.freeze({
   UPLOAD_URL: "/api/v1/storage/upload-url",
+  // Private objects — signed PDFs, review records, evidence — are not
+  // publicly addressable. A storageKey is an S3 key, not a URL, so it has to
+  // be exchanged for a short-lived signed one before anything can be opened.
+  DOWNLOAD_URL: "/api/v1/storage/download-url",
 });
 
 export const STORAGE_CATEGORY = Object.freeze({
@@ -258,4 +262,35 @@ function firstAbsoluteUrl(...candidates) {
     if (typeof c === "string" && /^https?:\/\//i.test(c)) return c;
   }
   return null;
+}
+
+// ─── Presigned download URL (for private objects: signed PDFs, evidence) ─────
+/**
+ * Ported from the provider app, which has resolved private keys this way since
+ * the document library was built. The employer app had upload hooks only,
+ * which is why its document rows offered no way to open anything.
+ *
+ * @param {{ key: string, signal?: AbortSignal }} params
+ * @returns {Promise<{ downloadUrl: string, expiresAt?: string }>}
+ */
+export async function requestDownloadUrl({ key, signal }) {
+  try {
+    const result = await $apiClient.post(
+      STORAGE_PATHS.DOWNLOAD_URL,
+      { key },
+      { signal },
+    );
+    const data = result.data?.data ?? result.data;
+    if (!data?.downloadUrl) {
+      // A 200 with no URL would otherwise open a blank tab, which reads as a
+      // browser problem rather than a failed request.
+      throw new ApiClientError({
+        message: "Could not generate a download link. Please try again.",
+        status: 502,
+      });
+    }
+    return { downloadUrl: data.downloadUrl, expiresAt: data.expiresAt };
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
 }

@@ -44,6 +44,45 @@ export function useCommitmentBoard(filters = {}) {
  * only the organisation that owns it, which is what lets an employer read a
  * document the provider drafted.
  */
+/**
+ * This enrolment's commitment statement, as the board reports it.
+ *
+ * ── WHY THIS EXISTS ─────────────────────────────────────────────────────────
+ *
+ * The profile drawer's Overview tab rendered `a.commitmentSigned`, which
+ * `normalizeApprentice` hardcoded to `false`. Every apprentice therefore
+ * displayed "Awaiting signature" with an amber warning and a "Sign commitment
+ * statement" button, including ones whose statement was fully signed. That is
+ * worse than a placeholder: it states something false, and it drives an
+ * employer to chase a signature that already exists.
+ *
+ * The learner profile aggregate does not carry signature state, so this reads
+ * the board the /commitments screen already loads — same query key, same
+ * 60-second staleTime, so opening the drawer reuses that cache rather than
+ * issuing another request.
+ *
+ * Returns `status: null` when the board has no row for this enrolment. A
+ * missing row is not an unsigned statement, and the caller renders nothing
+ * rather than guessing which.
+ */
+export function useEnrolmentCommitmentStatus(enrolmentId) {
+  const board = useCommitmentBoard();
+
+  const row = enrolmentId
+    ? (board.data?.rows ?? []).find((r) => r.enrolmentId === enrolmentId)
+    : undefined;
+
+  return {
+    // The employer's own signature state — not the statement's overall status,
+    // which can be "awaiting signatures" while the employer has already signed.
+    status: row?.employerStatus ?? null,
+    statementId: row?.statementId ?? null,
+    actionRequired: row?.actionRequired ?? false,
+    isLoading: board.isLoading,
+    isError: board.isError,
+  };
+}
+
 export function useCommitmentStatement(id, options = {}) {
   const { orgId } = useAuthUser();
 

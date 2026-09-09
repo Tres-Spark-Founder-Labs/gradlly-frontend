@@ -44,7 +44,6 @@ const INITIAL_FORM = {
   standard: "",
   provider: "",
   startDate: "",
-  cohort: "",
 };
 
 /**

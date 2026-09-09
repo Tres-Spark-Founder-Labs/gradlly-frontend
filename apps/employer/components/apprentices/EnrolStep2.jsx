@@ -12,7 +12,25 @@ import {
 import { Field, Select } from "./EnrolFields";
 import { T } from "./tokens";
 
-const COHORTS = ["2024-A", "2024-B", "2024-D", "2025-A"];
+/*
+ * ── THE COHORT SELECTOR IS GONE ─────────────────────────────────────────────
+ *
+ * It offered four invented options — "2024-A", "2024-B", "2024-D", "2025-A" —
+ * in a form that creates a real enrolment. Two things were wrong with it.
+ *
+ * There is no cohort anywhere on the API: neither the enrolment nor the
+ * apprentice DTO has such a field, and `normalizeApprentice` sets `cohort:
+ * null`. So the options could not have been sourced; they were made up.
+ *
+ * And the value went nowhere. `cohort` existed in the drawer's form state and
+ * was never included in the create payload, so an employer chose a cohort,
+ * submitted, and the choice was discarded in silence — the enrolment they
+ * believed they had filed under "2025-A" was filed under nothing.
+ *
+ * The roster's "cohort" filter is unrelated: it groups by the month of the
+ * planned start date (see roster-export.js), which is captured by the field
+ * directly above this comment.
+ */
 
 // ─── Inline create-standard modal ─────────────────────────────────────────────
 
@@ -256,14 +274,6 @@ export function EnrolStep2({ data, onChange }) {
         value={data.startDate}
         onChange={onChange}
       />
-      <Select
-        label="Cohort assignment"
-        name="cohort"
-        options={COHORTS}
-        value={data.cohort}
-        onChange={onChange}
-      />
-
       {selectedStandard && (
         <div
           className="rounded-xl px-4 py-3"

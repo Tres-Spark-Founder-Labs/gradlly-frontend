@@ -1,5 +1,23 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+/**
+ * ProfileDocuments resolves private S3 keys through a react-query mutation, so
+ * without this it needs a QueryClientProvider it has no reason to know about.
+ * Mocked rather than provided: what these tests care about is that the button
+ * asks for a download URL for the right key, not how the request is made.
+ */
+const download = vi.fn();
+let downloadingKey = null;
+
+vi.mock("@/features/storage/queries/storage.query", () => ({
+  useDownloadObject: () => ({ download, downloadingKey, isDownloading: false }),
+}));
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  downloadingKey = null;
+});
 
 import { ProfileActivity } from "./ProfileActivity";
 import { ProfileDocuments } from "./ProfileDocuments";
@@ -307,15 +325,59 @@ describe("ProfileDocuments", () => {
     expect(screen.getByText("Portfolio link")).toBeInTheDocument();
   });
 
-  it("links only the document that has a real URL", () => {
+  it("links the document that has a real URL directly", () => {
     render(<ProfileDocuments profile={profile} {...ready} />);
 
-    // A storageKey is not a URL, and this app has no presigned-download
-    // endpoint — so the stored file gets a statement, not a dead button.
+    // externalUrl rows are already openable, so they are not routed through
+    // the presigner — there is no key to exchange and the call would fail.
     const links = screen.getAllByRole("link");
     expect(links).toHaveLength(1);
     expect(links[0]).toHaveAttribute("href", "https://example.org/portfolio");
-    expect(screen.getByText("Held on the provider record")).toBeInTheDocument();
+  });
+
+  it("exchanges a storage key for a download URL", () => {
+    render(<ProfileDocuments profile={profile} {...ready} />);
+
+    // The earlier version rendered "Held on the provider record" here, on the
+    // belief that no presigned-download endpoint existed. It did —
+    // POST /storage/download-url — and the provider app had been using it all
+    // along. F1.2.2 AC5 asks for a library, and a list you cannot open
+    // anything from is a list.
+    fireEvent.click(
+      screen.getByLabelText("Download Commitment statement for Priya Shah"),
+    );
+
+    expect(download).toHaveBeenCalledTimes(1);
+    expect(download).toHaveBeenCalledWith("s3://bucket/doc-1.pdf");
+    expect(
+      screen.queryByText("Held on the provider record"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("offers nothing to press when a row has neither key nor URL", () => {
+    render(
+      <ProfileDocuments
+        profile={{
+          documents: [
+            {
+              id: "doc-3",
+              type: "review",
+              title: "Review record with no file",
+              documentAt: "2026-03-01T00:00:00.000Z",
+              storageKey: null,
+              externalUrl: null,
+            },
+          ],
+        }}
+        {...ready}
+      />,
+    );
+
+    // Naming the gap, rather than a control that cannot work — which is the
+    // fault the earlier version was avoiding, correctly, with the wrong remedy.
+    expect(screen.getByText("No file attached")).toBeInTheDocument();
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
 
   it("does not fall back to the fixture documents", () => {

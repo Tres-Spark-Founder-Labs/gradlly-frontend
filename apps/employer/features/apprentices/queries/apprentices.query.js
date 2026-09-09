@@ -111,7 +111,11 @@ function normalizeApprentice(apprentice, enrolment) {
     otjExpected: null,
     otjHoursCompleted: null,
     otjHoursRequired: null,
-    commitmentSigned: false,
+    // commitmentSigned used to be hardcoded false here, so the profile drawer
+    // told every employer their statement was awaiting signature — including
+    // ones already signed. Signature state lives on the commitment board;
+    // useEnrolmentCommitmentStatus reads it there, and renders nothing when
+    // the board has no row rather than inferring one.
     // milestones and recentActivity used to be hardcoded to [] here, which the
     // profile drawer rendered as "this apprentice has done nothing" while the
     // real data sat behind GET /learners/:enrolmentId/profile. The drawer now

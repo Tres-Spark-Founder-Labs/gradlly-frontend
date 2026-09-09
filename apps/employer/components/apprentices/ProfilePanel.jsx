@@ -187,7 +187,7 @@ export function ProfilePanel({ apprentice, onClose, onContact }) {
           style={{ animation: "fade-in 200ms ease both" }}
         >
           {tab === "Overview" && (
-            <ProfileOverview a={a} onContact={onContact} />
+            <ProfileOverview a={a} profile={profile} onContact={onContact} />
           )}
           {tab === "Timeline" && <ProfileTimeline {...tabState} />}
           {tab === "Milestones" && <ProfileMilestones {...tabState} />}
