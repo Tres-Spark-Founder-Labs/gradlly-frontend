@@ -31,6 +31,9 @@ import { cn } from "@/utils/helper";
  * actually appears in the directory.
  */
 
+// Mirrored byte for byte by RECIPIENT_PROFILE_OPTIONS in
+// apps/flow/features/levy-exchange/constants — matching is exact equality,
+// so change both in the same commit.
 const SUGGESTED = {
   sectors: [
     "Engineering & Manufacturing",
@@ -45,6 +48,13 @@ const SUGGESTED = {
     "Yorkshire and the Humber",
     "West Midlands",
     "South East",
+    "North East",
+    "East Midlands",
+    "East of England",
+    "South West",
+    "Wales",
+    "Scotland",
+    "Northern Ireland",
   ],
   sizeBands: ["1-9", "10-49", "50-249", "250+"],
   programmeTypes: [

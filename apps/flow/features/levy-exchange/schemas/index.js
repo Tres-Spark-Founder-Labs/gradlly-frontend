@@ -4,7 +4,9 @@ import {
   ELIGIBILITY_REGIONS,
   ELIGIBILITY_SECTORS,
   EMPLOYEE_COUNT_BANDS,
+  RECIPIENT_PROFILE_CLOSED_FIELDS,
   RECIPIENT_PROFILE_OPTIONS,
+  RECIPIENT_PROFILE_TEXT_MAX_LENGTH,
 } from "../constants";
 
 const values = (options) => options.map((o) => o.value);
@@ -31,13 +33,12 @@ export const levyEligibilityDefaults = {
 
 // ─── Recipient profile (UpsertRecipientProfileDto) ────────────────────────────
 
-/** The four fields matching compares to donor preferences by exact equality. */
-export const RECIPIENT_PROFILE_MATCHED_FIELDS = Object.freeze([
-  "sector",
-  "region",
-  "employeeCountBand",
-  "programmeType",
-]);
+const requiredText = (message, max) =>
+  z
+    .string()
+    .trim()
+    .min(1, message)
+    .max(max, `Keep this under ${max} characters`);
 
 /**
  * transferAmountRequired stays a STRING end to end.
@@ -56,20 +57,24 @@ export const RECIPIENT_PROFILE_MATCHED_FIELDS = Object.freeze([
  */
 const AMOUNT_PATTERN = /^\d{1,12}(\.\d{1,2})?$/;
 
-// Closed lists: see RECIPIENT_PROFILE_OPTIONS for why these are not free text.
+// Region and employee count are closed sets and validate against their lists;
+// sector and programme type are open and do not. RECIPIENT_PROFILE_OPTIONS
+// carries the reason.
 export const recipientProfileSchema = z.object({
-  sector: z.enum(RECIPIENT_PROFILE_OPTIONS.sector, {
-    message: "Choose your sector",
-  }),
+  sector: requiredText(
+    "Enter your sector",
+    RECIPIENT_PROFILE_TEXT_MAX_LENGTH.sector,
+  ),
   region: z.enum(RECIPIENT_PROFILE_OPTIONS.region, {
     message: "Choose your region",
   }),
   employeeCountBand: z.enum(RECIPIENT_PROFILE_OPTIONS.employeeCountBand, {
     message: "Choose your employee count",
   }),
-  programmeType: z.enum(RECIPIENT_PROFILE_OPTIONS.programmeType, {
-    message: "Choose a programme",
-  }),
+  programmeType: requiredText(
+    "Enter the programme type",
+    RECIPIENT_PROFILE_TEXT_MAX_LENGTH.programmeType,
+  ),
   transferAmountRequired: z
     .string()
     .trim()
@@ -96,45 +101,44 @@ export const recipientProfileDefaults = {
 const isOnList = (field, value) =>
   typeof value === "string" && RECIPIENT_PROFILE_OPTIONS[field].includes(value);
 
+const text = (value) => (typeof value === "string" ? value : "");
+
 /**
  * Stored profile → form values. Every field comes from the API response.
  *
- * A stored matched field that is not on its list — saved before the lists were
- * closed, or by another client, since the PUT validates none of them — comes
- * back as "" rather than being carried into the form. The select cannot show
- * it and saving it again would repeat the silent non-match; see
- * recipientProfileOffListValues, which surfaces it instead.
+ * A closed field whose stored value is not on its list — saved by another
+ * client, since the PUT validates none of these — comes back as "" rather than
+ * being carried into the form. The select cannot show it, and saving it again
+ * would repeat the non-match; recipientProfileOffListValues surfaces it
+ * instead. The two open fields carry whatever was stored.
  */
 export function recipientProfileToForm(profile) {
   if (!profile) return recipientProfileDefaults;
-  const pick = (field) =>
+  const closed = (field) =>
     isOnList(field, profile[field]) ? profile[field] : "";
   let hasDasAccount = "";
   if (typeof profile.hasDasAccount === "boolean") {
     hasDasAccount = profile.hasDasAccount ? "yes" : "no";
   }
   return {
-    sector: pick("sector"),
-    region: pick("region"),
-    employeeCountBand: pick("employeeCountBand"),
-    programmeType: pick("programmeType"),
-    transferAmountRequired:
-      typeof profile.transferAmountRequired === "string"
-        ? profile.transferAmountRequired
-        : "",
+    sector: text(profile.sector),
+    region: closed("region"),
+    employeeCountBand: closed("employeeCountBand"),
+    programmeType: text(profile.programmeType),
+    transferAmountRequired: text(profile.transferAmountRequired),
     hasDasAccount,
     isListed: profile.isListed === true,
   };
 }
 
 /**
- * The stored values the form had to drop, keyed by field — each one exactly as
- * the API returned it, so the screen can say which value cannot match.
+ * The stored values a closed field had to drop, keyed by field — each exactly
+ * as the API returned it, so the screen can say which value cannot match.
  */
 export function recipientProfileOffListValues(profile) {
   const offList = {};
   if (!profile) return offList;
-  for (const field of RECIPIENT_PROFILE_MATCHED_FIELDS) {
+  for (const field of RECIPIENT_PROFILE_CLOSED_FIELDS) {
     const stored = profile[field];
     if (
       typeof stored === "string" &&

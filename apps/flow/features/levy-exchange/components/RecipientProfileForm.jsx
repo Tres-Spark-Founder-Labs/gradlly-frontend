@@ -33,21 +33,24 @@ const DAS_OPTIONS = [
 
 const toOptions = (list) => list.map((value) => ({ value, text: value }));
 
-// Closed selects. The options are the donor side's values, byte for byte —
-// see RECIPIENT_PROFILE_OPTIONS for why free text was the wrong shape.
-const SELECT_FIELDS = [
-  { name: "sector", label: "Sector", placeholder: "Select your sector" },
-  { name: "region", label: "Region", placeholder: "Select your region" },
+// Region and employee count are closed sets: selects, validated against the
+// list. Sector and programme type are open: free text, with the donor side's
+// chips as suggestions. RECIPIENT_PROFILE_OPTIONS carries the reason.
+const PROFILE_FIELDS = [
+  { name: "sector", label: "Sector", closed: false },
+  {
+    name: "region",
+    label: "Region",
+    closed: true,
+    placeholder: "Select your region",
+  },
   {
     name: "employeeCountBand",
     label: "Employee count",
+    closed: true,
     placeholder: "Select your employee count",
   },
-  {
-    name: "programmeType",
-    label: "Programme type",
-    placeholder: "Select a programme",
-  },
+  { name: "programmeType", label: "Programme type", closed: false },
 ];
 
 /**
@@ -132,23 +135,42 @@ export function RecipientProfileForm() {
           noValidate
           className="grid gap-4 sm:grid-cols-2"
         >
-          {SELECT_FIELDS.map((field) => (
+          {PROFILE_FIELDS.map((field) => (
             <div key={field.name}>
-              <SingleSelectField
-                name={field.name}
-                label={field.label}
-                options={toOptions(RECIPIENT_PROFILE_OPTIONS[field.name])}
-                register={register}
-                setValue={setValue}
-                value={values[field.name] ?? ""}
-                error={errors[field.name]?.message}
-                placeholder={field.placeholder}
-                searchable={false}
-                required
-              />
-              {/* A saved value the list does not contain — shown as the API
-                  returned it, because the select cannot show it and quietly
-                  blanking it would hide why this SME never matched. */}
+              {field.closed ? (
+                <SingleSelectField
+                  name={field.name}
+                  label={field.label}
+                  options={toOptions(RECIPIENT_PROFILE_OPTIONS[field.name])}
+                  register={register}
+                  setValue={setValue}
+                  value={values[field.name] ?? ""}
+                  error={errors[field.name]?.message}
+                  placeholder={field.placeholder}
+                  searchable={false}
+                  required
+                />
+              ) : (
+                <>
+                  <InputField
+                    name={field.name}
+                    label={field.label}
+                    register={register}
+                    error={errors[field.name]?.message}
+                    list={`${field.name}-suggestions`}
+                    autoComplete="off"
+                    required
+                  />
+                  <datalist id={`${field.name}-suggestions`}>
+                    {RECIPIENT_PROFILE_OPTIONS[field.name].map((option) => (
+                      <option key={option} value={option} />
+                    ))}
+                  </datalist>
+                </>
+              )}
+              {/* A saved value a closed list does not contain — shown as the
+                  API returned it, because the select cannot show it and
+                  quietly blanking it would hide why this SME never matched. */}
               {offList[field.name] ? (
                 <p className="mt-1 flex items-start gap-1 text-xs text-amber-700">
                   <Info className="mt-px size-3.5 shrink-0" aria-hidden />

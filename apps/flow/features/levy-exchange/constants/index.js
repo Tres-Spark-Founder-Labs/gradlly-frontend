@@ -53,29 +53,43 @@ export const ELIGIBILITY_STATUS = Object.freeze({
   CHECK_WITH_ADVISOR: "check_with_advisor",
 });
 
-// ─── Recipient profile options: the donor chips, byte for byte ────────────────
+// ─── Recipient profile options ────────────────────────────────────────────────
 //
-// THESE MUST STAY BYTE-IDENTICAL to `SUGGESTED` in
+// THE VALUES MUST STAY BYTE-IDENTICAL to `SUGGESTED` in
 // apps/employer/components/levy-transfer/TransferPreferences.jsx.
 //
 // Matching is exact equality. levy-matching.service.ts keeps a donor only if
 // `preferredValues.includes(actualValue)` for every field that donor filters
 // on — case-, punctuation- and whitespace-sensitive. "North-West" is not
-// "North West", "10_49" is not "10-49", and a trailing space is a different
-// string. A value that equals none of a donor's preferences cannot match that
-// donor; if no donor matches, the SME is put in the waiting pool, and nothing
-// reads that pool, so nobody is ever told. (A donor with no preference on a
-// field, or with open matching, still admits any value — which is why a bad
-// value fails quietly rather than obviously.)
+// "North West". A value that equals none of a donor's preferences cannot match
+// that donor, and when no donor matches, the SME goes into a waiting pool that
+// nothing reads, so nobody is ever told.
 //
-// So the four profile fields are closed selects over these lists, not free
-// text with suggestions: a value off the list can match no donor's
-// preference, and the form now refuses one outright instead of saving it.
+// ── WHY TWO OF THESE VALIDATE AND TWO DO NOT ─────────────────────────────────
+//
+// A field is closed only where the real-world set is closed:
+//
+//   region             CLOSED — the twelve UK regions, all of them
+//   employeeCountBand  CLOSED — four bands that cover every size
+//   sector             OPEN   — no list of sectors is complete
+//   programmeType      OPEN   — there are several hundred standards
+//
+// That difference is why region and employee count are selects validated
+// against these lists (RECIPIENT_PROFILE_CLOSED_FIELDS), and sector and
+// programme type are free text. Their lists are the donor side's demo chips,
+// offered as suggestions; closing a field against five sectors or three
+// standards would not make those a vocabulary. It would stop an SME in retail
+// saying so, and leave a donor who typed "Retail" able to match no one. Both
+// sides are free text on those two fields, so parties who type the same value
+// still meet.
 //
 // The apps share no code, so this is a copy, not an import. Change both files
-// in the same commit, or the two sides stop meeting. The field names differ:
+// in the same commit. The field names differ between them:
 //   sectors → sector   regions → region
 //   sizeBands → employeeCountBand   programmeTypes → programmeType
+//
+// The real fix is a shared vocabulary enforced by the API on both sides; the
+// PUT validates none of these fields today.
 export const RECIPIENT_PROFILE_OPTIONS = Object.freeze({
   sector: Object.freeze([
     "Engineering & Manufacturing",
@@ -90,6 +104,13 @@ export const RECIPIENT_PROFILE_OPTIONS = Object.freeze({
     "Yorkshire and the Humber",
     "West Midlands",
     "South East",
+    "North East",
+    "East Midlands",
+    "East of England",
+    "South West",
+    "Wales",
+    "Scotland",
+    "Northern Ireland",
   ]),
   employeeCountBand: Object.freeze(["1-9", "10-49", "50-249", "250+"]),
   programmeType: Object.freeze([
@@ -97,6 +118,18 @@ export const RECIPIENT_PROFILE_OPTIONS = Object.freeze({
     "ST0415 Software Developer",
     "ST0215 Senior Healthcare Support Worker",
   ]),
+});
+
+/** The fields validated against RECIPIENT_PROFILE_OPTIONS — see above. */
+export const RECIPIENT_PROFILE_CLOSED_FIELDS = Object.freeze([
+  "region",
+  "employeeCountBand",
+]);
+
+// MaxLength on UpsertRecipientProfileDto, for the two free-text fields.
+export const RECIPIENT_PROFILE_TEXT_MAX_LENGTH = Object.freeze({
+  sector: 100,
+  programmeType: 100,
 });
 
 // ─── Match applications (LevyMatchApplicationStatus) ──────────────────────────
