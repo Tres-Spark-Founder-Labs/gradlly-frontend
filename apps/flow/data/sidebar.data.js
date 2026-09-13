@@ -5,8 +5,10 @@ import {
   CalendarCheck,
   CheckCircle2,
   ClipboardCheck,
+  ClipboardList,
   FileSignature,
   FileText,
+  Handshake,
   LayoutDashboard,
   MessageCircle,
   Settings,
@@ -40,6 +42,21 @@ export const NAV_SECTIONS = [
       },
       { label: "Reviews", href: "/reviews", icon: CalendarCheck },
       { label: "Funding", href: "/funding", icon: Banknote },
+    ],
+  },
+  {
+    title: "Levy Exchange",
+    items: [
+      {
+        label: "Recipient Profile",
+        href: "/levy-exchange/profile",
+        icon: ClipboardList,
+      },
+      {
+        label: "Donor Matches",
+        href: "/levy-exchange/matches",
+        icon: Handshake,
+      },
     ],
   },
   {
