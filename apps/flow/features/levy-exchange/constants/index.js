@@ -53,24 +53,30 @@ export const ELIGIBILITY_STATUS = Object.freeze({
   CHECK_WITH_ADVISOR: "check_with_advisor",
 });
 
-// ─── Recipient profile: suggestions, not a vocabulary ─────────────────────────
+// ─── Recipient profile options: the donor chips, byte for byte ────────────────
 //
-// sector, region, employeeCountBand and programmeType are free strings on the
-// server (UpsertRecipientProfileDto: IsString + MaxLength, no enum), and
-// matching compares them to a donor's preference arrays by EXACT,
-// case-sensitive equality (levy-matching.service.ts, passesPreferenceFilters).
+// THESE MUST STAY BYTE-IDENTICAL to `SUGGESTED` in
+// apps/employer/components/levy-transfer/TransferPreferences.jsx.
 //
-// So the value that matters is whatever donors actually entered. The employer
-// app's TransferPreferences.jsx takes donor preferences as free text and
-// offers suggestion chips; these lists are those chips, character for
-// character, so an SME who picks "North West" meets a donor who picked
-// "North West". Change one list and not the other and the two sides silently
-// stop matching. They are offered through a <datalist>, so the field stays
-// free text exactly as the API allows.
+// Matching is exact equality. levy-matching.service.ts keeps a donor only if
+// `preferredValues.includes(actualValue)` for every field that donor filters
+// on — case-, punctuation- and whitespace-sensitive. "North-West" is not
+// "North West", "10_49" is not "10-49", and a trailing space is a different
+// string. A value that equals none of a donor's preferences cannot match that
+// donor; if no donor matches, the SME is put in the waiting pool, and nothing
+// reads that pool, so nobody is ever told. (A donor with no preference on a
+// field, or with open matching, still admits any value — which is why a bad
+// value fails quietly rather than obviously.)
 //
-// These are deliberately NOT the eligibility lists above. Those are slugs
-// ("north_west", "10_49") and would never equal a donor's "North West".
-export const RECIPIENT_PROFILE_SUGGESTIONS = Object.freeze({
+// So the four profile fields are closed selects over these lists, not free
+// text with suggestions: a value off the list can match no donor's
+// preference, and the form now refuses one outright instead of saving it.
+//
+// The apps share no code, so this is a copy, not an import. Change both files
+// in the same commit, or the two sides stop meeting. The field names differ:
+//   sectors → sector   regions → region
+//   sizeBands → employeeCountBand   programmeTypes → programmeType
+export const RECIPIENT_PROFILE_OPTIONS = Object.freeze({
   sector: Object.freeze([
     "Engineering & Manufacturing",
     "Health & Social Care",
@@ -91,14 +97,6 @@ export const RECIPIENT_PROFILE_SUGGESTIONS = Object.freeze({
     "ST0415 Software Developer",
     "ST0215 Senior Healthcare Support Worker",
   ]),
-});
-
-// Column limits from UpsertRecipientProfileDto (MaxLength).
-export const RECIPIENT_PROFILE_MAX_LENGTH = Object.freeze({
-  sector: 100,
-  region: 100,
-  employeeCountBand: 50,
-  programmeType: 100,
 });
 
 // ─── Match applications (LevyMatchApplicationStatus) ──────────────────────────

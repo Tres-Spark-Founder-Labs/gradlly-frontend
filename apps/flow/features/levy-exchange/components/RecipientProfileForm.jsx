@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Info } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -13,13 +13,14 @@ import Button from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { applyServerErrors } from "@/lib/errors";
 
-import { RECIPIENT_PROFILE_SUGGESTIONS, formatIsoDate } from "../constants";
+import { RECIPIENT_PROFILE_OPTIONS, formatIsoDate } from "../constants";
 import {
   useRecipientProfile,
   useSaveRecipientProfile,
 } from "../queries/levy-exchange.query";
 import {
   recipientProfileDefaults,
+  recipientProfileOffListValues,
   recipientProfileSchema,
   recipientProfileToForm,
   recipientProfileToPayload,
@@ -30,21 +31,31 @@ const DAS_OPTIONS = [
   { value: "no", text: "No" },
 ];
 
-const TEXT_FIELDS = [
-  { name: "sector", label: "Sector" },
-  { name: "region", label: "Region" },
-  { name: "employeeCountBand", label: "Employee count band" },
-  { name: "programmeType", label: "Programme type" },
+const toOptions = (list) => list.map((value) => ({ value, text: value }));
+
+// Closed selects. The options are the donor side's values, byte for byte —
+// see RECIPIENT_PROFILE_OPTIONS for why free text was the wrong shape.
+const SELECT_FIELDS = [
+  { name: "sector", label: "Sector", placeholder: "Select your sector" },
+  { name: "region", label: "Region", placeholder: "Select your region" },
+  {
+    name: "employeeCountBand",
+    label: "Employee count",
+    placeholder: "Select your employee count",
+  },
+  {
+    name: "programmeType",
+    label: "Programme type",
+    placeholder: "Select a programme",
+  },
 ];
 
 /**
  * F4.2.3 — the SME's levy recipient profile (GET/PUT
  * /levy-exchange/recipient-profile), which matching reads.
  *
- * The four text fields are free text with suggestions, because the API takes
- * any string and matching compares it to donor preferences by exact equality —
- * see RECIPIENT_PROFILE_SUGGESTIONS. Saving goes straight to the match search:
- * AC2 measures results from "an SME completing their profile".
+ * Saving goes straight to the match search: AC2 measures results from
+ * "an SME completing their profile".
  */
 export function RecipientProfileForm() {
   const router = useRouter();
@@ -105,6 +116,7 @@ export function RecipientProfileForm() {
   }
 
   const savedOn = formatIsoDate(profile?.updatedAt);
+  const offList = recipientProfileOffListValues(profile);
 
   return (
     <Card>
@@ -120,22 +132,31 @@ export function RecipientProfileForm() {
           noValidate
           className="grid gap-4 sm:grid-cols-2"
         >
-          {TEXT_FIELDS.map((field) => (
+          {SELECT_FIELDS.map((field) => (
             <div key={field.name}>
-              <InputField
+              <SingleSelectField
                 name={field.name}
                 label={field.label}
+                options={toOptions(RECIPIENT_PROFILE_OPTIONS[field.name])}
                 register={register}
+                setValue={setValue}
+                value={values[field.name] ?? ""}
                 error={errors[field.name]?.message}
-                list={`${field.name}-suggestions`}
-                autoComplete="off"
+                placeholder={field.placeholder}
+                searchable={false}
                 required
               />
-              <datalist id={`${field.name}-suggestions`}>
-                {RECIPIENT_PROFILE_SUGGESTIONS[field.name].map((option) => (
-                  <option key={option} value={option} />
-                ))}
-              </datalist>
+              {/* A saved value the list does not contain — shown as the API
+                  returned it, because the select cannot show it and quietly
+                  blanking it would hide why this SME never matched. */}
+              {offList[field.name] ? (
+                <p className="mt-1 flex items-start gap-1 text-xs text-amber-700">
+                  <Info className="mt-px size-3.5 shrink-0" aria-hidden />
+                  <span>
+                    {`Your saved value "${offList[field.name]}" is not on the list donors choose from, so it cannot match a donor's preference. Choose one from the list.`}
+                  </span>
+                </p>
+              ) : null}
             </div>
           ))}
 

@@ -4,7 +4,7 @@ import {
   ELIGIBILITY_REGIONS,
   ELIGIBILITY_SECTORS,
   EMPLOYEE_COUNT_BANDS,
-  RECIPIENT_PROFILE_MAX_LENGTH,
+  RECIPIENT_PROFILE_OPTIONS,
 } from "../constants";
 
 const values = (options) => options.map((o) => o.value);
@@ -31,12 +31,13 @@ export const levyEligibilityDefaults = {
 
 // ─── Recipient profile (UpsertRecipientProfileDto) ────────────────────────────
 
-const requiredText = (message, max) =>
-  z
-    .string()
-    .trim()
-    .min(1, message)
-    .max(max, `Keep this under ${max} characters`);
+/** The four fields matching compares to donor preferences by exact equality. */
+export const RECIPIENT_PROFILE_MATCHED_FIELDS = Object.freeze([
+  "sector",
+  "region",
+  "employeeCountBand",
+  "programmeType",
+]);
 
 /**
  * transferAmountRequired stays a STRING end to end.
@@ -55,23 +56,20 @@ const requiredText = (message, max) =>
  */
 const AMOUNT_PATTERN = /^\d{1,12}(\.\d{1,2})?$/;
 
+// Closed lists: see RECIPIENT_PROFILE_OPTIONS for why these are not free text.
 export const recipientProfileSchema = z.object({
-  sector: requiredText(
-    "Enter your sector",
-    RECIPIENT_PROFILE_MAX_LENGTH.sector,
-  ),
-  region: requiredText(
-    "Enter your region",
-    RECIPIENT_PROFILE_MAX_LENGTH.region,
-  ),
-  employeeCountBand: requiredText(
-    "Enter your employee count band",
-    RECIPIENT_PROFILE_MAX_LENGTH.employeeCountBand,
-  ),
-  programmeType: requiredText(
-    "Enter the programme type",
-    RECIPIENT_PROFILE_MAX_LENGTH.programmeType,
-  ),
+  sector: z.enum(RECIPIENT_PROFILE_OPTIONS.sector, {
+    message: "Choose your sector",
+  }),
+  region: z.enum(RECIPIENT_PROFILE_OPTIONS.region, {
+    message: "Choose your region",
+  }),
+  employeeCountBand: z.enum(RECIPIENT_PROFILE_OPTIONS.employeeCountBand, {
+    message: "Choose your employee count",
+  }),
+  programmeType: z.enum(RECIPIENT_PROFILE_OPTIONS.programmeType, {
+    message: "Choose a programme",
+  }),
   transferAmountRequired: z
     .string()
     .trim()
@@ -95,23 +93,58 @@ export const recipientProfileDefaults = {
   isListed: false,
 };
 
-/** Stored profile → form values. Every field comes from the API response. */
+const isOnList = (field, value) =>
+  typeof value === "string" && RECIPIENT_PROFILE_OPTIONS[field].includes(value);
+
+/**
+ * Stored profile → form values. Every field comes from the API response.
+ *
+ * A stored matched field that is not on its list — saved before the lists were
+ * closed, or by another client, since the PUT validates none of them — comes
+ * back as "" rather than being carried into the form. The select cannot show
+ * it and saving it again would repeat the silent non-match; see
+ * recipientProfileOffListValues, which surfaces it instead.
+ */
 export function recipientProfileToForm(profile) {
   if (!profile) return recipientProfileDefaults;
-  const text = (value) => (typeof value === "string" ? value : "");
+  const pick = (field) =>
+    isOnList(field, profile[field]) ? profile[field] : "";
   let hasDasAccount = "";
   if (typeof profile.hasDasAccount === "boolean") {
     hasDasAccount = profile.hasDasAccount ? "yes" : "no";
   }
   return {
-    sector: text(profile.sector),
-    region: text(profile.region),
-    employeeCountBand: text(profile.employeeCountBand),
-    programmeType: text(profile.programmeType),
-    transferAmountRequired: text(profile.transferAmountRequired),
+    sector: pick("sector"),
+    region: pick("region"),
+    employeeCountBand: pick("employeeCountBand"),
+    programmeType: pick("programmeType"),
+    transferAmountRequired:
+      typeof profile.transferAmountRequired === "string"
+        ? profile.transferAmountRequired
+        : "",
     hasDasAccount,
     isListed: profile.isListed === true,
   };
+}
+
+/**
+ * The stored values the form had to drop, keyed by field — each one exactly as
+ * the API returned it, so the screen can say which value cannot match.
+ */
+export function recipientProfileOffListValues(profile) {
+  const offList = {};
+  if (!profile) return offList;
+  for (const field of RECIPIENT_PROFILE_MATCHED_FIELDS) {
+    const stored = profile[field];
+    if (
+      typeof stored === "string" &&
+      stored !== "" &&
+      !isOnList(field, stored)
+    ) {
+      offList[field] = stored;
+    }
+  }
+  return offList;
 }
 
 /** Validated form values → UpsertRecipientProfileDto. */
