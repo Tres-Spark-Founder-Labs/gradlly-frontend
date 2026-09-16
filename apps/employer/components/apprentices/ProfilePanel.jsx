@@ -59,6 +59,9 @@ export function ProfilePanel({ apprentice, onClose, onContact }) {
   // render — so a failed request shows up in the tab being read rather than
   // blanking the drawer.
   const tabState = {
+    // Timeline and the OTJ chart fetch for themselves — the journey and the
+    // lifetime buckets are not part of the profile aggregate.
+    enrolmentId,
     profile,
     isLoading,
     isError,

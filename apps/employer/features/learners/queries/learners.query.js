@@ -5,7 +5,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
 
 import { LEARNER_QUERY_KEYS } from "./keys";
-import { getLearnerProfile } from "../services/learners.service";
+import {
+  getLearnerOtjWeekly,
+  getLearnerProfile,
+} from "../services/learners.service";
 
 /**
  * One request behind the whole profile drawer.
@@ -25,6 +28,22 @@ export function useLearnerProfile(enrolmentId, options = {}) {
   return useQuery({
     queryKey: LEARNER_QUERY_KEYS.profile(orgId, enrolmentId),
     queryFn: () => getLearnerProfile(enrolmentId),
+    enabled: !!orgId && !!enrolmentId,
+    ...options,
+  });
+}
+
+/**
+ * F1.2.2 AC3 — the weekly OTJ chart's data, its own request rather than a
+ * slice of the profile: the profile's entry list is capped, and this is the
+ * one tab whose whole point is the programme lifetime.
+ */
+export function useLearnerOtjWeekly(enrolmentId, options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: LEARNER_QUERY_KEYS.otjWeekly(orgId, enrolmentId),
+    queryFn: () => getLearnerOtjWeekly(enrolmentId),
     enabled: !!orgId && !!enrolmentId,
     ...options,
   });

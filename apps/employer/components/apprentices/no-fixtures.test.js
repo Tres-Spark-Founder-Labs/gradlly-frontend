@@ -158,6 +158,42 @@ const FIELD_ALTERNATION = KNOWN_NULL_FIELDS.join("|");
 const GUARD_WINDOW = 400;
 
 /**
+ * A timeline constructed on the client from dates the aggregate happens to
+ * carry.
+ *
+ * Task 2.1 built ProfileTimeline from programme dates, reviews and any open
+ * break, because the profile carried no milestones. Right then, wrong once
+ * GET /enrolments/:id/journey served milestone statuses to an employer: a
+ * constructed chronology beside a real one is two answers to the same
+ * question, and the constructed one looks just as real. The timeline reads
+ * the journey and, where it returns nothing, says so. ProfileMilestones still
+ * derives, and is listed as such below rather than swept in here.
+ */
+const CONSTRUCTED_TIMELINE = /buildProgrammeMilestones/;
+
+/**
+ * A weekly chart drawn from the profile's capped entry list, or bucketed in
+ * the browser.
+ *
+ * `profile.otj.recentEntries` stops at 500, so a chart built from it ends
+ * early and looks complete. The lifetime endpoint groups by ISO week on the
+ * server; the chart's only job is to draw what it is given. Any week
+ * arithmetic here is the client deciding what a week is, which is the
+ * apprentice portal's and the API's decision, already made.
+ */
+const CLIENT_SIDE_BUCKETING = /recentEntries|getUTCDay|startOfWeek|setUTCDate/;
+
+/**
+ * The record's optional fields rendered bare.
+ *
+ * `wellbeing.score` and `submittedAt` are optional on the API. Interpolated
+ * straight into JSX they print "undefined"; they must pass through a
+ * presence test first, as `attendance` has to below.
+ */
+const BARE_OPTIONAL_RECORD_FIELD =
+  /\{\s*(?:data|payload|wellbeing)\??\.(?:score|submittedAt)\s*\}|\$\{\s*(?:data|payload|wellbeing)\??\.(?:score|submittedAt)\s*\}/;
+
+/**
  * A possibly-null field compared to a threshold without a presence test.
  *
  * `const attWarn = a.attendance < 85` — `null < 85` coerces to `0 < 85`, which
@@ -361,6 +397,27 @@ describe("the profile drawer holds no fixture data", () => {
     // the next reader hunting, and the whole reason this rule exists is that
     // the fault is invisible on screen until you know which figure is fake.
     expect(nullableComparisons(code(file))).toEqual([]);
+  });
+
+  it("ProfileTimeline draws from the journey endpoint, not a constructed chronology", () => {
+    expect(code("ProfileTimeline.jsx")).not.toMatch(CONSTRUCTED_TIMELINE);
+  });
+
+  it("ProfileOtjChart buckets nothing itself and never reads the capped entry list", () => {
+    expect(code("ProfileOtjChart.jsx")).not.toMatch(CLIENT_SIDE_BUCKETING);
+    // And admits a week only through a numeric check on both figures.
+    expect(code("ProfileOtjChart.jsx")).toMatch(
+      /isMinutes\(week\?\.approvedMinutes\)/,
+    );
+    expect(code("ProfileOtjChart.jsx")).toMatch(
+      /isMinutes\(week\?\.pendingMinutes\)/,
+    );
+  });
+
+  it("ProfileReviewRecord renders no optional record field bare", () => {
+    expect(code("ProfileReviewRecord.jsx")).not.toMatch(
+      BARE_OPTIONAL_RECORD_FIELD,
+    );
   });
 
   it("no longer hands the apprentice prop to a component that discards it", () => {
@@ -598,6 +655,38 @@ describe("the profile drawer holds no fixture data", () => {
       expect("a.tutorEmail ? a.tutorEmail : null").not.toMatch(
         NULLABLE_INTERPOLATION,
       );
+    });
+
+    it("sees a constructed timeline", () => {
+      expect(
+        stripComments("const milestones = buildProgrammeMilestones(profile);"),
+      ).toMatch(CONSTRUCTED_TIMELINE);
+    });
+
+    it("sees a chart bucketed in the browser or drawn from the capped list", () => {
+      expect("profile.otj.recentEntries.map((e) => e.minutes)").toMatch(
+        CLIENT_SIDE_BUCKETING,
+      );
+      expect("const offset = (d.getUTCDay() + 6) % 7;").toMatch(
+        CLIENT_SIDE_BUCKETING,
+      );
+      // Drawing what the endpoint returned is not bucketing.
+      expect("weeks.map((week) => week.approvedMinutes / peak)").not.toMatch(
+        CLIENT_SIDE_BUCKETING,
+      );
+    });
+
+    it("sees an optional record field rendered bare, but not a guarded one", () => {
+      expect("<p>{wellbeing.score} / 10</p>").toMatch(
+        BARE_OPTIONAL_RECORD_FIELD,
+      );
+      expect("`Submitted ${data.submittedAt}`").toMatch(
+        BARE_OPTIONAL_RECORD_FIELD,
+      );
+      // Pulled through a presence test into a local first.
+      expect(
+        "{wellbeingScore !== null ? `${wellbeingScore} / 10` : null}",
+      ).not.toMatch(BARE_OPTIONAL_RECORD_FIELD);
     });
 
     it("keeps code that merely sits next to a comment", () => {

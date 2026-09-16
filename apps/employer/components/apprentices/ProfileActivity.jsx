@@ -9,6 +9,7 @@ import {
 import { buildRecentActivity } from "@/features/learners/utils/programme-milestones";
 import { formatDate } from "@/utils/helper";
 
+import { ProfileOtjChart } from "./ProfileOtjChart";
 import { ProfileTabState } from "./ProfileTabState";
 import { T } from "./tokens";
 
@@ -90,6 +91,7 @@ function InterventionRow({ item }) {
 }
 
 export function ProfileActivity({
+  enrolmentId,
   profile,
   isLoading,
   isError,
@@ -102,56 +104,63 @@ export function ProfileActivity({
   const shown = profile?.otj?.recentEntries?.length ?? 0;
 
   return (
-    <ProfileTabState
-      unavailable={unavailable}
-      isLoading={isLoading}
-      isError={isError}
-      error={error}
-      isEmpty={!isLoading && !isError && items.length === 0}
-      emptyTitle="No activity recorded"
-      emptyDetail="No off-the-job sessions have been logged and no provider interventions have been raised."
-    >
-      <div className="space-y-1">
-        {items.map((item, i) => (
-          <div
-            key={item.key}
-            className="flex items-start gap-3 py-3"
-            style={{
-              borderBottom:
-                i < items.length - 1 ? `1px solid ${T.border}` : "none",
-            }}
-          >
-            <span
-              className="text-[10px] font-bold px-2 py-1 rounded-lg shrink-0 tabular-nums whitespace-nowrap"
+    <div className="space-y-4">
+      {/* F1.2.2 AC3 — the weekly chart, from its own lifetime endpoint. It
+          sits outside the list's state so a programme with nothing logged
+          still shows its empty weeks rather than only "No activity". */}
+      <ProfileOtjChart enrolmentId={enrolmentId} unavailable={unavailable} />
+
+      <ProfileTabState
+        unavailable={unavailable}
+        isLoading={isLoading}
+        isError={isError}
+        error={error}
+        isEmpty={!isLoading && !isError && items.length === 0}
+        emptyTitle="No activity recorded"
+        emptyDetail="No off-the-job sessions have been logged and no provider interventions have been raised."
+      >
+        <div className="space-y-1">
+          {items.map((item, i) => (
+            <div
+              key={item.key}
+              className="flex items-start gap-3 py-3"
               style={{
-                backgroundColor: T.card,
-                color: item.at ? T.muted : T.amber,
-                border: `1px solid ${T.border}`,
+                borderBottom:
+                  i < items.length - 1 ? `1px solid ${T.border}` : "none",
               }}
             >
-              {item.at ? formatDate(item.at) : "No date"}
-            </span>
-            <div className="min-w-0 flex-1">
-              {item.kind === "otj" ? (
-                <OtjRow item={item} />
-              ) : (
-                <InterventionRow item={item} />
-              )}
+              <span
+                className="text-[10px] font-bold px-2 py-1 rounded-lg shrink-0 tabular-nums whitespace-nowrap"
+                style={{
+                  backgroundColor: T.card,
+                  color: item.at ? T.muted : T.amber,
+                  border: `1px solid ${T.border}`,
+                }}
+              >
+                {item.at ? formatDate(item.at) : "No date"}
+              </span>
+              <div className="min-w-0 flex-1">
+                {item.kind === "otj" ? (
+                  <OtjRow item={item} />
+                ) : (
+                  <InterventionRow item={item} />
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-        {/* Says how much of the log is on screen. The API caps recentEntries,
+          {/* Says how much of the log is on screen. The API caps recentEntries,
             and showing 500 of 812 without saying so is a quiet understatement
             of how much the apprentice has done. */}
-        {typeof totalCount === "number" && shown > 0 ? (
-          <p className="text-[11px] pt-3" style={{ color: T.muted }}>
-            {truncated
-              ? `Showing the ${shown} most recent of ${totalCount} off-the-job sessions.`
-              : `All ${totalCount} off-the-job sessions.`}
-          </p>
-        ) : null}
-      </div>
-    </ProfileTabState>
+          {typeof totalCount === "number" && shown > 0 ? (
+            <p className="text-[11px] pt-3" style={{ color: T.muted }}>
+              {truncated
+                ? `Showing the ${shown} most recent of ${totalCount} off-the-job sessions.`
+                : `All ${totalCount} off-the-job sessions.`}
+            </p>
+          ) : null}
+        </div>
+      </ProfileTabState>
+    </div>
   );
 }

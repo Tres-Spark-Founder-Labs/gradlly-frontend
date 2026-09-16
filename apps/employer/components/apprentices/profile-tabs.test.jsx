@@ -14,14 +14,39 @@ vi.mock("@/features/storage/queries/storage.query", () => ({
   useDownloadObject: () => ({ download, downloadingKey, isDownloading: false }),
 }));
 
+/**
+ * Three tabs fetch for themselves: the Timeline (the journey endpoint), a
+ * review's record, and the OTJ chart (the lifetime weekly endpoint). None of
+ * that is in the profile aggregate. Each hook is mocked as state a test sets,
+ * so a tab can be shown the exact shape the API returns.
+ */
+const idle = { data: null, isLoading: false, isError: false, error: null };
+let journeyState = idle;
+let recordState = idle;
+let weeklyState = idle;
+
+vi.mock("@/features/enrolments/queries/enrolments.query", () => ({
+  useEnrolmentJourney: () => journeyState,
+}));
+vi.mock("@/features/reviews/queries/reviews.query", () => ({
+  useReviewRecord: () => recordState,
+}));
+vi.mock("@/features/learners/queries/learners.query", () => ({
+  useLearnerOtjWeekly: () => weeklyState,
+}));
+
 beforeEach(() => {
   vi.clearAllMocks();
   downloadingKey = null;
+  journeyState = idle;
+  recordState = idle;
+  weeklyState = idle;
 });
 
 import { ProfileActivity } from "./ProfileActivity";
 import { ProfileDocuments } from "./ProfileDocuments";
 import { ProfileMilestones } from "./ProfileMilestones";
+import { ProfileOtjChart } from "./ProfileOtjChart";
 import { ProfileReviews } from "./ProfileReviews";
 import { ProfileTimeline } from "./ProfileTimeline";
 
@@ -166,51 +191,281 @@ describe("ProfileMilestones", () => {
   });
 });
 
+/**
+ * F1.2.2 AC2. The timeline is the journey endpoint's, statuses included.
+ * Task 2.1's constructed chronology — programme dates plus reviews — is gone,
+ * and when the endpoint returns nothing the tab says so rather than rebuilding
+ * it: a constructed timeline that looks real is the fabrication class this
+ * folder exists to keep out.
+ */
 describe("ProfileTimeline", () => {
-  const profile = {
-    programme: {
-      standardTitle: "Data Analyst Level 4",
-      plannedStartDate: "2026-03-02",
-      plannedEndDate: null,
-      epaDate: null,
-      epaOrganisationName: null,
-      epaOrganisationUkprn: null,
-    },
-    reviews: [
+  const journey = {
+    enrolmentId: "enr-1",
+    milestones: [
       {
-        id: "rev-9",
-        status: "scheduled",
-        scheduledAt: "2026-09-01T09:00:00.000Z",
-        isOverdue: false,
-        tutorSigned: false,
-        apprenticeSigned: false,
+        code: "programme_start",
+        title: "Programme start",
+        description: "Enrolment confirmed by the provider.",
+        date: "2026-03-02",
+        status: "complete",
+      },
+      {
+        code: "review_1",
+        title: "First progress review",
+        description: null,
+        date: "2026-09-01",
+        status: "overdue",
+      },
+      {
+        code: "epa",
+        title: "End-point assessment",
+        description: null,
+        date: null,
+        status: "upcoming",
       },
     ],
-    breakInLearning: { active: false, recentInterventions: [] },
+    gatewayChecklist: [
+      {
+        code: "reviews",
+        title: "12-weekly reviews up to date",
+        description: "Every scheduled review held.",
+        status: "in_progress",
+      },
+    ],
+    gatewayCompletionPercent: 25,
+    gatewayReady: false,
   };
 
-  it("plots the dates the API returned", () => {
-    render(<ProfileTimeline profile={profile} {...ready} />);
+  it("plots the milestones the journey endpoint returned, with the API's statuses", () => {
+    journeyState = { ...ready, data: journey };
+    render(<ProfileTimeline enrolmentId="enr-1" />);
 
     expect(screen.getByText("Programme start")).toBeInTheDocument();
-    expect(screen.getByText("Review 1")).toBeInTheDocument();
+    expect(screen.getByText("First progress review")).toBeInTheDocument();
+    // The API said overdue. Nothing here inferred it from the date.
+    expect(screen.getByText("Overdue")).toBeInTheDocument();
   });
 
-  it("separates undated milestones instead of placing them", () => {
-    render(<ProfileTimeline profile={profile} {...ready} />);
+  it("lists an undated milestone separately rather than placing it", () => {
+    journeyState = { ...ready, data: journey };
+    render(<ProfileTimeline enrolmentId="enr-1" />);
 
-    expect(screen.getByText("Not yet scheduled")).toBeInTheDocument();
-    // Both plannedEndDate and epaDate are null here.
-    expect(screen.getAllByText("Date not recorded")).toHaveLength(2);
+    expect(screen.getByText("Not yet dated")).toBeInTheDocument();
+    expect(screen.getByText("End-point assessment")).toBeInTheDocument();
+    expect(screen.getAllByText("Date not recorded")).toHaveLength(1);
+  });
+
+  it("shows the gateway checklist with the API's own percentage", () => {
+    journeyState = { ...ready, data: journey };
+    render(<ProfileTimeline enrolmentId="enr-1" />);
+
+    expect(screen.getByText("Gateway checklist")).toBeInTheDocument();
+    expect(
+      screen.getByText("12-weekly reviews up to date"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("25% complete")).toBeInTheDocument();
+    expect(screen.getByText("In progress")).toBeInTheDocument();
+  });
+
+  it("says so when the journey returns nothing, instead of constructing a timeline", () => {
+    journeyState = {
+      ...ready,
+      data: { enrolmentId: "enr-1", milestones: [], gatewayChecklist: [] },
+    };
+    render(<ProfileTimeline enrolmentId="enr-1" />);
+
+    expect(
+      screen.getByText("No programme journey on the API"),
+    ).toBeInTheDocument();
+    // The constructed version's labels never appear.
+    expect(screen.queryByText("Review 1")).not.toBeInTheDocument();
+    expect(screen.queryByText("Planned end")).not.toBeInTheDocument();
+  });
+
+  it("reports its own error rather than blanking", () => {
+    journeyState = {
+      data: null,
+      isLoading: false,
+      isError: true,
+      error: { message: "journey unavailable" },
+    };
+    render(<ProfileTimeline enrolmentId="enr-1" />);
+
+    expect(screen.getByText(/journey unavailable/)).toBeInTheDocument();
   });
 
   it("does not render the fixture notes", () => {
-    render(<ProfileTimeline profile={profile} {...ready} />);
+    journeyState = { ...ready, data: journey };
+    render(<ProfileTimeline enrolmentId="enr-1" />);
 
     expect(screen.queryByText(/OTJ on pace/)).not.toBeInTheDocument();
     expect(
       screen.queryByText(/Commitment statement signed/),
     ).not.toBeInTheDocument();
+  });
+});
+
+/**
+ * F1.2.2 AC4. The record — outcome, agreed actions, SMART goals — was served
+ * by GET /reviews/:id/record all along and the tab never asked for it.
+ */
+describe("ProfileReviews — the record", () => {
+  const profile = {
+    reviews: [
+      {
+        id: "rev-1",
+        status: "completed",
+        scheduledAt: "2026-02-11T10:00:00.000Z",
+        isOverdue: false,
+        tutorSigned: true,
+        apprenticeSigned: true,
+      },
+    ],
+  };
+
+  it("opens the record on request and shows what it carries", () => {
+    recordState = {
+      ...ready,
+      data: {
+        reviewId: "rev-1",
+        submittedAt: "2026-02-12T09:00:00.000Z",
+        payload: {
+          progressSummary: "Ahead on the portfolio, behind on maths.",
+          actionsAgreed: "Book functional skills support.",
+          smartGoals: [
+            {
+              objective: "Pass functional skills maths",
+              measurable: "Mock exam score above 70%",
+              achievable: "Two sessions a week",
+              relevant: "Gateway requirement",
+              timeBound: "By the end of June",
+            },
+          ],
+          previousGoalProgress: [
+            {
+              objective: "Complete module 3",
+              outcome: "partially_achieved",
+              notes: "Two of three units",
+            },
+          ],
+          wellbeing: { score: 7 },
+          employerComments: "Happy with progress.",
+        },
+      },
+    };
+    render(<ProfileReviews profile={profile} {...ready} />);
+
+    // Nothing from the record is on screen until it is asked for.
+    expect(screen.queryByText("Progress summary")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("View record"));
+
+    expect(
+      screen.getByText("Ahead on the portfolio, behind on maths."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Book functional skills support."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Pass functional skills maths"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Partially achieved")).toBeInTheDocument();
+    expect(screen.getByText("7 / 10")).toBeInTheDocument();
+    expect(screen.getByText("Happy with progress.")).toBeInTheDocument();
+  });
+
+  it("says a review has no record yet on a 404, rather than inventing one", () => {
+    recordState = {
+      data: null,
+      isLoading: false,
+      isError: true,
+      error: { status: 404, message: "Not found" },
+    };
+    render(<ProfileReviews profile={profile} {...ready} />);
+    fireEvent.click(screen.getByText("View record"));
+
+    expect(
+      screen.getByText("No record has been written for this review yet."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Progressing well/)).not.toBeInTheDocument();
+  });
+
+  it("names what is missing when the record carries nothing", () => {
+    recordState = {
+      ...ready,
+      data: { reviewId: "rev-1", submittedAt: null, payload: {} },
+    };
+    render(<ProfileReviews profile={profile} {...ready} />);
+    fireEvent.click(screen.getByText("View record"));
+
+    expect(
+      screen.getByText("The record carries no summary, actions or goals."),
+    ).toBeInTheDocument();
+  });
+});
+
+/**
+ * F1.2.2 AC3. A bar per ISO week from the lifetime endpoint, approved and
+ * pending as separate segments — the apprentice portal's conventions.
+ */
+describe("ProfileOtjChart", () => {
+  const weekly = {
+    enrolmentId: "enr-1",
+    programmeStart: "2026-08-24",
+    truncated: false,
+    weeks: [
+      { weekStart: "2026-08-24", approvedMinutes: 120, pendingMinutes: 0 },
+      { weekStart: "2026-08-31", approvedMinutes: 0, pendingMinutes: 0 },
+      { weekStart: "2026-09-07", approvedMinutes: 15, pendingMinutes: 45 },
+    ],
+  };
+
+  it("draws every week the endpoint returned, approved and pending apart", () => {
+    weeklyState = { ...ready, data: weekly };
+    render(<ProfileOtjChart enrolmentId="enr-1" />);
+
+    expect(screen.getByText("Weekly off-the-job hours")).toBeInTheDocument();
+    // 135 approved minutes across the three weeks; pending is not in it.
+    expect(screen.getByText("2.3 h approved over 3 weeks")).toBeInTheDocument();
+    expect(screen.getByText("Approved")).toBeInTheDocument();
+    expect(screen.getByText("Awaiting approval")).toBeInTheDocument();
+    // The empty week is a bar, not a gap.
+    expect(
+      screen.getByText(
+        "Week beginning 2026-08-31: 0 h approved, 0 h awaiting approval",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Week beginning 2026-09-07: 0.3 h approved, 0.8 h awaiting approval",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("says why there is nothing to chart", () => {
+    weeklyState = { ...ready, data: { ...weekly, weeks: [] } };
+    render(<ProfileOtjChart enrolmentId="enr-1" />);
+
+    expect(screen.getByText("No weeks to chart")).toBeInTheDocument();
+  });
+
+  it("says when the oldest weeks were dropped", () => {
+    weeklyState = { ...ready, data: { ...weekly, truncated: true } };
+    render(<ProfileOtjChart enrolmentId="enr-1" />);
+
+    expect(screen.getByText(/oldest weeks are not shown/)).toBeInTheDocument();
+  });
+
+  it("reports its own error rather than blanking", () => {
+    weeklyState = {
+      data: null,
+      isLoading: false,
+      isError: true,
+      error: { message: "weekly unavailable" },
+    };
+    render(<ProfileOtjChart enrolmentId="enr-1" />);
+
+    expect(screen.getByText(/weekly unavailable/)).toBeInTheDocument();
   });
 });
 
@@ -413,12 +668,25 @@ describe("every profile tab, without an enrolment", () => {
     },
   );
 
+  /*
+   * The Timeline's own state is its own request's — the journey endpoint,
+   * not the profile — so its mock is put in the same state as the props the
+   * other tabs read. The property under test is unchanged: each tab reports
+   * the state of whatever it depends on, inside itself.
+   */
   it.each(tabs)("%s shows a loading state of its own", (_name, Tab) => {
+    journeyState = { ...idle, isLoading: true };
     render(<Tab profile={undefined} isLoading isError={false} error={null} />);
     expect(screen.getByText("Loading…")).toBeInTheDocument();
   });
 
   it.each(tabs)("%s shows an error state of its own", (_name, Tab) => {
+    journeyState = {
+      data: null,
+      isLoading: false,
+      isError: true,
+      error: { message: "Boom" },
+    };
     render(
       <Tab
         profile={undefined}

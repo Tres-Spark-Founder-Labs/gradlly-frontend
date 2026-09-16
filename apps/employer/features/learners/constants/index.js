@@ -12,6 +12,8 @@
  */
 export const LEARNER_PATHS = Object.freeze({
   profile: (enrolmentId) => `/api/v1/learners/${enrolmentId}/profile`,
+  // F1.2.2 AC3 — weekly OTJ buckets over the programme lifetime.
+  otjWeekly: (enrolmentId) => `/api/v1/learners/${enrolmentId}/otj/weekly`,
 });
 
 /** `ReviewStatus` on the API. */
@@ -65,3 +67,37 @@ export const INTERVENTION_ACTION_LABELS = Object.freeze({
  * from a real one once it is on the screen.
  */
 export const DATE_NOT_RECORDED = "Date not recorded";
+
+// ─── Programme journey (GET /enrolments/:id/journey) ─────────────────────────
+//
+// F1.2.2 AC2. The API's own milestones and gateway checklist, with the status
+// each carries. Labelled here for exactly the enum values the API declares
+// (JourneyMilestoneStatus, GatewayCriterionStatus); anything else renders as
+// the raw value rather than as a label invented for it.
+export const JOURNEY_MILESTONE_STATUS_LABELS = Object.freeze({
+  complete: "Complete",
+  current: "In progress",
+  upcoming: "Upcoming",
+  // Client decision Q2: a review whose date passed without being held is
+  // overdue, not still upcoming — an employer can chase that.
+  overdue: "Overdue",
+  cancelled: "Cancelled",
+});
+
+export const GATEWAY_STATUS_LABELS = Object.freeze({
+  complete: "Complete",
+  in_progress: "In progress",
+  not_started: "Not started",
+  blocked: "Blocked",
+});
+
+// ─── Review records (GET /reviews/:id/record) ────────────────────────────────
+//
+// F1.2.2 AC4. PreviousGoalOutcome on the API; the raw value is shown for
+// anything outside this list.
+export const PREVIOUS_GOAL_OUTCOME_LABELS = Object.freeze({
+  achieved: "Achieved",
+  partially_achieved: "Partially achieved",
+  not_achieved: "Not achieved",
+  carried_forward: "Carried forward",
+});

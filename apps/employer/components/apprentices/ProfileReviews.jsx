@@ -1,6 +1,7 @@
 "use client";
 
-import { Check, X } from "lucide-react";
+import { Check, ChevronDown, X } from "lucide-react";
+import { useState } from "react";
 
 import {
   REVIEW_STATUS,
@@ -8,6 +9,7 @@ import {
 } from "@/features/learners/constants";
 import { formatDateTime } from "@/utils/helper";
 
+import { ProfileReviewRecord } from "./ProfileReviewRecord";
 import { ProfileTabState } from "./ProfileTabState";
 import { T } from "./tokens";
 
@@ -26,9 +28,16 @@ import { T } from "./tokens";
  *
  * `LearnerProfileReviewItemDto` carries id, status, scheduledAt, isOverdue,
  * tutorSigned and apprenticeSigned. It does not carry outcome text, SMART goals
- * or action points — so those sections are gone rather than filled with
- * plausible sentences. What replaced them is the signature state, which is real
- * and is the thing an employer chases.
+ * or action points — so those sections were removed rather than filled with
+ * plausible sentences, and the signature state took their place.
+ *
+ * ── F1.2.2 AC4, THE RECORD ──────────────────────────────────────────────────
+ *
+ * The outcome, the agreed actions and the SMART goals do exist: they are the
+ * review's record, served by `GET /reviews/:id/record`, which returns 200 to
+ * an employer. Each card now opens its record on request (ProfileReviewRecord)
+ * — one request per review the reader opens, rather than one per review on
+ * every render of the tab.
  */
 
 function SignatureRow({ label, signed }) {
@@ -59,6 +68,7 @@ function statusTone(review) {
 
 function ReviewCard({ review, index }) {
   const tone = statusTone(review);
+  const [recordOpen, setRecordOpen] = useState(false);
 
   return (
     <div
@@ -101,6 +111,28 @@ function ReviewCard({ review, index }) {
       >
         <SignatureRow label="Tutor" signed={review.tutorSigned} />
         <SignatureRow label="Apprentice" signed={review.apprenticeSigned} />
+      </div>
+
+      <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: "8px" }}>
+        <button
+          type="button"
+          onClick={() => setRecordOpen((open) => !open)}
+          aria-expanded={recordOpen}
+          className="inline-flex items-center gap-1 text-[11px] font-semibold hover:opacity-70"
+          style={{ color: T.blue }}
+        >
+          {recordOpen ? "Hide record" : "View record"}
+          <ChevronDown
+            className="h-3 w-3 transition-transform"
+            style={{ transform: recordOpen ? "rotate(180deg)" : "" }}
+            aria-hidden
+          />
+        </button>
+        {recordOpen ? (
+          <div className="mt-2">
+            <ProfileReviewRecord reviewId={review.id} />
+          </div>
+        ) : null}
       </div>
     </div>
   );
