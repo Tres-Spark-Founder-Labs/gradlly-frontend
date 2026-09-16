@@ -165,9 +165,9 @@ const GUARD_WINDOW = 400;
  * break, because the profile carried no milestones. Right then, wrong once
  * GET /enrolments/:id/journey served milestone statuses to an employer: a
  * constructed chronology beside a real one is two answers to the same
- * question, and the constructed one looks just as real. The timeline reads
- * the journey and, where it returns nothing, says so. ProfileMilestones still
- * derives, and is listed as such below rather than swept in here.
+ * question, and the constructed one looks just as real. Both tabs that show
+ * the programme — the Timeline and the Milestones list — read the journey
+ * through one query and, where it returns nothing, say so.
  */
 const CONSTRUCTED_TIMELINE = /buildProgrammeMilestones/;
 
@@ -399,9 +399,12 @@ describe("the profile drawer holds no fixture data", () => {
     expect(nullableComparisons(code(file))).toEqual([]);
   });
 
-  it("ProfileTimeline draws from the journey endpoint, not a constructed chronology", () => {
-    expect(code("ProfileTimeline.jsx")).not.toMatch(CONSTRUCTED_TIMELINE);
-  });
+  it.each(["ProfileTimeline.jsx", "ProfileMilestones.jsx"])(
+    "%s draws from the journey endpoint, not a constructed chronology",
+    (file) => {
+      expect(code(file)).not.toMatch(CONSTRUCTED_TIMELINE);
+    },
+  );
 
   it("ProfileOtjChart buckets nothing itself and never reads the capped entry list", () => {
     expect(code("ProfileOtjChart.jsx")).not.toMatch(CLIENT_SIDE_BUCKETING);

@@ -128,62 +128,82 @@ describe("ProfileReviews", () => {
   });
 });
 
+/**
+ * F1.2.2 AC2, the other tab. Milestones come from the journey endpoint — the
+ * same query the Timeline uses — with the API's statuses. The derived list
+ * (programme dates plus reviews) is gone: two tabs in one drawer disagreeing
+ * about the same programme is worse than either alone.
+ */
 describe("ProfileMilestones", () => {
-  const profile = {
-    programme: {
-      standardTitle: "Software Developer Level 4",
-      plannedStartDate: "2026-01-06",
-      plannedEndDate: null,
-      epaDate: "2027-06-01",
-      epaOrganisationName: "Assessment Board Ltd",
-      epaOrganisationUkprn: "10009999",
-    },
-    reviews: [],
-    breakInLearning: { active: false, recentInterventions: [] },
+  const journey = {
+    enrolmentId: "enr-1",
+    milestones: [
+      {
+        code: "programme_start",
+        title: "Programme start",
+        description: "Enrolment confirmed by the provider.",
+        date: "2026-01-06",
+        status: "complete",
+      },
+      {
+        code: "review_1",
+        title: "First progress review",
+        description: null,
+        date: "2026-04-06",
+        status: "overdue",
+      },
+      {
+        code: "epa",
+        title: "End-point assessment",
+        description: null,
+        date: null,
+        status: "upcoming",
+      },
+    ],
+    gatewayChecklist: [],
+    gatewayCompletionPercent: 0,
+    gatewayReady: false,
   };
 
-  it("renders programme dates from the API", () => {
-    render(<ProfileMilestones profile={profile} {...ready} />);
+  it("renders the milestones the journey returned, with the API's statuses", () => {
+    journeyState = { ...ready, data: journey };
+    render(<ProfileMilestones enrolmentId="enr-1" />);
 
     expect(screen.getByText("Programme start")).toBeInTheDocument();
-    expect(screen.getByText("Software Developer Level 4")).toBeInTheDocument();
     expect(
-      screen.getByText("Assessment Board Ltd (10009999)"),
+      screen.getByText("Enrolment confirmed by the provider."),
     ).toBeInTheDocument();
+    expect(screen.getByText("Complete")).toBeInTheDocument();
+    // The API said overdue; no date here was read to decide it.
+    expect(screen.getByText("Overdue")).toBeInTheDocument();
   });
 
-  it("shows an unknown date as unknown rather than inferring one", () => {
-    render(<ProfileMilestones profile={profile} {...ready} />);
+  it("shows an undated milestone as not recorded rather than inferring a date", () => {
+    journeyState = { ...ready, data: journey };
+    render(<ProfileMilestones enrolmentId="enr-1" />);
 
-    // plannedEndDate is null. The old drawer would have placed it between the
-    // start and the EPA; this says it is not recorded.
-    expect(screen.getByText("Planned end")).toBeInTheDocument();
+    expect(screen.getByText("End-point assessment")).toBeInTheDocument();
     expect(screen.getByText("Date not recorded")).toBeInTheDocument();
-    expect(screen.getByText("Not recorded")).toBeInTheDocument();
   });
 
-  it("does not call a passed planned date complete", () => {
-    render(
-      <ProfileMilestones
-        profile={{
-          ...profile,
-          programme: { ...profile.programme, plannedEndDate: "2020-01-01" },
-        }}
-        {...ready}
-      />,
-    );
+  it("says so when the journey returns nothing, instead of deriving a list", () => {
+    journeyState = {
+      ...ready,
+      data: { enrolmentId: "enr-1", milestones: [], gatewayChecklist: [] },
+    };
+    render(<ProfileMilestones enrolmentId="enr-1" />);
 
-    // A planned end in the past with nothing confirming it is the case an
-    // employer needs to see. "Complete" would hide it.
-    //
-    // Two of them: the start date is also behind us. That is the point — a
-    // date being in the past says nothing about whether the event happened.
-    expect(screen.getAllByText("Date passed")).toHaveLength(2);
-    expect(screen.queryByText("Complete")).not.toBeInTheDocument();
+    expect(
+      screen.getByText("No programme milestones on the API"),
+    ).toBeInTheDocument();
+    // The derived version's labels never appear.
+    expect(screen.queryByText("Planned end")).not.toBeInTheDocument();
+    expect(screen.queryByText("Date passed")).not.toBeInTheDocument();
   });
 
   it("does not render the fixture ladder", () => {
-    render(<ProfileMilestones profile={profile} {...ready} />);
+    journeyState = { ...ready, data: journey };
+    render(<ProfileMilestones enrolmentId="enr-1" />);
 
     expect(screen.queryByText(/6-month review/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Gateway/i)).not.toBeInTheDocument();

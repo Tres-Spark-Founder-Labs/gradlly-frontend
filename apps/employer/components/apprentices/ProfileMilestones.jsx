@@ -5,87 +5,82 @@ import {
   CalendarClock,
   CheckCircle2,
   CircleSlash,
+  Clock,
   HelpCircle,
 } from "lucide-react";
 
-import { DATE_NOT_RECORDED } from "@/features/learners/constants";
-import { buildProgrammeMilestones } from "@/features/learners/utils/programme-milestones";
+import { useEnrolmentJourney } from "@/features/enrolments/queries/enrolments.query";
+import {
+  DATE_NOT_RECORDED,
+  JOURNEY_MILESTONE_STATUS_LABELS,
+} from "@/features/learners/constants";
 import { formatDate } from "@/utils/helper";
 
 import { ProfileTabState } from "./ProfileTabState";
 import { T } from "./tokens";
 
 /**
- * Programme milestones, derived from the profile aggregate.
+ * Programme milestones, as the journey endpoint reports them.
  *
- * Previously fed by `a.milestones`, which normalizeApprentice hardcoded to an
- * empty array — so this tab was permanently blank for every apprentice while
- * the API had the dates all along.
+ * ── WHAT THIS REPLACES, TWICE ───────────────────────────────────────────────
+ *
+ * First `a.milestones`, which normalizeApprentice hardcoded to an empty array,
+ * so the tab was blank for every apprentice. Then a list derived on the
+ * client from programme dates and reviews — right while the aggregate carried
+ * no milestones, and wrong once the Timeline beside it read
+ * `GET /enrolments/:id/journey`: two tabs in one drawer disagreeing about the
+ * same programme, one reading the endpoint and one inventing it. Worse than
+ * either state alone, and a user would see it.
+ *
+ * ── ONE REQUEST FOR BOTH TABS ───────────────────────────────────────────────
+ *
+ * The same `useEnrolmentJourney` the Timeline calls, so the same query key:
+ * react-query serves both tabs from one fetch, and opening the drawer does
+ * not ask twice. Where the journey returns nothing, this tab says so, as the
+ * Timeline does, and infers nothing in its place.
  */
 
 const STATUS = {
-  complete: {
-    icon: CheckCircle2,
-    color: T.green,
-    label: "Complete",
-  },
-  overdue: {
-    icon: AlertTriangle,
-    color: T.red,
-    label: "Overdue",
-  },
-  scheduled: {
-    icon: CalendarClock,
-    color: T.blue,
-    label: "Scheduled",
-  },
-  // Deliberately not "complete". A planned date that has passed with nothing
-  // confirming the event is exactly what an employer needs to chase, and
-  // calling it complete would hide it.
-  passed: {
-    icon: CalendarClock,
-    color: T.amber,
-    label: "Date passed",
-  },
-  cancelled: {
-    icon: CircleSlash,
-    color: T.muted,
-    label: "Cancelled",
-  },
-  unknown: {
-    icon: HelpCircle,
-    color: T.muted,
-    label: "Not recorded",
-  },
+  complete: { icon: CheckCircle2, color: T.green },
+  current: { icon: Clock, color: T.blue },
+  upcoming: { icon: CalendarClock, color: T.muted },
+  // Client decision Q2: a review whose date passed without being held is
+  // overdue, and the API says so. Nothing here reads a date to decide it.
+  overdue: { icon: AlertTriangle, color: T.red },
+  cancelled: { icon: CircleSlash, color: T.muted },
 };
 
-export function ProfileMilestones({
-  profile,
-  isLoading,
-  isError,
-  error,
-  unavailable,
-}) {
-  const milestones = buildProgrammeMilestones(profile);
+const UNKNOWN_STATUS = { icon: HelpCircle, color: T.muted };
+
+const isText = (value) => typeof value === "string" && value.trim() !== "";
+
+export function ProfileMilestones({ enrolmentId, unavailable }) {
+  const journey = useEnrolmentJourney(enrolmentId);
+  const milestones = Array.isArray(journey.data?.milestones)
+    ? journey.data.milestones
+    : [];
 
   return (
     <ProfileTabState
       unavailable={unavailable}
-      isLoading={isLoading}
-      isError={isError}
-      error={error}
-      isEmpty={!isLoading && !isError && milestones.length === 0}
-      emptyTitle="No programme milestones recorded"
-      emptyDetail="This enrolment has no planned dates and no reviews on the API."
+      isLoading={journey.isLoading}
+      isError={journey.isError}
+      error={journey.error}
+      isEmpty={
+        !journey.isLoading && !journey.isError && milestones.length === 0
+      }
+      emptyTitle="No programme milestones on the API"
+      emptyDetail="The journey endpoint returned no milestones for this enrolment. Nothing is inferred in their place."
     >
       <div className="space-y-1">
         {milestones.map((m) => {
-          const s = STATUS[m.status] ?? STATUS.unknown;
+          const s = STATUS[m.status] ?? UNKNOWN_STATUS;
           const Icon = s.icon;
+          const hasDate = isText(m.date);
 
           return (
             <div
-              key={m.key}
+              key={m.code ?? `${m.title}-${m.date}`}
               className="flex items-start gap-3 rounded-xl px-4 py-3"
               style={{
                 backgroundColor: T.card,
@@ -101,26 +96,28 @@ export function ProfileMilestones({
               </span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold" style={{ color: T.ink }}>
-                  {m.label}
+                  {m.title}
                 </p>
                 <p
                   className="text-xs mt-0.5"
-                  style={{ color: m.date ? T.muted : T.amber }}
+                  style={{ color: hasDate ? T.muted : T.amber }}
                 >
-                  {m.date ? formatDate(m.date) : DATE_NOT_RECORDED}
+                  {hasDate ? formatDate(m.date) : DATE_NOT_RECORDED}
                 </p>
-                {m.detail ? (
+                {isText(m.description) ? (
                   <p className="text-[11px] mt-0.5" style={{ color: T.subtle }}>
-                    {m.detail}
+                    {m.description}
                   </p>
                 ) : null}
               </div>
-              <span
-                className="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0"
-                style={{ backgroundColor: `${s.color}12`, color: s.color }}
-              >
-                {s.label}
-              </span>
+              {isText(m.status) ? (
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0"
+                  style={{ backgroundColor: `${s.color}12`, color: s.color }}
+                >
+                  {JOURNEY_MILESTONE_STATUS_LABELS[m.status] ?? m.status}
+                </span>
+              ) : null}
             </div>
           );
         })}
