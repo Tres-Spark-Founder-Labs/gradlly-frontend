@@ -4,7 +4,9 @@
 //
 //   eligibility check   PUBLIC, pre-account (the /eligibility funnel)
 //   recipient side      the signed-in SME: its recipient profile, a match
-//                       search, and the applications it has sent to donors
+//                       search, the applications it has sent to donors, and
+//                       the transfers it is the recipient of — list, detail,
+//                       the agreement document, and its own signature
 //
 // The donor side — donor links, transfer preferences, surplus, the recipient
 // directory, and PATCH /match-applications/:id — belongs to the employer
@@ -21,6 +23,10 @@ export const LEVY_EXCHANGE_PATHS = Object.freeze({
   RECIPIENT_PROFILE: "/api/v1/levy-exchange/recipient-profile",
   MATCH_SEARCH: "/api/v1/levy-exchange/matches/search",
   MATCH_APPLICATIONS: "/api/v1/levy-exchange/match-applications",
+  TRANSFERS: "/api/v1/levy-exchange/transfers",
+  transfer: (id) => `/api/v1/levy-exchange/transfers/${id}`,
+  transferSign: (id) => `/api/v1/levy-exchange/transfers/${id}/sign`,
+  transferDocument: (id) => `/api/v1/levy-exchange/transfers/${id}/document`,
 });
 
 export const EMPLOYEE_COUNT_BANDS = Object.freeze([
@@ -161,6 +167,78 @@ export const OPEN_APPLICATION_STATUSES = Object.freeze([
 
 // perPage is capped at 100 by PaginationQueryDto.
 export const MATCH_APPLICATIONS_PAGE_SIZE = 100;
+
+// ─── Transfers (LevyTransferStatus) ───────────────────────────────────────────
+//
+// The recipient's side of a levy transfer. Creating one (from a confirmed
+// match) and submitting it to the ESFA are the donor's, in the employer
+// portal; here the SME reads its transfers, downloads the agreement and adds
+// its own signature.
+//
+// The six statuses the enum carries, labelled here and nowhere else. A status
+// outside this list renders as the raw value the API sent, not as a label
+// invented for it. `detail` is only written where the API's own contract
+// states what the status means for the recipient.
+export const TRANSFER_STATUS = Object.freeze({
+  DRAFT: "draft",
+  PENDING_SIGNATURES: "pending_signatures",
+  PENDING_ESFA: "pending_esfa",
+  CONFIRMED: "confirmed",
+  ACTIVE: "active",
+  FAILED: "failed",
+});
+
+export const TRANSFER_STATUS_META = Object.freeze({
+  draft: {
+    label: "Draft",
+    color: "gray",
+    detail: "The agreement is being prepared. There is nothing to sign yet.",
+  },
+  pending_signatures: {
+    label: "Awaiting signatures",
+    color: "amber",
+    detail: "The donor signs first, then you.",
+  },
+  pending_esfa: {
+    label: "Awaiting ESFA",
+    color: "blue",
+    detail:
+      "Both parties have signed. The donor submits the transfer to the ESFA.",
+  },
+  confirmed: { label: "Confirmed", color: "green", detail: null },
+  active: { label: "Active", color: "green", detail: null },
+  failed: { label: "Failed", color: "red", detail: null },
+});
+
+// LevyTransferParty. The signing order — donor (1), then recipient (2) — is
+// enforced by the API's bilateral orchestrator. `actionRequired` on the
+// transfer DTO is the only signal that the signed-in user can sign now:
+// `status === pending_signatures` is true while the donor still has to sign,
+// and `nextParty === recipient` is true for a colleague the API would refuse.
+export const TRANSFER_PARTY = Object.freeze({
+  DONOR: "donor",
+  RECIPIENT: "recipient",
+});
+
+export const TRANSFER_PARTY_LABELS = Object.freeze({
+  donor: "Donor",
+  recipient: "Recipient",
+});
+
+// LevyTransferDocumentStatus
+export const TRANSFER_DOCUMENT_STATUS = Object.freeze({
+  PENDING: "pending",
+  READY: "ready",
+  SIGNED: "signed",
+});
+
+export const TRANSFER_DOCUMENT_STATUS_LABELS = Object.freeze({
+  pending: "Being generated",
+  ready: "Awaiting signatures",
+  signed: "Signed",
+});
+
+export const TRANSFERS_PAGE_SIZE = 20;
 
 /**
  * Formats a decimal-as-string GBP amount ("15000.00") for display WITHOUT

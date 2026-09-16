@@ -1,4 +1,5 @@
 import {
+  ArrowRightLeft,
   Banknote,
   Bell,
   Building2,
@@ -56,6 +57,11 @@ export const NAV_SECTIONS = [
         label: "Donor Matches",
         href: "/levy-exchange/matches",
         icon: Handshake,
+      },
+      {
+        label: "Transfers",
+        href: "/levy-exchange/transfers",
+        icon: ArrowRightLeft,
       },
     ],
   },

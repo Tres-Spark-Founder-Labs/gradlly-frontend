@@ -9,19 +9,25 @@ import {
 
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
 import { toastError, toastSuccess } from "@/hooks/useToast";
+import { ERROR_CODES } from "@/lib/errors";
 
 import { LEVY_EXCHANGE_QUERY_KEYS } from "./keys";
 import {
   MATCH_APPLICATION_STATUS,
   MATCH_APPLICATIONS_PAGE_SIZE,
+  TRANSFERS_PAGE_SIZE,
 } from "../constants";
 import {
   checkLevyEligibility,
   createMatchApplication,
   getRecipientProfile,
+  getTransfer,
+  getTransferDocument,
   listMatchApplications,
+  listTransfers,
   saveRecipientProfile,
   searchMatches,
+  signTransfer,
 } from "../services/levy-exchange.service";
 
 // Public eligibility self-assessment. No cache/invalidation — it's an anonymous,
@@ -124,6 +130,83 @@ export function useCreateMatchApplication({ onSuccess, ...options } = {}) {
       onSuccess?.(application, ...rest);
     },
     onError: (error) => toastError(error.message),
+    ...options,
+  });
+}
+
+// ─── Transfers (the SME as recipient) ─────────────────────────────────────────
+
+/**
+ * Transfers made to this SME, in the API's order. `role: recipient` stops an
+ * organisation that is also a donor from seeing the transfers it made.
+ */
+export function useRecipientTransfers({
+  page = 1,
+  perPage = TRANSFERS_PAGE_SIZE,
+  ...options
+} = {}) {
+  const { orgId } = useAuthUser();
+  const params = { role: "recipient", page, perPage };
+
+  return useQuery({
+    queryKey: LEVY_EXCHANGE_QUERY_KEYS.transfers(orgId, params),
+    queryFn: () => listTransfers(params),
+    enabled: !!orgId,
+    placeholderData: keepPreviousData,
+    select: (response) => ({
+      transfers: Array.isArray(response?.data) ? response.data : [],
+      meta: response?.meta ?? null,
+    }),
+    ...options,
+  });
+}
+
+export function useTransfer(id, options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: LEVY_EXCHANGE_QUERY_KEYS.transfer(orgId, id),
+    queryFn: () => getTransfer(id),
+    enabled: !!orgId && !!id,
+    ...options,
+  });
+}
+
+export function useTransferDocument(id, options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: LEVY_EXCHANGE_QUERY_KEYS.transferDocument(orgId, id),
+    queryFn: () => getTransferDocument(id),
+    enabled: !!orgId && !!id,
+    ...options,
+  });
+}
+
+/**
+ * The recipient's signature. The sign response's `nextParty` is null once
+ * both parties have signed. Every transfer view is invalidated: the list row,
+ * the detail and the document all change with a signature.
+ */
+export function useSignTransfer({ onSuccess, ...options } = {}) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: signTransfer,
+    onSuccess: (result, ...rest) => {
+      toastSuccess(
+        result?.nextParty === null
+          ? "Agreement fully signed."
+          : "Signature recorded.",
+      );
+      qc.invalidateQueries({
+        queryKey: [...LEVY_EXCHANGE_QUERY_KEYS.all(), "transfers"],
+      });
+      onSuccess?.(result, ...rest);
+    },
+    onError: (error) => {
+      if (error.code !== ERROR_CODES.VALIDATION) toastError(error.message);
+    },
     ...options,
   });
 }

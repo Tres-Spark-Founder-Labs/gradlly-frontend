@@ -102,3 +102,63 @@ export async function createMatchApplication(payload) {
     throw normalizeApiClientError(e);
   }
 }
+
+// ─── Transfers (the SME as recipient) ─────────────────────────────────────────
+//
+// Checked before this was written, because a row policy admitting the
+// recipient does not mean the service does: levy-transfer.service.ts reads a
+// transfer by donor OR recipient (getTransferForOrg), lists `role=recipient`
+// scoped to recipientOrganisationId, serves each party its own copy of the
+// agreement, and takes the recipient's signature. None of these need anything
+// beyond the active organisation.
+
+/**
+ * Paginated: the whole envelope ({ data, meta }), like listMatchApplications.
+ */
+export async function listTransfers(params = {}) {
+  try {
+    const result = await $apiClient.get(LEVY_EXCHANGE_PATHS.TRANSFERS, {
+      params,
+    });
+    return result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+export async function getTransfer(id) {
+  try {
+    const result = await $apiClient.get(LEVY_EXCHANGE_PATHS.transfer(id));
+    return unwrap(result);
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+/**
+ * The agreement as this party may see it: the unsigned PDF until both have
+ * signed, then this organisation's own signed copy. `downloadUrl` is absent
+ * while the PDF is still being generated.
+ */
+export async function getTransferDocument(id) {
+  try {
+    const result = await $apiClient.get(
+      LEVY_EXCHANGE_PATHS.transferDocument(id),
+    );
+    return unwrap(result);
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+export async function signTransfer({ id, party, signatureImageKey }) {
+  try {
+    const result = await $apiClient.post(LEVY_EXCHANGE_PATHS.transferSign(id), {
+      party,
+      signatureImageKey,
+    });
+    return unwrap(result);
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
