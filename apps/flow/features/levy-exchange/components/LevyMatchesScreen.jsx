@@ -53,16 +53,6 @@ export function LevyMatchesScreen() {
     [applicationsQuery.data],
   );
 
-  const donorNames = useMemo(
-    () =>
-      new Map(
-        matches
-          .filter((m) => isText(m?.donorOrganisationId))
-          .map((m) => [m.donorOrganisationId, m.donorDisplayName]),
-      ),
-    [matches],
-  );
-
   // Applications arrive newest first, so the first seen per donor is latest.
   const latestByDonor = useMemo(() => {
     const latest = new Map();
@@ -168,7 +158,6 @@ export function LevyMatchesScreen() {
       <MatchApplicationsList
         applications={applications}
         meta={applicationsQuery.data?.meta ?? null}
-        donorNames={donorNames}
         isLoading={applicationsQuery.isLoading}
         isError={applicationsQuery.isError}
         error={applicationsQuery.error}

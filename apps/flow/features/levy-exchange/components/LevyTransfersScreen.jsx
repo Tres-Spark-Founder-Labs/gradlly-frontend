@@ -54,11 +54,15 @@ export function LevyTransfersScreen() {
       cell: (transfer) => {
         const amount = formatGbpDecimal(transfer?.amount);
         const reference = transfer?.esfaTransferReference;
+        const donor = transfer?.donorOrganisationName;
         return (
           <div className="min-w-0">
             <p className="text-sm font-semibold text-neutral-900">
               {amount ?? "Transfer"}
             </p>
+            {isText(donor) ? (
+              <p className="text-xs text-neutral-600">From {donor}</p>
+            ) : null}
             {isText(reference) ? (
               <p className="text-xs text-neutral-500">ESFA ref {reference}</p>
             ) : null}

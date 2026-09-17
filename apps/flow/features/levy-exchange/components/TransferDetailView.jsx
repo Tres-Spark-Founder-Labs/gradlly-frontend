@@ -103,6 +103,11 @@ export function TransferDetailView({ transferId }) {
   }
 
   const amount = formatGbpDecimal(transfer.amount);
+  // The API's name for the donor. The parties to a transfer are known to each
+  // other (the agreement prints it); null only when the API has none.
+  const donorName = isText(transfer.donorOrganisationName)
+    ? transfer.donorOrganisationName
+    : null;
   const statusMeta = isText(transfer.status)
     ? (TRANSFER_STATUS_META[transfer.status] ?? null)
     : null;
@@ -120,7 +125,13 @@ export function TransferDetailView({ transferId }) {
       <PageSubheader
         icon={ArrowRightLeft}
         eyebrow="Levy Exchange"
-        title={amount ? `${amount} transfer` : "Transfer"}
+        title={
+          amount
+            ? `${amount} transfer${donorName ? ` from ${donorName}` : ""}`
+            : donorName
+              ? `Transfer from ${donorName}`
+              : "Transfer"
+        }
         description={statusMeta?.detail ?? undefined}
       />
 
@@ -208,6 +219,7 @@ export function TransferDetailView({ transferId }) {
         </CardHeader>
         <CardContent>
           <dl className="divide-y divide-neutral-100">
+            <Field label="From">{donorName}</Field>
             <Field label="Status">
               <TransferStatusBadge status={transfer.status} />
             </Field>

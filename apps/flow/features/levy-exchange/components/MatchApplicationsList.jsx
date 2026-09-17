@@ -18,16 +18,16 @@ const isText = (value) => typeof value === "string" && value.trim() !== "";
  * The applications this SME has sent (GET /match-applications?role=recipient),
  * with the state the donor has put them in.
  *
- * MatchApplicationResponseDto carries the donor's id and no name. A name is
- * shown only when the current search returned that donor, taken from its
- * donorDisplayName (already "Matched donor" when anonymous). Otherwise the row
- * says "a levy donor" rather than borrowing "Matched donor", which in F4.2.3
- * AC3 means anonymous, not "name unknown to this screen".
+ * The donor is the API's `donorDisplayName`: its name, or "Matched donor" when
+ * it matches anonymously (F4.2.3 AC3), by the same rule as the search. This
+ * used to borrow names from whatever the current search had returned, because
+ * the DTO carried only the id. When the API sends null — it cannot say whether
+ * the donor wanted anonymity — the row says "a levy donor" rather than
+ * "Matched donor", which means anonymous, not "name unknown".
  */
 export function MatchApplicationsList({
   applications,
   meta,
-  donorNames,
   isLoading,
   isError,
   error,
@@ -68,9 +68,7 @@ export function MatchApplicationsList({
                       color: "gray",
                     })
                   : null;
-                const donorName = isText(application?.donorOrganisationId)
-                  ? donorNames.get(application.donorOrganisationId)
-                  : undefined;
+                const donorName = application?.donorDisplayName;
                 const amount = formatGbpDecimal(application?.requestedAmount);
                 const sentOn = formatIsoDate(application?.createdAt);
 
