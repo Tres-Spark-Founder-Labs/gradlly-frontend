@@ -9,6 +9,7 @@ import {
   ClipboardList,
   FileSignature,
   FileText,
+  FolderOpen,
   Handshake,
   LayoutDashboard,
   MessageCircle,
@@ -22,7 +23,10 @@ import {
 export const NAV_SECTIONS = [
   {
     title: "Workspace",
-    items: [{ label: "Dashboard", href: "/", icon: LayoutDashboard }],
+    items: [
+      { label: "Dashboard", href: "/", icon: LayoutDashboard },
+      { label: "Documents", href: "/documents", icon: FolderOpen },
+    ],
   },
   {
     title: "Talent",
