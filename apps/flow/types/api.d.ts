@@ -3558,6 +3558,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/levy-exchange/vocabulary": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * The Levy Exchange vocabulary
+     * @description Public. The closed fields with their permitted values (validated on the recipient profile PUT, the transfer preference write and the eligibility check) and the open fields with suggestions (any value accepted, normalised on write). Values are display strings, compared exactly.
+     */
+    get: operations["VocabularyController_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/ilr/mapping-configs": {
     parameters: {
       query?: never;
@@ -7992,20 +8012,34 @@ export interface components {
     };
     CheckLevyEligibilityDto: {
       /**
-       * @description Employee count band slug (1_9, 10_49, 50_249 for SME; 250_plus is levy-paying)
-       * @example 10_49
+       * @description Closed field: one of GET /levy-exchange/vocabulary closed.employeeCountBand. 1-9, 10-49 and 50-249 are SME bands; 250+ is levy-paying.
+       * @example 10-49
+       * @enum {string}
        */
-      employeeCountBand: string;
+      employeeCountBand: "1-9" | "10-49" | "50-249" | "250+";
       /**
-       * @description Employer sector slug
-       * @example construction
+       * @description Open field: any value. Suggestions from GET /levy-exchange/vocabulary (open.sector); a sector with no configured funding band gets the default.
+       * @example Construction
        */
       sector: string;
       /**
-       * @description Employer region slug
-       * @example north_west
+       * @description Closed field: one of GET /levy-exchange/vocabulary closed.region.
+       * @example North West
+       * @enum {string}
        */
-      region: string;
+      region:
+        | "North East"
+        | "North West"
+        | "Yorkshire and the Humber"
+        | "East Midlands"
+        | "West Midlands"
+        | "East of England"
+        | "London"
+        | "South East"
+        | "South West"
+        | "Wales"
+        | "Scotland"
+        | "Northern Ireland";
       /**
        * @description Whether the employer already has a Digital Apprenticeship Service account
        * @example false
@@ -8059,23 +8093,37 @@ export interface components {
     };
     UpsertRecipientProfileDto: {
       /**
-       * @description Recipient sector slug used for rule-based matching
-       * @example construction
+       * @description Open field: any value, normalised on write. Suggestions from GET /levy-exchange/vocabulary (open.sector).
+       * @example Construction
        */
       sector: string;
       /**
-       * @description Recipient region slug used for rule-based matching
-       * @example north_west
+       * @description Closed field: one of GET /levy-exchange/vocabulary closed.region.
+       * @example North West
+       * @enum {string}
        */
-      region: string;
+      region:
+        | "North East"
+        | "North West"
+        | "Yorkshire and the Humber"
+        | "East Midlands"
+        | "West Midlands"
+        | "East of England"
+        | "London"
+        | "South East"
+        | "South West"
+        | "Wales"
+        | "Scotland"
+        | "Northern Ireland";
       /**
-       * @description Employee count band slug (e.g. 10_49, 50_249)
-       * @example 10_49
+       * @description Closed field: one of GET /levy-exchange/vocabulary closed.employeeCountBand.
+       * @example 10-49
+       * @enum {string}
        */
-      employeeCountBand: string;
+      employeeCountBand: "1-9" | "10-49" | "50-249" | "250+";
       /**
-       * @description Apprenticeship programme type slug
-       * @example standards
+       * @description Open field: any value, normalised on write. Suggestions from GET /levy-exchange/vocabulary (open.programmeType).
+       * @example ST0415 Software Developer
        */
       programmeType: string;
       /**
@@ -8112,30 +8160,46 @@ export interface components {
     };
     UpsertTransferPreferencesDto: {
       /**
+       * @description Open field: any values, each normalised on write. Suggestions from GET /levy-exchange/vocabulary (open.sector). Empty accepts every sector.
        * @example [
-       *       "construction",
-       *       "engineering"
+       *       "Construction",
+       *       "Engineering & Manufacturing"
        *     ]
        */
       sectors: string[];
       /**
+       * @description Closed field: each one of GET /levy-exchange/vocabulary closed.region. Empty accepts every region.
        * @example [
-       *       "north_west",
-       *       "yorkshire"
+       *       "North West",
+       *       "Yorkshire and the Humber"
        *     ]
        */
-      regions: string[];
+      regions: (
+        | "North East"
+        | "North West"
+        | "Yorkshire and the Humber"
+        | "East Midlands"
+        | "West Midlands"
+        | "East of England"
+        | "London"
+        | "South East"
+        | "South West"
+        | "Wales"
+        | "Scotland"
+        | "Northern Ireland"
+      )[];
       /**
+       * @description Closed field: each one of GET /levy-exchange/vocabulary closed.employeeCountBand. Empty accepts every size.
        * @example [
-       *       "10_49",
-       *       "50_249"
+       *       "10-49",
+       *       "50-249"
        *     ]
        */
-      sizeBands: string[];
+      sizeBands: ("1-9" | "10-49" | "50-249" | "250+")[];
       /**
+       * @description Open field: any values, each normalised on write. Suggestions from GET /levy-exchange/vocabulary (open.programmeType). Empty accepts every programme type.
        * @example [
-       *       "standards",
-       *       "frameworks"
+       *       "ST0415 Software Developer"
        *     ]
        */
       programmeTypes: string[];
@@ -8401,6 +8465,62 @@ export interface components {
        * @example 21000
        */
       attributedAmount?: number;
+    };
+    LevyClosedVocabularyDto: {
+      /**
+       * @description Permitted values for the recipient profile’s `region`, the donor preference’s `regions` and the eligibility check’s `region`.
+       * @example [
+       *       "North East",
+       *       "North West",
+       *       "Yorkshire and the Humber",
+       *       "East Midlands",
+       *       "West Midlands",
+       *       "East of England",
+       *       "London",
+       *       "South East",
+       *       "South West",
+       *       "Wales",
+       *       "Scotland",
+       *       "Northern Ireland"
+       *     ]
+       */
+      region: string[];
+      /**
+       * @description Permitted values for the recipient profile’s `employeeCountBand`, the donor preference’s `sizeBands` and the eligibility check’s `employeeCountBand`.
+       * @example [
+       *       "1-9",
+       *       "10-49",
+       *       "50-249",
+       *       "250+"
+       *     ]
+       */
+      employeeCountBand: string[];
+    };
+    LevyOpenVocabularyDto: {
+      /**
+       * @description Suggestions for the recipient profile’s `sector`, the donor preference’s `sectors` and the eligibility check’s `sector`. Any value is accepted.
+       * @example [
+       *       "Construction",
+       *       "Digital & Technology",
+       *       "Engineering & Manufacturing",
+       *       "Financial Services",
+       *       "Health & Social Care"
+       *     ]
+       */
+      sector: string[];
+      /**
+       * @description Suggestions for the recipient profile’s `programmeType` and the donor preference’s `programmeTypes`. Any value is accepted.
+       * @example [
+       *       "ST0145 Engineering Technician",
+       *       "ST0415 Software Developer",
+       *       "ST0215 Senior Healthcare Support Worker"
+       *     ]
+       */
+      programmeType: string[];
+    };
+    LevyVocabularyResponseDto: {
+      closed: components["schemas"]["LevyClosedVocabularyDto"];
+      open: components["schemas"]["LevyOpenVocabularyDto"];
     };
     IlrMappingConfigResponseDto: {
       /** Format: uuid */
@@ -20528,6 +20648,29 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
+  VocabularyController_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Closed fields with permitted values; open fields with suggestions */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            message?: string;
+            data?: components["schemas"]["LevyVocabularyResponseDto"];
+          };
         };
       };
     };

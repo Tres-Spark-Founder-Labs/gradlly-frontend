@@ -1,6 +1,7 @@
 export const LEVY_EXCHANGE_QUERY_KEYS = Object.freeze({
   all: () => ["levy-exchange"],
   eligibility: () => ["levy-exchange", "eligibility"],
+  vocabulary: () => ["levy-exchange", "vocabulary"],
   recipientProfile: (orgId) => ["levy-exchange", "recipient-profile", orgId],
   matchApplications: (orgId, params = {}) => [
     "levy-exchange",

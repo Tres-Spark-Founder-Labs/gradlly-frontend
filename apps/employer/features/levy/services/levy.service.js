@@ -184,6 +184,16 @@ export async function getTransferDocument({ orgId, id }) {
  * must open on defaults rather than on an error screen. Translated to `null` so
  * the caller can tell "not set yet" from "the request failed".
  */
+/** GET /levy-exchange/vocabulary — static reference data, no organisation scope. */
+export async function getLevyVocabulary() {
+  try {
+    const result = await $apiClient.get(LEVY_PATHS.VOCABULARY);
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
 export async function getTransferPreferences({ orgId } = {}) {
   try {
     const result = await $apiClient.get(LEVY_PATHS.TRANSFER_PREFERENCES, {

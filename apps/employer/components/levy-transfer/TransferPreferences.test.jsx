@@ -17,9 +17,28 @@ import { TransferPreferences } from "./TransferPreferences";
  */
 const save = vi.fn();
 let queryState;
+let vocabularyState;
+
+/**
+ * The vocabulary is mocked like the preferences: what these tests are about is
+ * the form's behaviour, not request wiring. It is the API's real shape — the
+ * closed fields carry permitted values, the open fields suggestions — because
+ * the form's two kinds of list are driven entirely by that distinction.
+ */
+const VOCABULARY = {
+  closed: {
+    region: ["North West", "London", "Yorkshire and the Humber"],
+    employeeCountBand: ["1-9", "10-49", "50-249", "250+"],
+  },
+  open: {
+    sector: ["Construction", "Digital & Technology"],
+    programmeType: ["ST0415 Software Developer"],
+  },
+};
 
 vi.mock("@/features/levy/queries/levy.query", () => ({
   useTransferPreferences: () => queryState,
+  useLevyVocabulary: () => vocabularyState,
   useUpdateTransferPreferences: () => ({ mutate: save, isPending: false }),
 }));
 
@@ -53,10 +72,21 @@ function addTo(labelPattern, value) {
 const submit = () =>
   fireEvent.click(screen.getByRole("button", { name: /save preferences/i }));
 
+function setVocabulary(overrides = {}) {
+  vocabularyState = {
+    data: VOCABULARY,
+    isLoading: false,
+    isError: false,
+    error: null,
+    ...overrides,
+  };
+}
+
 describe("TransferPreferences (F4.1.3)", () => {
   beforeEach(() => {
     save.mockClear();
     setQuery();
+    setVocabulary();
   });
 
   it("opens on defaults for a donor who has never saved preferences", () => {
@@ -164,13 +194,65 @@ describe("TransferPreferences (F4.1.3)", () => {
   it("does not add a duplicate or a whitespace-only value", async () => {
     render(<TransferPreferences />);
 
-    addTo(/add a region/i, "London");
-    addTo(/add a region/i, "London");
-    addTo(/add a region/i, "   ");
+    addTo(/add a sector/i, "Retail");
+    addTo(/add a sector/i, "Retail");
+    addTo(/add a sector/i, "   ");
     submit();
 
     await waitFor(() => expect(save).toHaveBeenCalled());
-    expect(save.mock.calls[0][0].regions).toEqual(["London"]);
+    expect(save.mock.calls[0][0].sectors).toEqual(["Retail"]);
+  });
+
+  /**
+   * Region and size band are closed sets the API validates. Matching compares
+   * these values to a recipient's profile by exact equality, so a typed
+   * near-miss ("North-West") narrows this donor's pool to nobody on that field
+   * — the quiet failure the vocabulary exists to stop.
+   */
+  it("offers the permitted values for a closed field, and no way to type one", async () => {
+    render(<TransferPreferences />);
+
+    // No free-text box for regions or size bands...
+    expect(screen.queryByLabelText(/add a region/i)).toBeNull();
+    expect(screen.queryByLabelText(/add a size band/i)).toBeNull();
+    // ...and the open fields still have theirs.
+    expect(screen.getByLabelText(/add a sector/i)).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "Add North West" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add 10-49" }));
+    submit();
+
+    await waitFor(() => expect(save).toHaveBeenCalled());
+    expect(save.mock.calls[0][0]).toMatchObject({
+      regions: ["North West"],
+      sizeBands: ["10-49"],
+    });
+  });
+
+  it("flags a saved value the vocabulary does not permit instead of hiding it", () => {
+    // Written before the API validated this field. Left in place so the donor
+    // can remove it: the save is now refused while it is there, and a value
+    // silently dropped from the form would be saved back the same way.
+    setQuery({ data: saved({ regions: ["Midlands", "London"] }) });
+    render(<TransferPreferences />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      /"Midlands" is not a permitted region/i,
+    );
+    expect(
+      screen.getByRole("button", { name: "Remove Midlands" }),
+    ).toBeVisible();
+  });
+
+  it("does not show the form when the vocabulary cannot be loaded", () => {
+    // Falling back to free text would send values the API rejects.
+    setVocabulary({ data: null, isError: true, error: { message: "boom" } });
+    render(<TransferPreferences />);
+
+    expect(
+      screen.getByText(/could not load the levy exchange vocabulary/i),
+    ).toBeVisible();
+    expect(screen.queryByLabelText(/add a sector/i)).toBeNull();
   });
 
   it("a removed value is not sent", async () => {

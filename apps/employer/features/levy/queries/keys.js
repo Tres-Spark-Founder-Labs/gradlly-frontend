@@ -4,6 +4,7 @@ export const LEVY_QUERY_KEYS = {
   expiryCalendar: (orgId) => ["levy", "expiry-calendar", orgId],
   donorLinks: (orgId) => ["levy", "donor-links", orgId],
   transferPreferences: (orgId) => ["levy", "transfer-preferences", orgId],
+  vocabulary: () => ["levy", "vocabulary"],
   recipientDirectory: (orgId, params = {}) => [
     "levy",
     "recipient-directory",

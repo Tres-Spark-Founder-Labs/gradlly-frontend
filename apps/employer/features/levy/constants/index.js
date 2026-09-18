@@ -6,6 +6,10 @@ export const LEVY_PATHS = Object.freeze({
   donorLink: (id) => `/api/v1/levy-exchange/donor-links/${id}`,
   donorSync: (id) => `/api/v1/levy-exchange/donor-links/${id}/sync`,
   TRANSFER_PREFERENCES: "/api/v1/levy-exchange/transfer-preferences",
+  // The Levy Exchange vocabulary: closed fields with their permitted values,
+  // open fields with suggestions. Matching compares these values exactly, so
+  // this app keeps no copy of them.
+  VOCABULARY: "/api/v1/levy-exchange/vocabulary",
   MATCH_APPLICATIONS: "/api/v1/levy-exchange/match-applications",
   matchApplication: (id) => `/api/v1/levy-exchange/match-applications/${id}`,
   MATCHES_SEARCH: "/api/v1/levy-exchange/matches/search",

@@ -19,6 +19,7 @@ import {
 } from "../constants";
 import {
   checkLevyEligibility,
+  getLevyVocabulary,
   createMatchApplication,
   getRecipientProfile,
   getTransfer,
@@ -29,6 +30,20 @@ import {
   searchMatches,
   signTransfer,
 } from "../services/levy-exchange.service";
+
+/**
+ * The vocabulary both this app's forms read. Fixed per API deploy and the same
+ * for every organisation, so it is fetched once and kept for the session; it
+ * is public, so it loads before sign-in for the eligibility checker.
+ */
+export function useLevyVocabulary(options = {}) {
+  return useQuery({
+    queryKey: LEVY_EXCHANGE_QUERY_KEYS.vocabulary(),
+    queryFn: getLevyVocabulary,
+    staleTime: Infinity,
+    ...options,
+  });
+}
 
 // Public eligibility self-assessment. No cache/invalidation — it's an anonymous,
 // stateless POST whose result the UI holds locally.

@@ -22,6 +22,7 @@ import {
   getTransferDocument,
   getDonorAnalytics,
   getDonorAnalyticsBreakdown,
+  getLevyVocabulary,
   getTransferPreferences,
   getTransfers,
   signTransfer,
@@ -307,6 +308,19 @@ export function useSubmitTransferToDas(id) {
 }
 
 // ─── F4.1.3 Transfer preferences ─────────────────────────────────────────────
+
+/**
+ * The Levy Exchange vocabulary. The same for every organisation and fixed per
+ * API deploy, so it is cached for the session rather than refetched.
+ */
+export function useLevyVocabulary(options = {}) {
+  return useQuery({
+    queryKey: LEVY_QUERY_KEYS.vocabulary(),
+    queryFn: getLevyVocabulary,
+    staleTime: Infinity,
+    ...options,
+  });
+}
 
 export function useTransferPreferences(options = {}) {
   const { orgId } = useAuthUser();

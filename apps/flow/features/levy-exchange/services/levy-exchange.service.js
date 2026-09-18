@@ -10,6 +10,21 @@ function unwrap(result) {
   return result.data?.data ?? result.data;
 }
 
+/**
+ * The Levy Exchange vocabulary: closed fields with their permitted values,
+ * open fields with suggestions. Public, like the eligibility check — the
+ * checker runs before anyone has an account — and the same for every
+ * organisation.
+ */
+export async function getLevyVocabulary() {
+  try {
+    const result = await $publicApiClient.get(LEVY_EXCHANGE_PATHS.VOCABULARY);
+    return unwrap(result);
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
 // Public, throttled (30/min). No auth, no org scoping — see $publicApiClient.
 export async function checkLevyEligibility(payload) {
   try {

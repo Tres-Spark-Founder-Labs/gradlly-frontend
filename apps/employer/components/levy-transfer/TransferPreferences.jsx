@@ -2,12 +2,13 @@
 
 // @ts-check
 
-import { Info, Loader2, Plus, X } from "lucide-react";
+import { AlertTriangle, Info, Loader2, Plus, X } from "lucide-react";
 import { useState } from "react";
 
 import Button from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import {
+  useLevyVocabulary,
   useTransferPreferences,
   useUpdateTransferPreferences,
 } from "@/features/levy/queries/levy.query";
@@ -16,53 +17,20 @@ import { cn } from "@/utils/helper";
 /**
  * F4.1.3 — Transfer preference settings.
  *
- * ── WHY FREE TEXT AND NOT DROPDOWNS ─────────────────────────────────────────
+ * ── ONE VOCABULARY, FROM THE API ────────────────────────────────────────────
  *
- * `sectors`, `regions`, `sizeBands` and `programmeTypes` are `string[]` on the
- * server with no enum behind them, and the SME directory searches them as free
- * text ("e.g. Manufacturing", "e.g. West Midlands"). Matching compares these
- * values to a recipient's profile by string equality.
+ * Matching compares these lists to a recipient's profile by exact string
+ * equality, so the values come from GET /levy-exchange/vocabulary, which the
+ * flow app's recipient profile reads too. This app keeps no copy.
  *
- * A dropdown would therefore have to invent a vocabulary, and any value that
- * did not exactly equal what recipients had typed would match nothing — a
- * donor would set preferences, see zero matches, and have no way to discover
- * why. Suggestions are offered as one-click chips because they are genuinely
- * helpful, but the field stays open so a donor can enter the value that
- * actually appears in the directory.
+ * The vocabulary separates two kinds of field, and so does this form:
+ *
+ *   regions, sizeBands        CLOSED — pick from the permitted values only.
+ *                             The API rejects anything else.
+ *   sectors, programmeTypes   OPEN — free text, with the API's suggestions
+ *                             one click away. Any value is accepted and
+ *                             normalised on save.
  */
-
-// Mirrored byte for byte by RECIPIENT_PROFILE_OPTIONS in
-// apps/flow/features/levy-exchange/constants — matching is exact equality,
-// so change both in the same commit.
-const SUGGESTED = {
-  sectors: [
-    "Engineering & Manufacturing",
-    "Health & Social Care",
-    "Digital & Technology",
-    "Construction",
-    "Financial Services",
-  ],
-  regions: [
-    "London",
-    "North West",
-    "Yorkshire and the Humber",
-    "West Midlands",
-    "South East",
-    "North East",
-    "East Midlands",
-    "East of England",
-    "South West",
-    "Wales",
-    "Scotland",
-    "Northern Ireland",
-  ],
-  sizeBands: ["1-9", "10-49", "50-249", "250+"],
-  programmeTypes: [
-    "ST0145 Engineering Technician",
-    "ST0415 Software Developer",
-    "ST0215 Senior Healthcare Support Worker",
-  ],
-};
 
 const EMPTY = {
   sectors: [],
@@ -74,8 +42,36 @@ const EMPTY = {
   anonymousMatching: false,
 };
 
-function ChipList({ label, name, values, suggestions, onChange, disabled }) {
+const asList = (value) => (Array.isArray(value) ? value : []);
+
+/**
+ * A list of chosen values.
+ *
+ * With `permitted` it is a closed field: the permitted values are the only way
+ * to add, and a chosen value outside them — saved before the API validated
+ * this field — is marked so the donor can remove it, rather than have the save
+ * refused without knowing why. With `suggestions` it is open: typed values
+ * plus one-click suggestions.
+ */
+function ChipList({
+  label,
+  name,
+  values,
+  permitted,
+  suggestions,
+  onChange,
+  disabled,
+}) {
   const [draft, setDraft] = useState("");
+  const closed = Array.isArray(permitted);
+  const offered = asList(closed ? permitted : suggestions).filter(
+    (option) => !values.includes(option),
+  );
+  const notPermitted = closed
+    ? values.filter((value) => !permitted.includes(value))
+    : [];
+  const plural = label.toLowerCase();
+  const singular = plural.replace(/s$/, "");
 
   const add = (raw) => {
     const value = raw.trim();
@@ -86,8 +82,6 @@ function ChipList({ label, name, values, suggestions, onChange, disabled }) {
 
   const remove = (value) => onChange(values.filter((v) => v !== value));
 
-  const unusedSuggestions = suggestions.filter((s) => !values.includes(s));
-
   return (
     <fieldset className="w-full" disabled={disabled}>
       <legend className="block mb-1 text-sm font-medium text-gray-700">
@@ -97,73 +91,101 @@ function ChipList({ label, name, values, suggestions, onChange, disabled }) {
       <div
         className="flex flex-wrap gap-2 mb-2"
         role="list"
-        aria-label={`Selected ${label.toLowerCase()}`}
+        aria-label={`Selected ${plural}`}
       >
         {values.length === 0 && (
           <span className="text-sm text-gray-500">
-            None set — all {label.toLowerCase()} accepted
+            None set — all {plural} accepted
           </span>
         )}
-        {values.map((value) => (
-          <span
-            key={value}
-            role="listitem"
-            className="inline-flex items-center gap-1 px-2 py-1 text-sm bg-green-50 text-green-800 border border-green-200 rounded"
-          >
-            {value}
-            <button
-              type="button"
-              onClick={() => remove(value)}
-              aria-label={`Remove ${value}`}
-              className="p-0.5 rounded hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-600"
+        {values.map((value) => {
+          const flagged = notPermitted.includes(value);
+          return (
+            <span
+              key={value}
+              role="listitem"
+              className={cn(
+                "inline-flex items-center gap-1 px-2 py-1 text-sm border rounded",
+                flagged
+                  ? "bg-amber-50 text-amber-900 border-amber-300"
+                  : "bg-green-50 text-green-800 border-green-200",
+              )}
             >
-              <X className="w-3 h-3" aria-hidden="true" />
-            </button>
-          </span>
-        ))}
-      </div>
-
-      <div className="flex gap-2">
-        <input
-          type="text"
-          name={name}
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              // Otherwise Enter submits the surrounding form and the donor
-              // loses the value they were part-way through typing.
-              e.preventDefault();
-              add(draft);
-            }
-          }}
-          placeholder={`Add a ${label.toLowerCase().replace(/s$/, "")}`}
-          aria-label={`Add a ${label.toLowerCase().replace(/s$/, "")}`}
-          className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-        />
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => add(draft)}
-          disabled={!draft.trim()}
-        >
-          <Plus className="w-4 h-4" aria-hidden="true" />
-          <span className="sr-only">Add {label.toLowerCase()}</span>
-        </Button>
-      </div>
-
-      {unusedSuggestions.length > 0 && (
-        <div className="mt-2">
-          <span className="text-xs text-gray-500">Suggestions:</span>
-          <div className="flex flex-wrap gap-1 mt-1">
-            {unusedSuggestions.map((s) => (
+              {flagged && (
+                <AlertTriangle className="w-3 h-3" aria-hidden="true" />
+              )}
+              {value}
               <button
-                key={s}
                 type="button"
-                onClick={() => add(s)}
+                onClick={() => remove(value)}
+                aria-label={`Remove ${value}`}
+                className="p-0.5 rounded hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-600"
+              >
+                <X className="w-3 h-3" aria-hidden="true" />
+              </button>
+            </span>
+          );
+        })}
+      </div>
+
+      {notPermitted.length > 0 && (
+        <p className="mb-2 text-xs text-amber-800" role="alert">
+          {`${notPermitted.map((v) => `"${v}"`).join(", ")} ${
+            notPermitted.length === 1
+              ? "is not a permitted"
+              : "are not permitted"
+          } ${notPermitted.length === 1 ? singular : plural}, so saving will be refused. Remove ${
+            notPermitted.length === 1 ? "it" : "them"
+          } and choose from the list.`}
+        </p>
+      )}
+
+      {!closed && (
+        <div className="flex gap-2">
+          <input
+            type="text"
+            name={name}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                // Otherwise Enter submits the surrounding form and the donor
+                // loses the value they were part-way through typing.
+                e.preventDefault();
+                add(draft);
+              }
+            }}
+            placeholder={`Add a ${singular}`}
+            aria-label={`Add a ${singular}`}
+            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-600"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => add(draft)}
+            disabled={!draft.trim()}
+          >
+            <Plus className="w-4 h-4" aria-hidden="true" />
+            <span className="sr-only">Add {plural}</span>
+          </Button>
+        </div>
+      )}
+
+      {offered.length > 0 && (
+        <div className={cn(!closed && "mt-2")}>
+          <span className="text-xs text-gray-500">
+            {closed ? `Add a ${singular}:` : "Suggestions:"}
+          </span>
+          <div className="flex flex-wrap gap-1 mt-1">
+            {offered.map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => add(option)}
+                aria-label={`Add ${option}`}
                 className="px-2 py-0.5 text-xs text-gray-700 bg-gray-100 border border-gray-200 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-green-600"
               >
-                + {s}
+                + {option}
               </button>
             ))}
           </div>
@@ -175,6 +197,8 @@ function ChipList({ label, name, values, suggestions, onChange, disabled }) {
 
 export function TransferPreferences() {
   const { data, isLoading, isError, error } = useTransferPreferences();
+  const vocabularyQuery = useLevyVocabulary();
+  const vocabulary = vocabularyQuery.data ?? null;
   const { mutate: save, isPending } = useUpdateTransferPreferences();
 
   const [form, setForm] = useState(EMPTY);
@@ -227,12 +251,27 @@ export function TransferPreferences() {
     });
   };
 
-  if (isLoading) {
+  if (isLoading || vocabularyQuery.isLoading) {
     return (
       <Card>
         <CardContent className="flex items-center gap-2 py-8 text-gray-600">
           <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
           Loading your matching preferences…
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (vocabularyQuery.isError || !vocabulary) {
+    // Without the vocabulary the closed lists have nothing to choose from, and
+    // offering free text in their place would send values the API refuses.
+    return (
+      <Card>
+        <CardContent className="py-8 text-red-700">
+          Could not load the Levy Exchange vocabulary.
+          {vocabularyQuery.error?.message
+            ? ` ${vocabularyQuery.error.message}`
+            : ""}
         </CardContent>
       </Card>
     );
@@ -311,7 +350,7 @@ export function TransferPreferences() {
               label="Sectors"
               name="sectors"
               values={form.sectors}
-              suggestions={SUGGESTED.sectors}
+              suggestions={asList(vocabulary.open?.sector)}
               onChange={set("sectors")}
               disabled={form.openMatching}
             />
@@ -319,7 +358,7 @@ export function TransferPreferences() {
               label="Regions"
               name="regions"
               values={form.regions}
-              suggestions={SUGGESTED.regions}
+              permitted={asList(vocabulary.closed?.region)}
               onChange={set("regions")}
               disabled={form.openMatching}
             />
@@ -327,7 +366,7 @@ export function TransferPreferences() {
               label="Size bands"
               name="sizeBands"
               values={form.sizeBands}
-              suggestions={SUGGESTED.sizeBands}
+              permitted={asList(vocabulary.closed?.employeeCountBand)}
               onChange={set("sizeBands")}
               disabled={form.openMatching}
             />
@@ -335,7 +374,7 @@ export function TransferPreferences() {
               label="Programme types"
               name="programmeTypes"
               values={form.programmeTypes}
-              suggestions={SUGGESTED.programmeTypes}
+              suggestions={asList(vocabulary.open?.programmeType)}
               onChange={set("programmeTypes")}
               disabled={form.openMatching}
             />

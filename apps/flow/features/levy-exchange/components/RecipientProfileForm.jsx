@@ -13,15 +13,16 @@ import Button from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { applyServerErrors } from "@/lib/errors";
 
-import { RECIPIENT_PROFILE_OPTIONS, formatIsoDate } from "../constants";
+import { formatIsoDate } from "../constants";
 import {
+  useLevyVocabulary,
   useRecipientProfile,
   useSaveRecipientProfile,
 } from "../queries/levy-exchange.query";
 import {
+  buildRecipientProfileSchema,
   recipientProfileDefaults,
   recipientProfileOffListValues,
-  recipientProfileSchema,
   recipientProfileToForm,
   recipientProfileToPayload,
 } from "../schemas";
@@ -31,11 +32,16 @@ const DAS_OPTIONS = [
   { value: "no", text: "No" },
 ];
 
-const toOptions = (list) => list.map((value) => ({ value, text: value }));
+const toOptions = (values) =>
+  (Array.isArray(values) ? values : []).map((value) => ({
+    value,
+    text: value,
+  }));
 
-// Region and employee count are closed sets: selects, validated against the
-// list. Sector and programme type are open: free text, with the donor side's
-// chips as suggestions. RECIPIENT_PROFILE_OPTIONS carries the reason.
+// Region and employee count are the vocabulary's closed fields: selects over
+// its permitted values. Sector and programme type are open: free text with its
+// suggestions. Both lists come from GET /levy-exchange/vocabulary, which the
+// donor's preferences screen reads too — see ../constants.
 const PROFILE_FIELDS = [
   { name: "sector", label: "Sector", closed: false },
   {
@@ -69,6 +75,14 @@ export function RecipientProfileForm() {
     error,
     refetch,
   } = useRecipientProfile();
+  const vocabularyQuery = useLevyVocabulary();
+  const vocabulary = vocabularyQuery.data ?? null;
+  const options = (field) =>
+    toOptions(
+      field === "sector" || field === "programmeType"
+        ? vocabulary?.open?.[field]
+        : vocabulary?.closed?.[field],
+    );
 
   const {
     register,
@@ -79,16 +93,20 @@ export function RecipientProfileForm() {
     control,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(recipientProfileSchema),
+    resolver: zodResolver(buildRecipientProfileSchema(vocabulary)),
     defaultValues: recipientProfileDefaults,
     mode: "onBlur",
   });
   const values = useWatch({ control });
 
-  // undefined = still loading; null = no profile yet (the API's 404).
+  // undefined = still loading; null = no profile yet (the API's 404). The
+  // vocabulary decides whether a stored closed value can be shown, so the form
+  // is seeded once both have arrived.
   useEffect(() => {
-    if (profile !== undefined) reset(recipientProfileToForm(profile));
-  }, [profile, reset]);
+    if (profile !== undefined && vocabulary) {
+      reset(recipientProfileToForm(profile, vocabulary));
+    }
+  }, [profile, vocabulary, reset]);
 
   const save = useSaveRecipientProfile({
     onSuccess: () => router.push("/levy-exchange/matches"),
@@ -99,8 +117,30 @@ export function RecipientProfileForm() {
       onError: (err) => applyServerErrors(err, setError),
     });
 
-  if (isLoading) {
+  if (isLoading || vocabularyQuery.isLoading) {
     return <p className="text-sm text-neutral-500">Loading your profile…</p>;
+  }
+
+  // Without the vocabulary the two closed fields have nothing to offer, and a
+  // free-text fallback would send values the API refuses.
+  if (vocabularyQuery.isError || !vocabulary) {
+    return (
+      <Card>
+        <CardContent className="space-y-3 pt-6">
+          <p className="text-sm text-danger-600" role="alert">
+            {vocabularyQuery.error?.message ??
+              "Could not load the sector, region and size options."}
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => vocabularyQuery.refetch()}
+          >
+            Try again
+          </Button>
+        </CardContent>
+      </Card>
+    );
   }
 
   if (isError) {
@@ -119,7 +159,7 @@ export function RecipientProfileForm() {
   }
 
   const savedOn = formatIsoDate(profile?.updatedAt);
-  const offList = recipientProfileOffListValues(profile);
+  const offList = recipientProfileOffListValues(profile, vocabulary);
 
   return (
     <Card>
@@ -141,7 +181,7 @@ export function RecipientProfileForm() {
                 <SingleSelectField
                   name={field.name}
                   label={field.label}
-                  options={toOptions(RECIPIENT_PROFILE_OPTIONS[field.name])}
+                  options={options(field.name)}
                   register={register}
                   setValue={setValue}
                   value={values[field.name] ?? ""}
@@ -162,8 +202,8 @@ export function RecipientProfileForm() {
                     required
                   />
                   <datalist id={`${field.name}-suggestions`}>
-                    {RECIPIENT_PROFILE_OPTIONS[field.name].map((option) => (
-                      <option key={option} value={option} />
+                    {options(field.name).map((option) => (
+                      <option key={option.value} value={option.value} />
                     ))}
                   </datalist>
                 </>
@@ -175,7 +215,7 @@ export function RecipientProfileForm() {
                 <p className="mt-1 flex items-start gap-1 text-xs text-amber-700">
                   <Info className="mt-px size-3.5 shrink-0" aria-hidden />
                   <span>
-                    {`Your saved value "${offList[field.name]}" is not on the list donors choose from, so it cannot match a donor's preference. Choose one from the list.`}
+                    {`Your saved value "${offList[field.name]}" is not one of the permitted values, so it cannot match a donor's preference and saving will be refused until you change it. Choose one from the list.`}
                   </span>
                 </p>
               ) : null}

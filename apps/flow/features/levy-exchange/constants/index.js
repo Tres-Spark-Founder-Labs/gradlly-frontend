@@ -20,6 +20,7 @@
 // matching from "an SME completing their profile".
 export const LEVY_EXCHANGE_PATHS = Object.freeze({
   ELIGIBILITY_CHECK: "/api/v1/levy-exchange/eligibility/check",
+  VOCABULARY: "/api/v1/levy-exchange/vocabulary",
   RECIPIENT_PROFILE: "/api/v1/levy-exchange/recipient-profile",
   MATCH_SEARCH: "/api/v1/levy-exchange/matches/search",
   MATCH_APPLICATIONS: "/api/v1/levy-exchange/match-applications",
@@ -29,29 +30,6 @@ export const LEVY_EXCHANGE_PATHS = Object.freeze({
   transferDocument: (id) => `/api/v1/levy-exchange/transfers/${id}/document`,
 });
 
-export const EMPLOYEE_COUNT_BANDS = Object.freeze([
-  { value: "1_9", text: "1–9 employees" },
-  { value: "10_49", text: "10–49 employees" },
-  { value: "50_249", text: "50–249 employees" },
-  { value: "250_plus", text: "250+ employees" },
-]);
-
-export const ELIGIBILITY_SECTORS = Object.freeze([
-  { value: "construction", text: "Construction" },
-  { value: "healthcare", text: "Healthcare" },
-  { value: "manufacturing", text: "Manufacturing" },
-  { value: "retail", text: "Retail" },
-  { value: "technology", text: "Technology" },
-]);
-
-export const ELIGIBILITY_REGIONS = Object.freeze([
-  { value: "north_west", text: "North West" },
-  { value: "london", text: "London" },
-  { value: "south_east", text: "South East" },
-  { value: "midlands", text: "Midlands" },
-  { value: "scotland", text: "Scotland" },
-]);
-
 // LevyEligibilityStatus
 export const ELIGIBILITY_STATUS = Object.freeze({
   ELIGIBLE: "eligible",
@@ -59,78 +37,24 @@ export const ELIGIBILITY_STATUS = Object.freeze({
   CHECK_WITH_ADVISOR: "check_with_advisor",
 });
 
-// ─── Recipient profile options ────────────────────────────────────────────────
+// ─── The vocabulary ──────────────────────────────────────────────────────────
 //
-// THE VALUES MUST STAY BYTE-IDENTICAL to `SUGGESTED` in
-// apps/employer/components/levy-transfer/TransferPreferences.jsx.
+// The values matching compares live in the API and are served by
+// GET /levy-exchange/vocabulary (LEVY_EXCHANGE_PATHS.VOCABULARY), read here
+// through `useLevyVocabulary`. This app holds no copy of them, and neither
+// does the employer app: the two portals sit on either side of one exact
+// string comparison, and a second list is how they drift apart.
 //
-// Matching is exact equality. levy-matching.service.ts keeps a donor only if
-// `preferredValues.includes(actualValue)` for every field that donor filters
-// on — case-, punctuation- and whitespace-sensitive. "North-West" is not
-// "North West". A value that equals none of a donor's preferences cannot match
-// that donor, and when no donor matches, the SME goes into a waiting pool that
-// nothing reads, so nobody is ever told.
+// The endpoint separates the two kinds of field, and the forms follow it:
 //
-// ── WHY TWO OF THESE VALIDATE AND TWO DO NOT ─────────────────────────────────
+//   closed.region             the twelve UK regions
+//   closed.employeeCountBand  four bands covering every size
+//   open.sector               suggestions; any value is accepted
+//   open.programmeType        suggestions; any value is accepted
 //
-// A field is closed only where the real-world set is closed:
-//
-//   region             CLOSED — the twelve UK regions, all of them
-//   employeeCountBand  CLOSED — four bands that cover every size
-//   sector             OPEN   — no list of sectors is complete
-//   programmeType      OPEN   — there are several hundred standards
-//
-// That difference is why region and employee count are selects validated
-// against these lists (RECIPIENT_PROFILE_CLOSED_FIELDS), and sector and
-// programme type are free text. Their lists are the donor side's demo chips,
-// offered as suggestions; closing a field against five sectors or three
-// standards would not make those a vocabulary. It would stop an SME in retail
-// saying so, and leave a donor who typed "Retail" able to match no one. Both
-// sides are free text on those two fields, so parties who type the same value
-// still meet.
-//
-// The apps share no code, so this is a copy, not an import. Change both files
-// in the same commit. The field names differ between them:
-//   sectors → sector   regions → region
-//   sizeBands → employeeCountBand   programmeTypes → programmeType
-//
-// The real fix is a shared vocabulary enforced by the API on both sides; the
-// PUT validates none of these fields today.
-export const RECIPIENT_PROFILE_OPTIONS = Object.freeze({
-  sector: Object.freeze([
-    "Engineering & Manufacturing",
-    "Health & Social Care",
-    "Digital & Technology",
-    "Construction",
-    "Financial Services",
-  ]),
-  region: Object.freeze([
-    "London",
-    "North West",
-    "Yorkshire and the Humber",
-    "West Midlands",
-    "South East",
-    "North East",
-    "East Midlands",
-    "East of England",
-    "South West",
-    "Wales",
-    "Scotland",
-    "Northern Ireland",
-  ]),
-  employeeCountBand: Object.freeze(["1-9", "10-49", "50-249", "250+"]),
-  programmeType: Object.freeze([
-    "ST0145 Engineering Technician",
-    "ST0415 Software Developer",
-    "ST0215 Senior Healthcare Support Worker",
-  ]),
-});
-
-/** The fields validated against RECIPIENT_PROFILE_OPTIONS — see above. */
-export const RECIPIENT_PROFILE_CLOSED_FIELDS = Object.freeze([
-  "region",
-  "employeeCountBand",
-]);
+// Closed fields are validated by the API on write and rejected by name; open
+// fields are normalised (trimmed, internal whitespace collapsed) on both
+// sides, so parties who type the same words still meet.
 
 // MaxLength on UpsertRecipientProfileDto, for the two free-text fields.
 export const RECIPIENT_PROFILE_TEXT_MAX_LENGTH = Object.freeze({

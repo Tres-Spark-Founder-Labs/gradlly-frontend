@@ -5,20 +5,28 @@ import { ArrowRight, CheckCircle2, Info, XCircle } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
 
 import { CheckboxField } from "@/components/form/CheckboxField";
+import { InputField } from "@/components/form/InputField";
 import { SingleSelectField } from "@/components/form/SingleSelectField";
 import Button from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import TextBadge from "@/components/ui/TextBadge";
 import { cn } from "@/utils/helper";
 
+import { ELIGIBILITY_STATUS } from "../constants";
 import {
-  ELIGIBILITY_REGIONS,
-  ELIGIBILITY_SECTORS,
-  ELIGIBILITY_STATUS,
-  EMPLOYEE_COUNT_BANDS,
-} from "../constants";
-import { useCheckLevyEligibility } from "../queries/levy-exchange.query";
-import { levyEligibilityDefaults, levyEligibilitySchema } from "../schemas";
+  useCheckLevyEligibility,
+  useLevyVocabulary,
+} from "../queries/levy-exchange.query";
+import {
+  buildLevyEligibilitySchema,
+  levyEligibilityDefaults,
+} from "../schemas";
+
+const toOptions = (values) =>
+  (Array.isArray(values) ? values : []).map((value) => ({
+    value,
+    text: value,
+  }));
 
 const STATUS_META = {
   [ELIGIBILITY_STATUS.ELIGIBLE]: {
@@ -113,6 +121,12 @@ function ResultCard({ result, sector, region }) {
 }
 
 export function EligibilityChecker() {
+  // The same vocabulary the recipient profile and the donor's preferences use:
+  // the funding band is keyed by sector and eligibility by employee count, so
+  // a checker with its own list answered its own question, not the API's.
+  const vocabularyQuery = useLevyVocabulary();
+  const vocabulary = vocabularyQuery.data ?? null;
+
   const {
     register,
     handleSubmit,
@@ -120,7 +134,7 @@ export function EligibilityChecker() {
     control,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(levyEligibilitySchema),
+    resolver: zodResolver(buildLevyEligibilitySchema(vocabulary)),
     defaultValues: levyEligibilityDefaults,
     mode: "onBlur",
   });
@@ -154,30 +168,42 @@ export function EligibilityChecker() {
             <SingleSelectField
               name="employeeCountBand"
               label="How many employees do you have?"
-              options={EMPLOYEE_COUNT_BANDS}
+              options={toOptions(vocabulary?.closed?.employeeCountBand)}
               register={register}
               setValue={setValue}
               value={values.employeeCountBand ?? ""}
               error={errors.employeeCountBand?.message}
+              placeholder="Select your employee count"
               searchable={false}
             />
-            <SingleSelectField
-              name="sector"
-              label="Which sector are you in?"
-              options={ELIGIBILITY_SECTORS}
-              register={register}
-              setValue={setValue}
-              value={values.sector ?? ""}
-              error={errors.sector?.message}
-            />
+            {/* Sector is an open field everywhere else, so it is free text here
+                too, with the API's suggestions. A select would ask this SME to
+                describe itself from five options and quietly decide its funding
+                band on the answer. */}
+            <div>
+              <InputField
+                name="sector"
+                label="Which sector are you in?"
+                register={register}
+                error={errors.sector?.message}
+                list="eligibility-sector-suggestions"
+                autoComplete="off"
+              />
+              <datalist id="eligibility-sector-suggestions">
+                {toOptions(vocabulary?.open?.sector).map((option) => (
+                  <option key={option.value} value={option.value} />
+                ))}
+              </datalist>
+            </div>
             <SingleSelectField
               name="region"
               label="Where are you based?"
-              options={ELIGIBILITY_REGIONS}
+              options={toOptions(vocabulary?.closed?.region)}
               register={register}
               setValue={setValue}
               value={values.region ?? ""}
               error={errors.region?.message}
+              placeholder="Select your region"
             />
             <div className="flex items-end">
               <CheckboxField
@@ -187,11 +213,23 @@ export function EligibilityChecker() {
               />
             </div>
             <div className="sm:col-span-2">
-              <Button type="submit" color="green" loading={isPending}>
+              <Button
+                type="submit"
+                color="green"
+                loading={isPending}
+                disabled={!vocabulary}
+              >
                 Check eligibility
               </Button>
             </div>
           </form>
+
+          {vocabularyQuery.isError ? (
+            <p className="mt-4 text-sm text-danger-600" role="alert">
+              {vocabularyQuery.error?.message ??
+                "Could not load the sector, region and size options."}
+            </p>
+          ) : null}
 
           {error ? (
             <p className="mt-4 text-sm text-danger-600" role="alert">
