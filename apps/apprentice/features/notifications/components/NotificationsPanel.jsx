@@ -9,6 +9,7 @@ import { cn } from "@/utils/helper";
 
 import { NotificationItem } from "./NotificationItem";
 import { NotificationPreferences } from "./NotificationPreferences";
+import { PushNotificationsToggle } from "./PushNotificationsToggle";
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
@@ -164,6 +165,8 @@ export function NotificationsPanel() {
       ) : null}
 
       <NotificationPreferences />
+
+      <PushNotificationsToggle />
     </div>
   );
 }

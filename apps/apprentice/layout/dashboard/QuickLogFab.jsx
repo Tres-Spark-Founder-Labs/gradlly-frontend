@@ -2,7 +2,8 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 
 import { QuickOtjLogSheet } from "@/features/otj/components/QuickOtjLogSheet";
 
@@ -29,8 +30,29 @@ import { QuickOtjLogSheet } from "@/features/otj/components/QuickOtjLogSheet";
  * text, and a visible focus ring. There is no axe-core in this repository yet,
  * which is recorded as an outstanding launch gate rather than assumed fine.
  */
+/**
+ * `?log=1` opens the sheet on arrival. It is where the inactivity push lands
+ * (F3.1.4 AC5 — "alerts include a CTA to log hours immediately") and where the
+ * manifest's "Log a session" shortcut points, so both open the form directly
+ * rather than a page with a button on it.
+ */
 export function QuickLogFab() {
-  const [open, setOpen] = useState(false);
+  // useSearchParams needs a Suspense boundary for static prerendering. The
+  // fallback is the same button, so the FAB is never missing from a page.
+  return (
+    <Suspense fallback={<QuickLogFabButton initialOpen={false} />}>
+      <QuickLogFabWithUrl />
+    </Suspense>
+  );
+}
+
+function QuickLogFabWithUrl() {
+  const searchParams = useSearchParams();
+  return <QuickLogFabButton initialOpen={searchParams.get("log") === "1"} />;
+}
+
+function QuickLogFabButton({ initialOpen }) {
+  const [open, setOpen] = useState(initialOpen);
 
   return (
     <>

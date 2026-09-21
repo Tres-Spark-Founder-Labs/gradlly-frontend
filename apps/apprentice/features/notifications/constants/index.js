@@ -6,6 +6,9 @@ export const NOTIFICATION_PATHS = Object.freeze({
   read: (id) => `/api/v1/notifications/${id}/read`,
   // F3.4.3 AC3 — the user's own per-type preferences (GET and PATCH).
   PREFERENCES: "/api/v1/notifications/preferences",
+  // F3.4.3 AC4 — web push: this browser's subscription, and the key to make one.
+  PUSH_SUBSCRIPTIONS: "/api/v1/notifications/push-subscriptions",
+  PUSH_PUBLIC_KEY: "/api/v1/notifications/push-subscriptions/public-key",
 });
 
 // Visual metadata per notification `type`. Unknown types fall back to `default`.

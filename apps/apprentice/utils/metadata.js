@@ -53,6 +53,16 @@ export function createPageSeo({
     icons: {
       icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
       shortcut: "/favicon.svg",
+      apple: "/icons/icon-192.png",
+    },
+    // The PRD describes Portal 3 as an installable web app (mobile-first,
+    // native app Phase 2). The manifest is what makes "Add to Home Screen"
+    // install it as one; the service worker (public/sw.js) handles push.
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: `${PORTAL.brand}`,
     },
     formatDetection: {
       email: false,

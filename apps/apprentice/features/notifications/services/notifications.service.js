@@ -66,3 +66,38 @@ export async function updateNotificationPreferences(preferences) {
     throw normalizeApiClientError(e);
   }
 }
+
+/** F3.4.3 AC4 — the server's VAPID public key; null when push is not configured. */
+export async function getPushPublicKey() {
+  try {
+    const result = await $apiClient.get(NOTIFICATION_PATHS.PUSH_PUBLIC_KEY);
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+/** Stores this browser's subscription — `PushSubscription.toJSON()`, unchanged. */
+export async function createPushSubscription(subscription) {
+  try {
+    const result = await $apiClient.post(
+      NOTIFICATION_PATHS.PUSH_SUBSCRIPTIONS,
+      subscription,
+    );
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+/** Retires this browser's subscription by its endpoint. */
+export async function deletePushSubscription(endpoint) {
+  try {
+    const result = await $apiClient.delete(
+      `${NOTIFICATION_PATHS.PUSH_SUBSCRIPTIONS}?endpoint=${encodeURIComponent(endpoint)}`,
+    );
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}

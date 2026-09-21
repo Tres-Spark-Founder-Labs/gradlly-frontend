@@ -12,6 +12,7 @@ import { InputField } from "@/components/form/InputField";
 import { SingleSelectField } from "@/components/form/SingleSelectField";
 import Button from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import { PushOptInCard } from "@/features/notifications/components/PushOptInCard";
 import { useLearnerSummary } from "@/features/reporting/queries/reporting.query";
 import { applyServerErrors } from "@/lib/errors";
 
@@ -179,6 +180,11 @@ function ConfirmationState({
             : "This session is not counted until approved."}
         </p>
       </div>
+
+      {/* F3.4.3 AC4 — the one place push is offered: after a session has just
+          been logged, never on page load. The card decides for itself whether
+          it may appear (supported, not asked yet, not declined). */}
+      <PushOptInCard />
 
       <div className="mt-5 flex gap-2">
         <Button

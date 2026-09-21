@@ -1010,6 +1010,196 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/das/manual/levy-balance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Record the levy balance by hand
+     * @description One row per organisation: submitting again corrects the figure rather than adding a second. Stored with lastSyncStatus = manual, so the sync card reports "Manually entered" rather than claiming a sync happened.
+     */
+    post: operations["DasManualController_setLevyBalance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/das/manual/levy-monthly": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * The stored monthly levy rows, verbatim
+     * @description Populates the monthly form. Separate from /reporting/levy-utilisation, which types contributions and spend as numbers and omits currency entirely — saving that view back would silently reset every currency.
+     */
+    get: operations["DasManualController_listMonthly"];
+    /**
+     * Replace the monthly levy series
+     * @description REPLACES every monthly entry for the active organisation — this is not an upsert. The whole set is written in one transaction, so a failure part-way leaves the previous series intact rather than half a year. Months must be contiguous: gaps are allowed at either end (a levy year in progress) but not in the middle, where a missing month is a dropped row rather than a zero.
+     */
+    put: operations["DasManualController_replaceMonthly"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/das/manual/levy-tranches": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * The stored tranche rows for one DAS account, verbatim
+     * @description Populates the tranche form. /levy-exchange/surplus/expiry-calendar is a 24-month projection derived from these rows rather than the rows themselves, so it carries neither row identity nor donorLinkId.
+     */
+    get: operations["DasManualController_listTranches"];
+    /**
+     * Replace the tranches on one DAS account
+     * @description REPLACES every tranche on the given donor link — not an upsert, and scoped to the link rather than the organisation. An organisation may hold several linked DAS accounts (F4.1.1 AC4), so tranches on its other links are untouched. Written in one transaction. The donor link must already exist: create it at POST /das/manual/donor-link.
+     */
+    put: operations["DasManualController_replaceTranches"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/das/manual/funding-payments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * The stored funding payments, verbatim
+     * @description Populates the payment form when an operator opens an existing payment to correct it. The display DTO types amount as a number.
+     */
+    get: operations["DasManualController_listFundingPayments"];
+    put?: never;
+    /**
+     * Record a funding payment by hand
+     * @description Keyed on externalReference per organisation, so re-entering a reference corrects that payment rather than double-counting it. A negative amount is a clawback and requires a clawbackNotice; payments synced from the ESFA are recorded as sent and carry no such requirement.
+     */
+    post: operations["DasManualController_recordFundingPayment"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/das/manual/ilr-receipt": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Record the ESFA receipt for an ILR submission
+     * @description For an ILR built here and filed through the ESFA portal by hand. Writes the returned reference and the time the ESFA accepted it — not the time this was typed in — onto an existing submission.
+     */
+    post: operations["DasManualController_recordIlrReceipt"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/das/manual/donor-link": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Record a DAS account by hand
+     * @description Created with status = manual rather than linked: no OAuth consent took place, and nothing should treat it as a live connection to sync against. Several per organisation is normal (F4.1.1 AC4). This is step one — tranches attach to a link and cannot be entered without one.
+     */
+    post: operations["DasManualController_createDonorLink"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/das/manual/donor-links": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List the DAS accounts tranches can be attached to
+     * @description Read by the Levy data screen so the operator can choose which account a set of tranches belongs to, and so the tranche form can say plainly when none exists yet.
+     */
+    get: operations["DasManualController_listDonorLinks"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/notifications/push-subscriptions/public-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * The VAPID public key browsers subscribe with
+     * @description Pass as applicationServerKey to PushManager.subscribe(). Null when web push is not configured on this server.
+     */
+    get: operations["NotificationsController_getPushPublicKey"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/notifications/push-subscriptions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Subscribe this browser to web push */
+    post: operations["NotificationsController_createPushSubscription"];
+    /** Unsubscribe this browser from web push */
+    delete: operations["NotificationsController_deletePushSubscription"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/notifications": {
     parameters: {
       query?: never;
@@ -1042,6 +1232,30 @@ export interface paths {
     head?: never;
     /** Mark all unread notifications as read */
     patch: operations["NotificationsController_markAllRead"];
+    trace?: never;
+  };
+  "/notifications/preferences": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get the current user notification preferences
+     * @description Every (channel, type) pair with its enabled state; an absent choice is enabled. `configurable` marks the pairs PATCH accepts: email, for the types the platform emails.
+     */
+    get: operations["NotificationsController_getPreferences"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Set the current user notification preferences
+     * @description Upserts each { channel, type, enabled }. Refused, naming the pair, when a pair is not configurable or appears twice.
+     */
+    patch: operations["NotificationsController_updatePreferences"];
     trace?: never;
   };
   "/notifications/preferences/digest": {
@@ -2626,6 +2840,66 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/learners/{enrolmentId}/otj/weekly": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Off-the-job minutes per ISO week over the programme lifetime
+     * @description Approved and submitted (pending) minutes for every ISO week from the programme start to this week, grouped server-side so a long programme is neither truncated nor bucketed in the browser. Approved is the authoritative figure; pending is kept separate and never merged into it.
+     */
+    get: operations["LearnersController_getOtjWeekly"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/reporting/donor-analytics": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Donor analytics summary (F4.1.4 AC1)
+     * @description Total transferred, SMEs funded, learners funded, completion rate and EPA pass rate — the last two computed over the enrolments this donor funded, not the recipients’ whole cohorts. `esgImpact` (AC3) is always null pending an agreed methodology.
+     */
+    get: operations["DonorAnalyticsController_getSummary"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/reporting/donor-analytics/breakdown": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Transferred amount by sector, region and programme (F4.1.4 AC2)
+     * @description Sector and region come from each recipient’s profile and are read live, so a recipient editing its profile changes historical groupings. Transfers with no usable programme detail are grouped as "Unspecified" rather than dropped, so the parts sum to the whole.
+     */
+    get: operations["DonorAnalyticsController_getBreakdown"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/reporting/levy-roi": {
     parameters: {
       query?: never;
@@ -3297,6 +3571,67 @@ export interface paths {
      * @description Returns PDF metadata and storage key for the transfer agreement. Available after PDF generation completes.
      */
     get: operations["TransfersController_getDocument"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/levy-exchange/transfers/{id}/enrolments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List the enrolments this transfer funded */
+    get: operations["TransfersController_listEnrolments"];
+    put?: never;
+    /**
+     * Record that this transfer funded an enrolment
+     * @description Called by the provider delivering the training. The transfer must be confirmed or active, and the enrolment must belong to the employer that received the transfer. Idempotent — linking the same pair twice returns the existing link rather than double-counting the learner.
+     */
+    post: operations["TransfersController_linkEnrolment"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/levy-exchange/transfers/{id}/enrolments/{enrolmentId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Remove a funding link recorded in error
+     * @description Soft-deletes the link. The enrolment and the transfer are untouched — only the claim that this transfer paid for that learner is withdrawn.
+     */
+    delete: operations["TransfersController_unlinkEnrolment"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/levy-exchange/vocabulary": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * The Levy Exchange vocabulary
+     * @description Public. The closed fields with their permitted values (validated on the recipient profile PUT, the transfer preference write and the eligibility check) and the open fields with suggestions (any value accepted, normalised on write). Values are display strings, compared exactly.
+     */
+    get: operations["VocabularyController_get"];
     put?: never;
     post?: never;
     delete?: never;
@@ -4298,6 +4633,15 @@ export interface components {
       /** @description Lightweight list of every organisation the user actively belongs to, ordered by role priority then join date. Empty array when the user has no active memberships. Intended to drive an org switcher. */
       organisations: components["schemas"]["OrganisationListItemDto"][];
     };
+    MfaChallengeResponseDto: {
+      /** @example true */
+      mfaRequired: boolean;
+      /**
+       * @description Short-lived token identifying this login attempt. Submit it with a TOTP or recovery code to POST /auth/mfa/verify to complete login.
+       * @example 550e8400-e29b-41d4-a716-446655440000
+       */
+      challengeToken: string;
+    };
     SignupDto: {
       /**
        * @description First name of the user
@@ -4432,15 +4776,6 @@ export interface components {
       locale?: string;
       /** @example Europe/London */
       timezone?: string;
-    };
-    MfaChallengeResponseDto: {
-      /** @example true */
-      mfaRequired: boolean;
-      /**
-       * @description Short-lived token identifying this login attempt. Submit it with a TOTP or recovery code to POST /auth/mfa/verify to complete login.
-       * @example 550e8400-e29b-41d4-a716-446655440000
-       */
-      challengeToken: string;
     };
     MfaEnrollResponseDto: {
       /**
@@ -4701,7 +5036,7 @@ export interface components {
       /** @example 2025-01-15 */
       date?: string | null;
       /** @enum {string} */
-      status: "complete" | "current" | "upcoming";
+      status: "complete" | "current" | "upcoming" | "overdue" | "cancelled";
     };
     GatewayChecklistItemDto: {
       /** @example otj_on_track */
@@ -4722,6 +5057,23 @@ export interface components {
       approvedMinutes: number;
       expectedMinutesByToday: number;
       totalTargetMinutes: number;
+      /**
+       * @description F3.1.2 AC1 — approved minutes as a percentage of the total target. Null
+       *     when no target could be computed, which is not the same as zero.
+       * @example 62.5
+       */
+      percentOfTarget?: number | null;
+      /**
+       * @description Progress ring band. green ≥70% of target, amber 50–69%, red <50%, unknown when no target could be computed.
+       * @example amber
+       * @enum {string}
+       */
+      progressBand: "green" | "amber" | "red" | "unknown";
+      /**
+       * Format: date
+       * @description Projected date the OTJ target is met at current pace; null when it cannot be projected
+       */
+      projectedCompletionDate?: string | null;
     };
     EnrolmentJourneyResponseDto: {
       /** Format: uuid */
@@ -4735,15 +5087,21 @@ export interface components {
       /** @description Days remaining until EPA; null when EPA date unset */
       daysToEpa?: number | null;
       /**
-       * @description EPA countdown colour band: green / amber / red / unset
+       * @description EPA countdown colour band. green ≥90 days, amber 30–89, red ≤29 (including the day itself), overdue once the date has passed with no completion recorded, unset when the provider has not confirmed a date.
        * @example amber
+       * @enum {string}
        */
-      epaCountdownBand: Record<string, never>;
+      epaCountdownBand: "green" | "amber" | "red" | "overdue" | "unset";
       milestones: components["schemas"]["JourneyMilestoneDto"][];
       gatewayChecklist: components["schemas"]["GatewayChecklistItemDto"][];
       /** @description Gateway checklist completion 0–100 */
       gatewayCompletionPercent: number;
       gatewayReady: boolean;
+      /**
+       * Format: date-time
+       * @description When gateway readiness was reached; null when not currently ready
+       */
+      gatewayReadyAt?: string | null;
       pace: components["schemas"]["EnrolmentJourneyPaceDto"];
     };
     ParticipantUserOptionDto: {
@@ -5069,7 +5427,7 @@ export interface components {
       /** @example GBP */
       currency: string | null;
       /** @enum {string} */
-      lastSyncStatus: "idle" | "success" | "failed";
+      lastSyncStatus: "idle" | "success" | "failed" | "manual";
       lastErrorMessage: string | null;
       lastSyncedAt: string | null;
     };
@@ -5148,6 +5506,122 @@ export interface components {
       /** Format: date-time */
       occurredAt: string;
     };
+    ManualLevyBalanceDto: {
+      /**
+       * @description Available levy balance in GBP. Up to two decimal places.
+       * @example 48250.00
+       */
+      balance: string;
+      /**
+       * @default GBP
+       * @example GBP
+       */
+      currency: string;
+      /**
+       * @description The DAS account this balance belongs to, if known.
+       * @example MDAS-11223344
+       */
+      accountId?: string;
+      /**
+       * @description UKPRN, if the organisation record does not already carry it.
+       * @example 10001234
+       */
+      ukprn?: string;
+    };
+    ManualLevyMonthlyRowDto: {
+      /**
+       * @description Month as YYYY-MM. Stored as the first of that month.
+       * @example 2026-04
+       */
+      month: string;
+      /** @example 4100.00 */
+      contributions: string;
+      /** @example 2750.00 */
+      spend: string;
+      /**
+       * @default GBP
+       * @example GBP
+       */
+      currency: string;
+    };
+    ManualLevyMonthlyDto: {
+      /** @description Up to 12 contiguous months, oldest first. Gaps are allowed at either end (a year in progress) but not in the middle — enter 0.00 for a month with no contribution. REPLACES every monthly entry for the active organisation; this is not an upsert. */
+      months: components["schemas"]["ManualLevyMonthlyRowDto"][];
+    };
+    ManualLevyTrancheRowDto: {
+      /** @example 7800.00 */
+      amount: string;
+      /**
+       * @description The date this tranche expires, YYYY-MM-DD.
+       * @example 2027-04-30
+       */
+      expiresOn: string;
+    };
+    ManualLevyTranchesDto: {
+      /**
+       * Format: uuid
+       * @description The donor link these tranches belong to. Required: an organisation may have several linked DAS accounts (F4.1.1 AC4). Create one first at POST /das/manual/donor-link.
+       */
+      donorLinkId: string;
+      /** @description REPLACES every tranche on this donor link — not an upsert. Tranches on the organisation's other donor links are untouched. */
+      tranches: components["schemas"]["ManualLevyTrancheRowDto"][];
+    };
+    ManualFundingPaymentDto: {
+      /**
+       * @description The ESFA payment reference. Unique per organisation.
+       * @example MDAS-PAY-2026-04
+       */
+      externalReference: string;
+      /** @example 2026-04-15 */
+      paymentDate: string;
+      /**
+       * @description Negative for a clawback, which is a real ESFA adjustment rather than a data-entry error.
+       * @example 1250.00
+       */
+      amount: string;
+      /**
+       * @default GBP
+       * @example GBP
+       */
+      currency: string;
+      /** @example 2026-27 */
+      fundingPeriod?: string;
+      /** @description Why the amount was recovered. Required when the amount is negative. Not required on payments synced from the ESFA, which are recorded as sent. */
+      clawbackNotice?: string;
+    };
+    ManualIlrReceiptDto: {
+      /**
+       * Format: uuid
+       * @description The ILR submission this receipt belongs to.
+       */
+      submissionId: string;
+      /**
+       * @description The reference the ESFA returned for the submission.
+       * @example ESFA-2026-000123
+       */
+      esfaReference: string;
+      /**
+       * @description When the ESFA accepted it, not when this was typed in.
+       * @example 2026-04-16T09:30:00.000Z
+       */
+      submittedAt: string;
+    };
+    ManualDonorLinkDto: {
+      /**
+       * @description How the operator will recognise this account. Shown wherever a link has to be chosen, so it should distinguish one legal entity from another.
+       * @example Meridian Engineering — main levy account
+       */
+      label: string;
+      /** @example MDAS-11223344 */
+      dasAccountId?: string;
+      /** @example 10001234 */
+      ukprn?: string;
+      /**
+       * @description The balance on this account, if known. Left absent rather than zeroed when it is not.
+       * @example 48250.00
+       */
+      lastBalance?: string;
+    };
     NotificationResponseDto: {
       /** Format: uuid */
       id: string;
@@ -5169,7 +5643,9 @@ export interface components {
         | "levy_expiry_90"
         | "levy_expiry_30"
         | "message"
-        | "caseload_at_risk";
+        | "caseload_at_risk"
+        | "epa_date_updated"
+        | "milestone_completed";
       /** @example Invitation accepted */
       title: string;
       /** @example You joined Acme Ltd. */
@@ -5199,9 +5675,102 @@ export interface components {
         | "levy_expiry_90"
         | "levy_expiry_30"
         | "message"
-        | "caseload_at_risk";
+        | "caseload_at_risk"
+        | "epa_date_updated"
+        | "milestone_completed";
       /** @enum {string} */
       frequency: "daily" | "weekly" | "off";
+    };
+    NotificationChannelPreferenceDto: {
+      /** @enum {string} */
+      channel: "in_app" | "email" | "digest" | "push";
+      /** @description Whether this channel is on. With no stored choice, true. */
+      enabled: boolean;
+      /** @description Whether PATCH /notifications/preferences may change this pair. True only for email on a type the platform emails. In-app is never configurable (F3.4.3 AC1: the centre lists every notification); the OTJ digest keeps its own endpoint, /notifications/preferences/digest. */
+      configurable: boolean;
+    };
+    NotificationTypePreferencesDto: {
+      /** @enum {string} */
+      type:
+        | "system"
+        | "generic"
+        | "invitation"
+        | "otj"
+        | "review"
+        | "commitment"
+        | "portfolio"
+        | "ilr_submission_succeeded"
+        | "ilr_submission_failed"
+        | "levy_expiry_90"
+        | "levy_expiry_30"
+        | "message"
+        | "caseload_at_risk"
+        | "epa_date_updated"
+        | "milestone_completed";
+      /** @example Review reminders */
+      label: string;
+      channels: components["schemas"]["NotificationChannelPreferenceDto"][];
+    };
+    NotificationPreferencesResponseDto: {
+      types: components["schemas"]["NotificationTypePreferencesDto"][];
+    };
+    UpdateNotificationPreferenceItemDto: {
+      /**
+       * @example email
+       * @enum {string}
+       */
+      channel: "in_app" | "email" | "digest" | "push";
+      /**
+       * @example review
+       * @enum {string}
+       */
+      type:
+        | "system"
+        | "generic"
+        | "invitation"
+        | "otj"
+        | "review"
+        | "commitment"
+        | "portfolio"
+        | "ilr_submission_succeeded"
+        | "ilr_submission_failed"
+        | "levy_expiry_90"
+        | "levy_expiry_30"
+        | "message"
+        | "caseload_at_risk"
+        | "epa_date_updated"
+        | "milestone_completed";
+      /** @example false */
+      enabled: boolean;
+    };
+    UpdateNotificationPreferencesDto: {
+      preferences: components["schemas"]["UpdateNotificationPreferenceItemDto"][];
+    };
+    PushPublicKeyResponseDto: {
+      /** @description The VAPID public key to pass as applicationServerKey; null when web push is not configured on this server. */
+      publicKey: string | null;
+    };
+    PushSubscriptionResponseDto: {
+      /** Format: uuid */
+      id: string;
+      endpoint: string;
+      userAgent?: string | null;
+      createdAt: string;
+    };
+    PushSubscriptionKeysDto: {
+      /** @description P-256 ECDH public key, base64url. */
+      p256dh: string;
+      /** @description Authentication secret, base64url. */
+      auth: string;
+    };
+    CreatePushSubscriptionDto: {
+      /**
+       * Format: uri
+       * @description The push service URL for this browser.
+       * @example https://fcm.googleapis.com/fcm/send/…
+       */
+      endpoint: string;
+      keys: components["schemas"]["PushSubscriptionKeysDto"];
     };
     MarkAllNotificationsReadDto: {
       /**
@@ -5757,6 +6326,29 @@ export interface components {
        */
       status: "not_started" | "in_progress" | "completed";
     };
+    PdfJobResponseDto: {
+      /** Format: uuid */
+      jobId: string;
+      /** @enum {string} */
+      status: "queued" | "processing" | "completed" | "failed";
+      /** @enum {string} */
+      template:
+        | "hello"
+        | "review_snapshot"
+        | "commitment_snapshot"
+        | "levy_transfer_agreement"
+        | "levy_roi_report"
+        | "commitment_audit_trail"
+        | "provider_comparison"
+        | "qip_plan"
+        | "learner_cohort";
+      outputKey?: string | null;
+      errorMessage?: string | null;
+      createdAt: string;
+      completedAt?: string | null;
+      downloadUrl?: string;
+      downloadExpiresAt?: string;
+    };
     UpdateQipActionProgressDto: {
       /**
        * @description Progress on the action.
@@ -5925,29 +6517,6 @@ export interface components {
     };
     UpdateSarReportDto: {
       sections: components["schemas"]["UpdateSarSectionDto"][];
-    };
-    PdfJobResponseDto: {
-      /** Format: uuid */
-      jobId: string;
-      /** @enum {string} */
-      status: "queued" | "processing" | "completed" | "failed";
-      /** @enum {string} */
-      template:
-        | "hello"
-        | "review_snapshot"
-        | "commitment_snapshot"
-        | "levy_transfer_agreement"
-        | "levy_roi_report"
-        | "commitment_audit_trail"
-        | "provider_comparison"
-        | "qip_plan"
-        | "learner_cohort";
-      outputKey?: string | null;
-      errorMessage?: string | null;
-      createdAt: string;
-      completedAt?: string | null;
-      downloadUrl?: string;
-      downloadExpiresAt?: string;
     };
     CreatePdfJobDto: {
       /**
@@ -6805,6 +7374,11 @@ export interface components {
       userId?: string | null;
       name?: string | null;
     };
+    LearnerProfileProviderDto: {
+      /** Format: uuid */
+      organisationId: string;
+      name?: string | null;
+    };
     LearnerProfileReviewItemDto: {
       /** Format: uuid */
       id: string;
@@ -6894,6 +7468,7 @@ export interface components {
       employer: components["schemas"]["LearnerProfileEmployerDto"];
       programme: components["schemas"]["LearnerProfileProgrammeDto"];
       tutor: components["schemas"]["LearnerProfileTutorDto"];
+      provider: components["schemas"]["LearnerProfileProviderDto"];
       reviews: components["schemas"]["LearnerProfileReviewItemDto"][];
       otj: components["schemas"]["LearnerProfileOtjDto"];
       documents: components["schemas"]["LearnerDocumentItemDto"][];
@@ -6913,13 +7488,55 @@ export interface components {
       messageThreads: components["schemas"]["MessageThreadSummaryDto"][];
       breakInLearning: components["schemas"]["LearnerProfileBreakInLearningDto"];
     };
+    LearnerOtjWeeklyBucketDto: {
+      /**
+       * Format: date
+       * @description Monday of the ISO week, YYYY-MM-DD.
+       */
+      weekStart: string;
+      /** @description Approved off-the-job minutes logged in the week. The authoritative figure. */
+      approvedMinutes: number;
+      /** @description Submitted minutes awaiting a decision. Shown separately from approved, never merged into it. Draft and rejected entries are in neither. */
+      pendingMinutes: number;
+    };
+    LearnerOtjWeeklyResponseDto: {
+      /** Format: uuid */
+      enrolmentId: string;
+      /**
+       * Format: date
+       * @description The planned programme start the range is anchored to, when recorded.
+       */
+      programmeStart?: string | null;
+      /** @description Every ISO week from the earlier of the programme start and the first logged week, to the later of this week and the last logged week. Weeks with no logging are present with zeros. */
+      weeks: components["schemas"]["LearnerOtjWeeklyBucketDto"][];
+      /** @description True when the range exceeded 520 weeks and the oldest were dropped. */
+      truncated: boolean;
+    };
     LearnerMeSummaryOtjPaceDto: {
       /** @enum {string|null} */
       alertLevel?: "on_track" | "at_risk" | "off_track" | null;
       /** @example 42.5 */
       otjPercent: number | null;
-      /** @example 1200 */
+      /**
+       * @description Approved only. The authoritative figure (client decision D2) and the one the 15%/30% risk thresholds are evaluated against.
+       * @example 1200
+       */
       approvedMinutes: number;
+      /**
+       * @description Every non-deleted entry at any status, drafts included. Draft minutes are therefore derivable as loggedMinutes minus the other three.
+       * @example 1890
+       */
+      loggedMinutes: number;
+      /**
+       * @description Submitted and awaiting a decision. Never merged into approvedMinutes and never hidden (D2): a learner who logs hours and sees nothing change concludes the app is broken and stops logging.
+       * @example 600
+       */
+      pendingMinutes: number;
+      /**
+       * @description Sent back by the provider. Counted in loggedMinutes, excluded from pendingMinutes and approvedMinutes.
+       * @example 90
+       */
+      rejectedMinutes: number;
     };
     LearnerMeSummaryResponseDto: {
       /** Format: uuid */
@@ -6986,6 +7603,56 @@ export interface components {
        * @description Null un-assigns, moving these learners to the Unassigned row.
        */
       tutorUserId?: string | null;
+    };
+    DonorEsgImpactDto: {
+      /** @description Estimated productivity uplift. Awaiting an agreed formula. */
+      productivityUplift?: number | null;
+      /** @description Social mobility score. Awaiting a defined methodology — see client decision 19. */
+      socialMobilityScore?: number | null;
+    };
+    DonorAnalyticsSummaryDto: {
+      /**
+       * @description Total transferred to date across confirmed and active transfers.
+       * @example 48000
+       */
+      totalTransferred: number;
+      /**
+       * @description Distinct SMEs that received a confirmed or active transfer.
+       * @example 3
+       */
+      smesFunded: number;
+      /**
+       * @description Distinct learners funded. A learner funded by two of this donor’s transfers counts once.
+       * @example 7
+       */
+      learnersFunded: number;
+      /** @example 2 */
+      completedCount: number;
+      /**
+       * @description Percentage of funded enrolments completed; null when none are funded yet — which is not the same as 0%.
+       * @example 28.57
+       */
+      completionRate?: number | null;
+      /**
+       * @description EPA pass rate over funded enrolments; null when none assessed yet. Merit and distinction count as passes.
+       * @example 100
+       */
+      epaPassRate?: number | null;
+      /** @example 2 */
+      epaAssessedCount: number;
+      /** @description AC3 — null until a methodology is agreed (decision 19). */
+      esgImpact?: components["schemas"]["DonorEsgImpactDto"] | null;
+    };
+    DonorAnalyticsBreakdownRowDto: {
+      /** @example Engineering & Manufacturing */
+      label: string;
+      /** @example 21000 */
+      amount: number;
+    };
+    DonorAnalyticsBreakdownDto: {
+      bySector: components["schemas"]["DonorAnalyticsBreakdownRowDto"][];
+      byRegion: components["schemas"]["DonorAnalyticsBreakdownRowDto"][];
+      byProgrammeType: components["schemas"]["DonorAnalyticsBreakdownRowDto"][];
     };
     LevyRoiForecastSliceDto: {
       /** @example 12 */
@@ -7472,7 +8139,7 @@ export interface components {
       dasAccountId: string | null;
       ukprn: string | null;
       /** @enum {string} */
-      status: "pending_consent" | "linked" | "error";
+      status: "pending_consent" | "linked" | "error" | "manual";
       lastErrorMessage: string | null;
       consentedAt: string | null;
       lastSyncedAt: string | null;
@@ -7502,20 +8169,34 @@ export interface components {
     };
     CheckLevyEligibilityDto: {
       /**
-       * @description Employee count band slug (1_9, 10_49, 50_249 for SME; 250_plus is levy-paying)
-       * @example 10_49
+       * @description Closed field: one of GET /levy-exchange/vocabulary closed.employeeCountBand. 1-9, 10-49 and 50-249 are SME bands; 250+ is levy-paying.
+       * @example 10-49
+       * @enum {string}
        */
-      employeeCountBand: string;
+      employeeCountBand: "1-9" | "10-49" | "50-249" | "250+";
       /**
-       * @description Employer sector slug
-       * @example construction
+       * @description Open field: any value. Suggestions from GET /levy-exchange/vocabulary (open.sector); a sector with no configured funding band gets the default.
+       * @example Construction
        */
       sector: string;
       /**
-       * @description Employer region slug
-       * @example north_west
+       * @description Closed field: one of GET /levy-exchange/vocabulary closed.region.
+       * @example North West
+       * @enum {string}
        */
-      region: string;
+      region:
+        | "North East"
+        | "North West"
+        | "Yorkshire and the Humber"
+        | "East Midlands"
+        | "West Midlands"
+        | "East of England"
+        | "London"
+        | "South East"
+        | "South West"
+        | "Wales"
+        | "Scotland"
+        | "Northern Ireland";
       /**
        * @description Whether the employer already has a Digital Apprenticeship Service account
        * @example false
@@ -7569,23 +8250,37 @@ export interface components {
     };
     UpsertRecipientProfileDto: {
       /**
-       * @description Recipient sector slug used for rule-based matching
-       * @example construction
+       * @description Open field: any value, normalised on write. Suggestions from GET /levy-exchange/vocabulary (open.sector).
+       * @example Construction
        */
       sector: string;
       /**
-       * @description Recipient region slug used for rule-based matching
-       * @example north_west
+       * @description Closed field: one of GET /levy-exchange/vocabulary closed.region.
+       * @example North West
+       * @enum {string}
        */
-      region: string;
+      region:
+        | "North East"
+        | "North West"
+        | "Yorkshire and the Humber"
+        | "East Midlands"
+        | "West Midlands"
+        | "East of England"
+        | "London"
+        | "South East"
+        | "South West"
+        | "Wales"
+        | "Scotland"
+        | "Northern Ireland";
       /**
-       * @description Employee count band slug (e.g. 10_49, 50_249)
-       * @example 10_49
+       * @description Closed field: one of GET /levy-exchange/vocabulary closed.employeeCountBand.
+       * @example 10-49
+       * @enum {string}
        */
-      employeeCountBand: string;
+      employeeCountBand: "1-9" | "10-49" | "50-249" | "250+";
       /**
-       * @description Apprenticeship programme type slug
-       * @example standards
+       * @description Open field: any value, normalised on write. Suggestions from GET /levy-exchange/vocabulary (open.programmeType).
+       * @example ST0415 Software Developer
        */
       programmeType: string;
       /**
@@ -7622,30 +8317,46 @@ export interface components {
     };
     UpsertTransferPreferencesDto: {
       /**
+       * @description Open field: any values, each normalised on write. Suggestions from GET /levy-exchange/vocabulary (open.sector). Empty accepts every sector.
        * @example [
-       *       "construction",
-       *       "engineering"
+       *       "Construction",
+       *       "Engineering & Manufacturing"
        *     ]
        */
       sectors: string[];
       /**
+       * @description Closed field: each one of GET /levy-exchange/vocabulary closed.region. Empty accepts every region.
        * @example [
-       *       "north_west",
-       *       "yorkshire"
+       *       "North West",
+       *       "Yorkshire and the Humber"
        *     ]
        */
-      regions: string[];
+      regions: (
+        | "North East"
+        | "North West"
+        | "Yorkshire and the Humber"
+        | "East Midlands"
+        | "West Midlands"
+        | "East of England"
+        | "London"
+        | "South East"
+        | "South West"
+        | "Wales"
+        | "Scotland"
+        | "Northern Ireland"
+      )[];
       /**
+       * @description Closed field: each one of GET /levy-exchange/vocabulary closed.employeeCountBand. Empty accepts every size.
        * @example [
-       *       "10_49",
-       *       "50_249"
+       *       "10-49",
+       *       "50-249"
        *     ]
        */
-      sizeBands: string[];
+      sizeBands: ("1-9" | "10-49" | "50-249" | "250+")[];
       /**
+       * @description Open field: any values, each normalised on write. Suggestions from GET /levy-exchange/vocabulary (open.programmeType). Empty accepts every programme type.
        * @example [
-       *       "standards",
-       *       "frameworks"
+       *       "ST0415 Software Developer"
        *     ]
        */
       programmeTypes: string[];
@@ -7725,6 +8436,8 @@ export interface components {
       id: string;
       /** Format: uuid */
       donorOrganisationId: string;
+      /** @description The donor’s name, or "Matched donor" when it matches anonymously (F4.2.3 AC3). Null when the API cannot say which applies. */
+      donorDisplayName: string | null;
       /** Format: uuid */
       recipientOrganisationId: string;
       /** @example 15000.00 */
@@ -7753,11 +8466,22 @@ export interface components {
       /** @enum {string} */
       status?: "pending" | "confirmed" | "rejected" | "withdrawn";
     };
+    LevyTransferSignatureStateDto: {
+      /** @enum {string} */
+      party: "donor" | "recipient";
+      /** @description Signing order. The donor signs first (1), then the recipient (2). */
+      signOrder: number;
+      signed: boolean;
+      /** Format: date-time */
+      signedAt?: string | null;
+    };
     LevyTransferResponseDto: {
       /** Format: uuid */
       id: string;
       /** Format: uuid */
       donorOrganisationId: string;
+      /** @description The donor organisation’s name. The parties to a transfer are known to each other; null only when the organisation no longer exists. */
+      donorOrganisationName: string | null;
       /** Format: uuid */
       recipientOrganisationId: string;
       /** Format: uuid */
@@ -7780,6 +8504,15 @@ export interface components {
       expiryDate?: string | null;
       createdAt: string;
       updatedAt: string;
+      /** @description Both parties’ signature slots, in signing order. */
+      signatures: components["schemas"]["LevyTransferSignatureStateDto"][];
+      /**
+       * @description The party whose signature is awaited. Null unless status is pending_signatures: before the agreement PDF exists, and once both parties have signed.
+       * @enum {string|null}
+       */
+      nextParty?: "donor" | "recipient" | null;
+      /** @description True when the requesting user can sign now: their party is next in order and they are its assigned signer or an organisation owner/admin. */
+      actionRequired: boolean;
     };
     LevyTransferDocumentResponseDto: {
       /** Format: uuid */
@@ -7811,6 +8544,23 @@ export interface components {
       downloadExpiresAt?: string;
       /** @enum {string|null} */
       nextParty?: "donor" | "recipient" | null;
+    };
+    TransferEnrolmentResponseDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      transferId: string;
+      /** Format: uuid */
+      enrolmentId: string;
+      /** Format: uuid */
+      donorOrganisationId: string;
+      /**
+       * @description Amount attributed to this enrolment; null when the transfer was not apportioned.
+       * @example 21000.00
+       */
+      attributedAmount?: string | null;
+      /** Format: date-time */
+      createdAt: string;
     };
     CreateTransferFromMatchDto: {
       /**
@@ -7860,6 +8610,74 @@ export interface components {
         | "confirmed"
         | "active"
         | "failed";
+    };
+    LinkTransferEnrolmentDto: {
+      /**
+       * Format: uuid
+       * @description The enrolment this transfer paid for
+       */
+      enrolmentId: string;
+      /**
+       * @description Amount of the transfer attributed to this enrolment. Omit when the transfer has not been apportioned — no figure is inferred.
+       * @example 21000
+       */
+      attributedAmount?: number;
+    };
+    LevyClosedVocabularyDto: {
+      /**
+       * @description Permitted values for the recipient profile’s `region`, the donor preference’s `regions` and the eligibility check’s `region`.
+       * @example [
+       *       "North East",
+       *       "North West",
+       *       "Yorkshire and the Humber",
+       *       "East Midlands",
+       *       "West Midlands",
+       *       "East of England",
+       *       "London",
+       *       "South East",
+       *       "South West",
+       *       "Wales",
+       *       "Scotland",
+       *       "Northern Ireland"
+       *     ]
+       */
+      region: string[];
+      /**
+       * @description Permitted values for the recipient profile’s `employeeCountBand`, the donor preference’s `sizeBands` and the eligibility check’s `employeeCountBand`.
+       * @example [
+       *       "1-9",
+       *       "10-49",
+       *       "50-249",
+       *       "250+"
+       *     ]
+       */
+      employeeCountBand: string[];
+    };
+    LevyOpenVocabularyDto: {
+      /**
+       * @description Suggestions for the recipient profile’s `sector`, the donor preference’s `sectors` and the eligibility check’s `sector`. Any value is accepted.
+       * @example [
+       *       "Construction",
+       *       "Digital & Technology",
+       *       "Engineering & Manufacturing",
+       *       "Financial Services",
+       *       "Health & Social Care"
+       *     ]
+       */
+      sector: string[];
+      /**
+       * @description Suggestions for the recipient profile’s `programmeType` and the donor preference’s `programmeTypes`. Any value is accepted.
+       * @example [
+       *       "ST0145 Engineering Technician",
+       *       "ST0415 Software Developer",
+       *       "ST0215 Senior Healthcare Support Worker"
+       *     ]
+       */
+      programmeType: string[];
+    };
+    LevyVocabularyResponseDto: {
+      closed: components["schemas"]["LevyClosedVocabularyDto"];
+      open: components["schemas"]["LevyOpenVocabularyDto"];
     };
     IlrMappingConfigResponseDto: {
       /** Format: uuid */
@@ -8086,15 +8904,28 @@ export interface components {
        */
       contactEmail?: string;
       /**
-       * @description Sector slug pre-seeded from eligibility checker
-       * @example construction
+       * @description Sector pre-seeded from the eligibility checker. Open vocabulary field: any value, normalised on write. Suggestions from GET /levy-exchange/vocabulary (open.sector).
+       * @example Construction
        */
       sector?: string;
       /**
-       * @description Region slug pre-seeded from eligibility checker
-       * @example north_west
+       * @description Region pre-seeded from the eligibility checker. Closed vocabulary field: one of GET /levy-exchange/vocabulary closed.region.
+       * @example North West
+       * @enum {string}
        */
-      region?: string;
+      region?:
+        | "North East"
+        | "North West"
+        | "Yorkshire and the Humber"
+        | "East Midlands"
+        | "West Midlands"
+        | "East of England"
+        | "London"
+        | "South East"
+        | "South West"
+        | "Wales"
+        | "Scotland"
+        | "Northern Ireland";
     };
     CreateRegistrationSessionResponseDto: {
       /** Format: uuid */
@@ -11743,6 +12574,328 @@ export interface operations {
       };
     };
   };
+  DasManualController_setLevyBalance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ManualLevyBalanceDto"];
+      };
+    };
+    responses: {
+      /** @description Balance recorded */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  DasManualController_listMonthly: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Stored monthly rows, money as strings */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  DasManualController_replaceMonthly: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ManualLevyMonthlyDto"];
+      };
+    };
+    responses: {
+      /** @description Series replaced */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  DasManualController_listTranches: {
+    parameters: {
+      query: {
+        /** @description The DAS account whose tranches to return. */
+        donorLinkId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Stored tranches, amounts as strings */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  DasManualController_replaceTranches: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ManualLevyTranchesDto"];
+      };
+    };
+    responses: {
+      /** @description Tranches replaced */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  DasManualController_listFundingPayments: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Stored payments, amounts as strings */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  DasManualController_recordFundingPayment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ManualFundingPaymentDto"];
+      };
+    };
+    responses: {
+      /** @description Payment recorded */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  DasManualController_recordIlrReceipt: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ManualIlrReceiptDto"];
+      };
+    };
+    responses: {
+      /** @description Receipt recorded */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  DasManualController_createDonorLink: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ManualDonorLinkDto"];
+      };
+    };
+    responses: {
+      /** @description DAS account recorded */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  DasManualController_listDonorLinks: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description DAS accounts */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  NotificationsController_getPushPublicKey: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The public key, or null */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            message?: string;
+            data?: components["schemas"]["PushPublicKeyResponseDto"];
+          };
+        };
+      };
+      /** @description Missing or invalid bearer token */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
+  NotificationsController_createPushSubscription: {
+    parameters: {
+      query?: never;
+      header: {
+        "user-agent": string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreatePushSubscriptionDto"];
+      };
+    };
+    responses: {
+      /** @description The stored subscription */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            message?: string;
+            data?: components["schemas"]["PushSubscriptionResponseDto"];
+          };
+        };
+      };
+      /** @description Missing or invalid bearer token */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description Not a web push subscription */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
+  NotificationsController_deletePushSubscription: {
+    parameters: {
+      query: {
+        endpoint: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description How many subscriptions were removed (0 or 1) */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            message?: string;
+            data?: {
+              removed?: number;
+            };
+          };
+        };
+      };
+      /** @description Missing or invalid bearer token */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
   NotificationsController_list: {
     parameters: {
       query?: {
@@ -11814,6 +12967,83 @@ export interface operations {
       };
       /** @description Missing or invalid bearer token */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
+  NotificationsController_getPreferences: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Every (channel, type) pair */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            message?: string;
+            data?: components["schemas"]["NotificationPreferencesResponseDto"];
+          };
+        };
+      };
+      /** @description Missing or invalid bearer token */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
+  NotificationsController_updatePreferences: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateNotificationPreferencesDto"];
+      };
+    };
+    responses: {
+      /** @description Every (channel, type) pair, after the change */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            message?: string;
+            data?: components["schemas"]["NotificationPreferencesResponseDto"];
+          };
+        };
+      };
+      /** @description Missing or invalid bearer token */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description A pair is not configurable, or appears twice */
+      422: {
         headers: {
           [name: string]: unknown;
         };
@@ -17210,6 +18440,149 @@ export interface operations {
       };
     };
   };
+  LearnersController_getOtjWeekly: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Active organisation UUID (optional override) */
+        "x-organisation-id"?: string;
+      };
+      path: {
+        enrolmentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Weekly buckets */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            message?: string;
+            data?: components["schemas"]["LearnerOtjWeeklyResponseDto"];
+          };
+        };
+      };
+      /** @description Missing or invalid bearer token */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description No active organisation context, non-provider org, or enrolment not accessible */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description Enrolment not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
+  DonorAnalyticsController_getSummary: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Active organisation UUID (optional override) */
+        "x-organisation-id"?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Donor analytics summary */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            message?: string;
+            data?: components["schemas"]["DonorAnalyticsSummaryDto"];
+          };
+        };
+      };
+      /** @description Missing or invalid bearer token */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description No active organisation context */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
+  DonorAnalyticsController_getBreakdown: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Active organisation UUID (optional override) */
+        "x-organisation-id"?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Breakdowns */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            message?: string;
+            data?: components["schemas"]["DonorAnalyticsBreakdownDto"];
+          };
+        };
+      };
+      /** @description Missing or invalid bearer token */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description No active organisation context */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
   LevyRoiReportController_getSummary: {
     parameters: {
       query?: never;
@@ -18413,11 +19786,11 @@ export interface operations {
         page?: number;
         /** @description Items per page. */
         perPage?: number;
-        /** @description Filter by SME sector */
+        /** @description Filter by SME sector, compared exactly. An open vocabulary field: GET /levy-exchange/vocabulary open.sector carries the suggestions. */
         sector?: string;
-        /** @description Filter by SME region */
+        /** @description Filter by SME region, compared exactly. A closed vocabulary field: GET /levy-exchange/vocabulary closed.region carries every value a stored profile can hold. */
         region?: string;
-        /** @description Filter by apprenticeship programme type */
+        /** @description Filter by apprenticeship programme type, compared exactly. An open vocabulary field: GET /levy-exchange/vocabulary open.programmeType carries the suggestions. */
         programmeType?: string;
       };
       header?: {
@@ -19464,6 +20837,202 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
+  TransfersController_listEnrolments: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Active organisation UUID (optional override) */
+        "x-organisation-id"?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Funded enrolments */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            message?: string;
+            data?: components["schemas"]["TransferEnrolmentResponseDto"][];
+          };
+        };
+      };
+      /** @description Missing or invalid bearer token */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description No active organisation context */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
+  TransfersController_linkEnrolment: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Active organisation UUID (optional override) */
+        "x-organisation-id"?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["LinkTransferEnrolmentDto"];
+      };
+    };
+    responses: {
+      /** @description Enrolment linked */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            message?: string;
+            data?: components["schemas"]["TransferEnrolmentResponseDto"];
+          };
+        };
+      };
+      /** @description Transfer is not yet funding, or the enrolment belongs to another employer */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description Missing or invalid bearer token */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description No active organisation context */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description Transfer or enrolment not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description Validation failed */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ValidationErrorResponseDto"];
+        };
+      };
+    };
+  };
+  TransfersController_unlinkEnrolment: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Active organisation UUID (optional override) */
+        "x-organisation-id"?: string;
+      };
+      path: {
+        id: string;
+        enrolmentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or invalid bearer token */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description The caller can see the link but does not own the enrolment; only the enrolment's owner can unlink it */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description No such link */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
+  VocabularyController_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Closed fields with permitted values; open fields with suggestions */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            message?: string;
+            data?: components["schemas"]["LevyVocabularyResponseDto"];
+          };
         };
       };
     };

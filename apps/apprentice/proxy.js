@@ -46,7 +46,10 @@ export function proxy(request) {
 }
 
 export const config = {
+  // webmanifest: browsers fetch the manifest without cookies unless the link
+  // says use-credentials, so a login redirect here would make the app
+  // uninstallable. It is a public file with nothing personal in it.
   matcher: [
-    "/((?!_next/|api/|.*\\.(?:ico|png|jpg|jpeg|svg|webp|css|js|woff2?|ttf|map)$).*)",
+    "/((?!_next/|api/|.*\\.(?:ico|png|jpg|jpeg|svg|webp|css|js|webmanifest|woff2?|ttf|map)$).*)",
   ],
 };
