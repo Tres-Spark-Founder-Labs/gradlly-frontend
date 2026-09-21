@@ -4,6 +4,8 @@ export const NOTIFICATION_PATHS = Object.freeze({
   BASE: "/api/v1/notifications",
   READ_ALL: "/api/v1/notifications/read-all",
   read: (id) => `/api/v1/notifications/${id}/read`,
+  // F3.4.3 AC3 — the user's own per-type preferences (GET and PATCH).
+  PREFERENCES: "/api/v1/notifications/preferences",
 });
 
 // Visual metadata per notification `type`. Unknown types fall back to `default`.

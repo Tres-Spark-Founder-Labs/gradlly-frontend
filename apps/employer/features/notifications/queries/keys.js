@@ -7,4 +7,6 @@ export const NOTIFICATION_QUERY_KEYS = {
     { page, perPage, unreadOnly },
   ],
   unreadCount: (orgId) => ["notifications", "unread-count", orgId],
+  // Per user, not per organisation: the preference follows the person.
+  preferences: (userId) => ["notifications", "preferences", userId],
 };

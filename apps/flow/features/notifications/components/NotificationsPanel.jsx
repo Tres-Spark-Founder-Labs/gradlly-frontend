@@ -8,6 +8,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { cn } from "@/utils/helper";
 
 import { NotificationItem } from "./NotificationItem";
+import { NotificationPreferences } from "./NotificationPreferences";
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
@@ -40,8 +41,9 @@ function NotificationSkeleton() {
  * NotificationsPanel
  *
  * Lists the user's notifications with an All/Unread filter, "mark all as read"
- * action, pagination and per-item mark-as-read. Used in the Settings →
- * Notifications tab across all portals.
+ * action, pagination and per-item mark-as-read, then the user's per-type email
+ * preferences (F3.4.3: the centre, "with the ability to manage notification
+ * preferences"). Used in the Settings → Notifications tab across all portals.
  */
 export function NotificationsPanel() {
   const [filter, setFilter] = useState("all");
@@ -160,6 +162,8 @@ export function NotificationsPanel() {
           onPerPageChange={handlePerPageChange}
         />
       ) : null}
+
+      <NotificationPreferences />
     </div>
   );
 }

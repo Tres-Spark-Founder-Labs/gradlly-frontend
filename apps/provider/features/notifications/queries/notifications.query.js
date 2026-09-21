@@ -12,9 +12,11 @@ import { toastError } from "@/hooks/useToast";
 
 import { NOTIFICATION_QUERY_KEYS } from "./keys";
 import {
+  getNotificationPreferences,
   listNotifications,
   markAllNotificationsRead,
   markNotificationRead,
+  updateNotificationPreferences,
 } from "../services/notifications.service";
 
 // Refetch the unread badge periodically so it stays roughly live.
@@ -100,4 +102,65 @@ export function useMarkAllNotificationsRead() {
       toastError(error.message || "Failed to mark all as read.");
     },
   });
+}
+
+/** F3.4.3 AC3 — the signed-in user's per-type preferences. */
+export function useNotificationPreferences(options = {}) {
+  const { user } = useAuthUser();
+  const userId = user?.id;
+
+  return useQuery({
+    queryKey: NOTIFICATION_QUERY_KEYS.preferences(userId),
+    queryFn: getNotificationPreferences,
+    enabled: !!userId,
+    ...options,
+  });
+}
+
+/**
+ * Optimistic: the cached matrix takes the change at once, the server's answer
+ * replaces it, and a refusal restores what was there and says why.
+ */
+export function useUpdateNotificationPreferences() {
+  const qc = useQueryClient();
+  const { user } = useAuthUser();
+  const key = NOTIFICATION_QUERY_KEYS.preferences(user?.id);
+
+  return useMutation({
+    mutationFn: (preferences) => updateNotificationPreferences(preferences),
+    onMutate: async (preferences) => {
+      await qc.cancelQueries({ queryKey: key });
+      const previous = qc.getQueryData(key);
+      qc.setQueryData(key, (current) =>
+        applyPreferenceChanges(current, preferences),
+      );
+      return { previous };
+    },
+    onError: (error, _preferences, context) => {
+      qc.setQueryData(key, context?.previous);
+      toastError(error?.message ?? "Your preference could not be saved.");
+    },
+    onSuccess: (matrix) => {
+      qc.setQueryData(key, matrix);
+    },
+  });
+}
+
+/** The cached matrix with each { channel, type, enabled } applied. */
+function applyPreferenceChanges(matrix, preferences) {
+  if (!matrix || !Array.isArray(matrix.types)) return matrix;
+  return {
+    ...matrix,
+    types: matrix.types.map((entry) => ({
+      ...entry,
+      channels: (Array.isArray(entry.channels) ? entry.channels : []).map(
+        (channel) => {
+          const change = preferences.find(
+            (p) => p.type === entry.type && p.channel === channel.channel,
+          );
+          return change ? { ...channel, enabled: change.enabled } : channel;
+        },
+      ),
+    })),
+  };
 }

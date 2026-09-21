@@ -48,3 +48,28 @@ export async function markAllNotificationsRead({ organisationId } = {}) {
     throw normalizeApiClientError(e);
   }
 }
+
+/**
+ * F3.4.3 AC3 — every (channel, type) pair for the signed-in user, labelled,
+ * each marked `configurable`. Per user, so no organisation is sent.
+ */
+export async function getNotificationPreferences() {
+  try {
+    const result = await $apiClient.get(NOTIFICATION_PATHS.PREFERENCES);
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
+/** Upserts `[{ channel, type, enabled }]`; returns the whole matrix. */
+export async function updateNotificationPreferences(preferences) {
+  try {
+    const result = await $apiClient.patch(NOTIFICATION_PATHS.PREFERENCES, {
+      preferences,
+    });
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}

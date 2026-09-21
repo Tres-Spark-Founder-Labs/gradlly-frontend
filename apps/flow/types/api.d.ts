@@ -1196,6 +1196,30 @@ export interface paths {
     patch: operations["NotificationsController_markAllRead"];
     trace?: never;
   };
+  "/notifications/preferences": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get the current user notification preferences
+     * @description Every (channel, type) pair with its enabled state; an absent choice is enabled. `configurable` marks the pairs PATCH accepts: email, for the types the platform emails.
+     */
+    get: operations["NotificationsController_getPreferences"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Set the current user notification preferences
+     * @description Upserts each { channel, type, enabled }. Refused, naming the pair, when a pair is not configurable or appears twice.
+     */
+    patch: operations["NotificationsController_updatePreferences"];
+    trace?: never;
+  };
   "/notifications/preferences/digest": {
     parameters: {
       query?: never;
@@ -5581,7 +5605,9 @@ export interface components {
         | "levy_expiry_90"
         | "levy_expiry_30"
         | "message"
-        | "caseload_at_risk";
+        | "caseload_at_risk"
+        | "epa_date_updated"
+        | "milestone_completed";
       /** @example Invitation accepted */
       title: string;
       /** @example You joined Acme Ltd. */
@@ -5611,9 +5637,76 @@ export interface components {
         | "levy_expiry_90"
         | "levy_expiry_30"
         | "message"
-        | "caseload_at_risk";
+        | "caseload_at_risk"
+        | "epa_date_updated"
+        | "milestone_completed";
       /** @enum {string} */
       frequency: "daily" | "weekly" | "off";
+    };
+    NotificationChannelPreferenceDto: {
+      /** @enum {string} */
+      channel: "in_app" | "email" | "digest";
+      /** @description Whether this channel is on. With no stored choice, true. */
+      enabled: boolean;
+      /** @description Whether PATCH /notifications/preferences may change this pair. True only for email on a type the platform emails. In-app is never configurable (F3.4.3 AC1: the centre lists every notification); the OTJ digest keeps its own endpoint, /notifications/preferences/digest. */
+      configurable: boolean;
+    };
+    NotificationTypePreferencesDto: {
+      /** @enum {string} */
+      type:
+        | "system"
+        | "generic"
+        | "invitation"
+        | "otj"
+        | "review"
+        | "commitment"
+        | "portfolio"
+        | "ilr_submission_succeeded"
+        | "ilr_submission_failed"
+        | "levy_expiry_90"
+        | "levy_expiry_30"
+        | "message"
+        | "caseload_at_risk"
+        | "epa_date_updated"
+        | "milestone_completed";
+      /** @example Review reminders */
+      label: string;
+      channels: components["schemas"]["NotificationChannelPreferenceDto"][];
+    };
+    NotificationPreferencesResponseDto: {
+      types: components["schemas"]["NotificationTypePreferencesDto"][];
+    };
+    UpdateNotificationPreferenceItemDto: {
+      /**
+       * @example email
+       * @enum {string}
+       */
+      channel: "in_app" | "email" | "digest";
+      /**
+       * @example review
+       * @enum {string}
+       */
+      type:
+        | "system"
+        | "generic"
+        | "invitation"
+        | "otj"
+        | "review"
+        | "commitment"
+        | "portfolio"
+        | "ilr_submission_succeeded"
+        | "ilr_submission_failed"
+        | "levy_expiry_90"
+        | "levy_expiry_30"
+        | "message"
+        | "caseload_at_risk"
+        | "epa_date_updated"
+        | "milestone_completed";
+      /** @example false */
+      enabled: boolean;
+    };
+    UpdateNotificationPreferencesDto: {
+      preferences: components["schemas"]["UpdateNotificationPreferenceItemDto"][];
     };
     MarkAllNotificationsReadDto: {
       /**
@@ -8747,15 +8840,28 @@ export interface components {
        */
       contactEmail?: string;
       /**
-       * @description Sector slug pre-seeded from eligibility checker
-       * @example construction
+       * @description Sector pre-seeded from the eligibility checker. Open vocabulary field: any value, normalised on write. Suggestions from GET /levy-exchange/vocabulary (open.sector).
+       * @example Construction
        */
       sector?: string;
       /**
-       * @description Region slug pre-seeded from eligibility checker
-       * @example north_west
+       * @description Region pre-seeded from the eligibility checker. Closed vocabulary field: one of GET /levy-exchange/vocabulary closed.region.
+       * @example North West
+       * @enum {string}
        */
-      region?: string;
+      region?:
+        | "North East"
+        | "North West"
+        | "Yorkshire and the Humber"
+        | "East Midlands"
+        | "West Midlands"
+        | "East of England"
+        | "London"
+        | "South East"
+        | "South West"
+        | "Wales"
+        | "Scotland"
+        | "Northern Ireland";
     };
     CreateRegistrationSessionResponseDto: {
       /** Format: uuid */
@@ -12682,6 +12788,83 @@ export interface operations {
       };
       /** @description Missing or invalid bearer token */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
+  NotificationsController_getPreferences: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Every (channel, type) pair */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            message?: string;
+            data?: components["schemas"]["NotificationPreferencesResponseDto"];
+          };
+        };
+      };
+      /** @description Missing or invalid bearer token */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
+  NotificationsController_updatePreferences: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateNotificationPreferencesDto"];
+      };
+    };
+    responses: {
+      /** @description Every (channel, type) pair, after the change */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            message?: string;
+            data?: components["schemas"]["NotificationPreferencesResponseDto"];
+          };
+        };
+      };
+      /** @description Missing or invalid bearer token */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description A pair is not configurable, or appears twice */
+      422: {
         headers: {
           [name: string]: unknown;
         };
@@ -19424,11 +19607,11 @@ export interface operations {
         page?: number;
         /** @description Items per page. */
         perPage?: number;
-        /** @description Filter by SME sector */
+        /** @description Filter by SME sector, compared exactly. An open vocabulary field: GET /levy-exchange/vocabulary open.sector carries the suggestions. */
         sector?: string;
-        /** @description Filter by SME region */
+        /** @description Filter by SME region, compared exactly. A closed vocabulary field: GET /levy-exchange/vocabulary closed.region carries every value a stored profile can hold. */
         region?: string;
-        /** @description Filter by apprenticeship programme type */
+        /** @description Filter by apprenticeship programme type, compared exactly. An open vocabulary field: GET /levy-exchange/vocabulary open.programmeType carries the suggestions. */
         programmeType?: string;
       };
       header?: {
