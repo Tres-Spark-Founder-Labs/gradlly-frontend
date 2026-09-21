@@ -31,7 +31,12 @@ import {
  *   AC2  structured by KSB category  (see the note on format below)
  *   AC3  generated within 60 seconds (measured — see epa-pack-timing.e2e-spec)
  *   AC4  preview before generating   → buildPackPreview
- *   AC5  download link also emailed  (see the note below)
+ *   AC5  download link also emailed  — by graddly-api once the pack is
+ *        built (EpaPackEmailService), to the person who exported it, with a
+ *        presigned link (TTL is EPA_PACK_EMAIL_LINK_TTL_SECONDS, 24h by
+ *        default); respects their portfolio email preference.
+ *        The API reports it as downloadEmailSentAt, and only that field
+ *        makes this screen say so.
  *
  * The PRD asks for "a single tap", so the export is one button. The preview
  * above it is a list, not a step: nothing has to be confirmed or configured
@@ -149,7 +154,11 @@ export function EpaPackExport() {
                   Your pack is ready
                 </p>
                 <p className="text-xs text-neutral-500">
-                  The download link is also in your documents.
+                  {/* The email says how long its link lasts; that is server
+                      config, so it is not repeated here. */}
+                  {exporter.downloadEmailSentAt
+                    ? "We have also emailed you the link."
+                    : "The download link is also in your documents."}
                 </p>
               </div>
               <Button href={exporter.downloadUrl} startIcon={<Download />}>

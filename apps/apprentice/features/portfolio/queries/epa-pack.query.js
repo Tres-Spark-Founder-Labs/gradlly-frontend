@@ -65,6 +65,8 @@ export function useEpaPackExport(enrolmentId) {
       start.isPending ||
       (Boolean(jobId) && !TERMINAL.has(job.data?.status ?? "")),
     downloadUrl: job.data?.downloadUrl ?? null,
+    /** F3.3.4 AC5 — set by the API only once the link email was queued. */
+    downloadEmailSentAt: job.data?.downloadEmailSentAt ?? null,
     manifest: job.data?.manifest ?? null,
     errorMessage: job.data?.errorMessage ?? start.error?.message ?? null,
   };
