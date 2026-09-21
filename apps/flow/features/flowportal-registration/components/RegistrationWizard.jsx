@@ -6,6 +6,7 @@ import { useCallback, useState } from "react";
 
 import Button from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
+import { useLevyVocabulary } from "@/features/levy-exchange/queries/levy-exchange.query";
 import { ERROR_CODES } from "@/lib/errors";
 import { formatDateTime } from "@/utils/helper";
 
@@ -21,6 +22,7 @@ import {
   useCreateRegistrationSession,
   useRegistrationSession,
 } from "../queries/registration.query";
+import { registrationPrefill } from "../schemas";
 
 function readStoredToken() {
   if (typeof window === "undefined") return null;
@@ -61,20 +63,32 @@ export function RegistrationWizard() {
 
   const complete = useCompleteRegistration(token);
 
+  // The vocabulary decides whether a region hint in the URL is still valid.
+  // Public, so it loads before sign-in like the eligibility checker's.
+  const vocabularyQuery = useLevyVocabulary();
+
+  // A region hint can only be checked once the vocabulary has answered, so
+  // Start waits for that — and only when there is a region hint to check. If
+  // the vocabulary fails, isLoading ends and the hint is simply dropped:
+  // nothing about an old URL may stop this person starting.
+  const checkingRegionHint =
+    Boolean(searchParams.get("region")) && vocabularyQuery.isLoading;
+
   const handleStart = useCallback(() => {
-    // Seed sector/region from the eligibility check when arriving via its CTA.
-    createSession.mutate({
-      sector: searchParams.get("sector") || undefined,
-      region: searchParams.get("region") || undefined,
-    });
-  }, [createSession, searchParams]);
+    // Seed sector/region from the eligibility check when arriving via its CTA
+    // — as prefill, filtered leniently; see registrationPrefill for why the
+    // URL is treated differently from a value the person picked.
+    createSession.mutate(
+      registrationPrefill(searchParams, vocabularyQuery.data),
+    );
+  }, [createSession, searchParams, vocabularyQuery.data]);
 
   // ── No session yet: start screen ────────────────────────────────────────────
   if (!token) {
     return (
       <StartScreen
         onStart={handleStart}
-        loading={createSession.isPending}
+        loading={createSession.isPending || checkingRegionHint}
         error={createSession.error}
       />
     );
@@ -94,7 +108,7 @@ export function RegistrationWizard() {
     return (
       <StartScreen
         onStart={handleStart}
-        loading={createSession.isPending}
+        loading={createSession.isPending || checkingRegionHint}
         error={createSession.error}
         expired
       />

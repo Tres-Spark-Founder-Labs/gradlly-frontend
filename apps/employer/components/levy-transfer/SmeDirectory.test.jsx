@@ -2,9 +2,27 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockUseRecipientDirectory = vi.fn();
+let vocabularyState;
+
+/**
+ * The API's vocabulary shape: closed fields carry permitted values, open
+ * fields suggestions. The directory's region filter is built from the first,
+ * its sector and programme-type suggestions from the second.
+ */
+const VOCABULARY = {
+  closed: {
+    region: ["North West", "West Midlands", "London"],
+    employeeCountBand: ["1-9", "10-49", "50-249", "250+"],
+  },
+  open: {
+    sector: ["Construction", "Engineering & Manufacturing"],
+    programmeType: ["ST0415 Software Developer"],
+  },
+};
 
 vi.mock("@/features/levy/queries/levy.query", () => ({
   useRecipientDirectory: (params) => mockUseRecipientDirectory(params),
+  useLevyVocabulary: () => vocabularyState,
 }));
 
 const { SmeDirectory } = await import("./SmeDirectory");
@@ -12,10 +30,10 @@ const { SmeDirectory } = await import("./SmeDirectory");
 const sme = (overrides = {}) => ({
   id: "p-1",
   organisationId: "org-sme",
-  sector: "Manufacturing",
+  sector: "Engineering & Manufacturing",
   region: "West Midlands",
   employeeCountBand: "10-49",
-  programmeType: "standards",
+  programmeType: "ST0415 Software Developer",
   transferAmountRequired: "15000.00",
   hasDasAccount: true,
   isListed: true,
@@ -39,6 +57,12 @@ const given = ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vocabularyState = {
+    data: VOCABULARY,
+    isLoading: false,
+    isError: false,
+    error: null,
+  };
 });
 
 describe("SmeDirectory — F1.1.4 AC2 (search or browse)", () => {
@@ -46,9 +70,9 @@ describe("SmeDirectory — F1.1.4 AC2 (search or browse)", () => {
     given({ recipients: [sme()] });
     render(<SmeDirectory />);
 
-    expect(screen.getByText("Manufacturing")).toBeVisible();
-    expect(screen.getByText(/West Midlands/)).toBeVisible();
-    expect(screen.getByText("standards")).toBeVisible();
+    expect(screen.getByText("Engineering & Manufacturing")).toBeVisible();
+    expect(screen.getByText(/West Midlands · 10-49/)).toBeVisible();
+    expect(screen.getByText("ST0415 Software Developer")).toBeVisible();
     // Amount required is money, so 2dp per the shared formatter.
     expect(screen.getByText("£15,000.00")).toBeVisible();
   });
@@ -87,14 +111,53 @@ describe("SmeDirectory — F1.1.4 AC2 (search or browse)", () => {
       target: { value: "West Midlands" },
     });
     fireEvent.change(screen.getByLabelText(/programme type/i), {
-      target: { value: "standards" },
+      target: { value: "ST0415 Software Developer" },
     });
 
     expect(mockUseRecipientDirectory).toHaveBeenLastCalledWith({
       sector: "Manufacturing",
       region: "West Midlands",
-      programmeType: "standards",
+      programmeType: "ST0415 Software Developer",
     });
+  });
+
+  /**
+   * The directory compares exactly, as matching does, so each filter must be
+   * able to hold a value a profile holds. Region is a closed set: a select
+   * over the served values, never a text box a donor can type a near-miss
+   * into. Sector and programme type are open: free text, with suggestions.
+   */
+  it("offers region as a select over the served values, with 'any' as the default", () => {
+    given({ recipients: [] });
+    render(<SmeDirectory />);
+
+    const region = screen.getByLabelText(/region/i);
+    expect(region.tagName).toBe("SELECT");
+    expect(
+      Array.from(region.querySelectorAll("option")).map((o) => o.value),
+    ).toEqual(["", "North West", "West Midlands", "London"]);
+  });
+
+  it("keeps sector and programme type as free text, with the served suggestions", () => {
+    given({ recipients: [] });
+    const { container } = render(<SmeDirectory />);
+
+    const sector = screen.getByLabelText(/sector/i);
+    expect(sector.tagName).toBe("INPUT");
+    const suggested = (input) =>
+      Array.from(
+        container.querySelectorAll(`#${input.getAttribute("list")} option`),
+      ).map((o) => o.value);
+    expect(suggested(sector)).toEqual([
+      "Construction",
+      "Engineering & Manufacturing",
+    ]);
+    expect(suggested(screen.getByLabelText(/programme type/i))).toEqual([
+      "ST0415 Software Developer",
+    ]);
+    // The old placeholder was not a vocabulary value, and typed as shown it
+    // matched nothing once the directory went exact.
+    expect(sector).not.toHaveAttribute("placeholder", "e.g. Manufacturing");
   });
 
   it("ignores whitespace-only input", () => {
@@ -134,6 +197,44 @@ describe("SmeDirectory — states", () => {
       target: { value: "Aerospace" },
     });
     expect(screen.getByText(/No SMEs match those filters/i)).toBeVisible();
+  });
+
+  it("says why an open-field search can come back empty", () => {
+    // Exact comparison is the honest rule, but a donor who typed "retail"
+    // against an SME's "Retail" should be told it is exact, not left guessing.
+    given({ recipients: [] });
+    render(<SmeDirectory />);
+    fireEvent.change(screen.getByLabelText(/sector/i), {
+      target: { value: "retail" },
+    });
+    expect(screen.getByText(/match an SME.s wording exactly/i)).toBeVisible();
+  });
+
+  it("does not explain exact wording for a region, which can only be a served value", () => {
+    given({ recipients: [] });
+    render(<SmeDirectory />);
+    fireEvent.change(screen.getByLabelText(/region/i), {
+      target: { value: "London" },
+    });
+    expect(screen.queryByText(/match an SME.s wording exactly/i)).toBeNull();
+  });
+
+  it("still browses when the vocabulary cannot be loaded, and says region is unavailable", () => {
+    // Nothing is written here, so a failed vocabulary must not take the
+    // directory down with it; only the region select loses its options.
+    vocabularyState = {
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: { message: "boom" },
+    };
+    given({ recipients: [sme()] });
+    render(<SmeDirectory />);
+
+    expect(screen.getByText("Engineering & Manufacturing")).toBeVisible();
+    expect(
+      screen.getByText(/region options could not be loaded/i),
+    ).toBeVisible();
   });
 
   it("shows a loading state", () => {
