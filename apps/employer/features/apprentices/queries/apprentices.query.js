@@ -11,6 +11,7 @@ import { toastError, toastSuccess } from "@/hooks/useToast";
 import { APPRENTICE_QUERY_KEYS } from "./keys";
 import {
   createApprentice,
+  exportRosterPdf,
   getApprentices,
 } from "../services/apprentices.service";
 import { normalisePaceStatus } from "../utils/risk-status";
@@ -174,6 +175,18 @@ export function useApprenticeRoster() {
     isLoading: apprenticesQ.isLoading || enrolmentsQ.isLoading,
     isError: apprenticesQ.isError || enrolmentsQ.isError,
   };
+}
+
+/** F1.2.1 AC6 — queues the roster PDF through the shared job pipeline. */
+export function useExportRosterPdf() {
+  const { orgId } = useAuthUser();
+
+  return useMutation({
+    mutationFn: (body) => exportRosterPdf({ orgId, body }),
+    onError: (error) => {
+      toastError(error.message || "The PDF export could not be started.");
+    },
+  });
 }
 
 export function useCreateApprentice() {

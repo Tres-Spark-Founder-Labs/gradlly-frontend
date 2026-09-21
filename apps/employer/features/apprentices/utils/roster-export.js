@@ -159,6 +159,34 @@ export function nextSortState(current, column) {
   };
 }
 
+// ─── PDF (F1.2.1 AC6) ───────────────────────────────────────────────────────
+
+/**
+ * The screen state, as POST /apprentices/roster/export takes it.
+ *
+ * The CSV is written here from `visible`; the PDF is rendered by graddly-api,
+ * which rebuilds the same list from these parameters with the same rules
+ * (`src/apprentices/apprentice-roster.rules.ts` is a port of this file). So
+ * this sends exactly what `filterRoster` and `sortRoster` were given, and
+ * nothing the server would have to guess: empty values are left out rather
+ * than sent as "" or null.
+ */
+export function toRosterExportQuery({ filter, search, advanced, sort } = {}) {
+  const query = {};
+  if (filter && filter !== "all") query.filter = filter;
+  const text = (search ?? "").trim();
+  if (text) query.search = text;
+  for (const key of ["provider", "standard", "epaMonth", "cohort"]) {
+    const value = advanced?.[key];
+    if (value) query[key] = value;
+  }
+  if (sort?.sortBy && SORT_ACCESSORS[sort.sortBy]) {
+    query.sortBy = sort.sortBy;
+    query.sortOrder = sort.sortOrder === "desc" ? "desc" : "asc";
+  }
+  return query;
+}
+
 // ─── CSV ────────────────────────────────────────────────────────────────────
 
 /** Columns mirror the on-screen table, so the file matches what was exported. */

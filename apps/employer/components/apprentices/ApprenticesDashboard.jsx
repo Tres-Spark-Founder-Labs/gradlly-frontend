@@ -2,7 +2,10 @@
 
 import { useMemo, useState } from "react";
 
-import { useApprenticeRoster } from "@/features/apprentices/queries/apprentices.query";
+import {
+  useApprenticeRoster,
+  useExportRosterPdf,
+} from "@/features/apprentices/queries/apprentices.query";
 import { isFlagged } from "@/features/apprentices/utils/risk-status";
 import {
   deriveFilterOptions,
@@ -10,7 +13,9 @@ import {
   filterRoster,
   nextSortState,
   sortRoster,
+  toRosterExportQuery,
 } from "@/features/apprentices/utils/roster-export";
+import { usePdfJobPoll } from "@/hooks/usePdfJobPoll";
 import { toastError } from "@/hooks/useToast";
 
 import { EnrolDrawer } from "./EnrolDrawer";
@@ -58,6 +63,37 @@ export function ApprenticesDashboard() {
   const handleExportCsv = () => {
     const wrote = downloadRosterCsv(visible);
     if (!wrote) toastError("There is nothing to export.");
+  };
+
+  // F1.2.1 AC6 — the PDF half. Rendered by the API from the same screen
+  // state the CSV is written from, then polled like every other PDF job.
+  const { mutateAsync: queueRosterPdf, isPending: queueingPdf } =
+    useExportRosterPdf();
+  const [pdfJobId, setPdfJobId] = useState(null);
+
+  usePdfJobPoll({
+    jobId: pdfJobId,
+    enabled: !!pdfJobId,
+    onComplete: (job) => {
+      setPdfJobId(null);
+      if (job?.status === "completed" && job.downloadUrl) {
+        window.open(job.downloadUrl, "_blank", "noopener,noreferrer");
+      } else {
+        toastError("The roster PDF could not be generated. Please try again.");
+      }
+    },
+  });
+
+  const exportingPdf = queueingPdf || !!pdfJobId;
+  const handleExportPdf = async () => {
+    if (!visible.length) {
+      toastError("There is nothing to export.");
+      return;
+    }
+    const job = await queueRosterPdf(
+      toRosterExportQuery({ filter, search, advanced, sort }),
+    ).catch(() => null);
+    if (job?.jobId) setPdfJobId(job.jobId);
   };
 
   if (isLoading) {
@@ -120,6 +156,8 @@ export function ApprenticesDashboard() {
           onSearch={setSearch}
           onEnrol={() => setEnrol(true)}
           onExportCsv={handleExportCsv}
+          onExportPdf={handleExportPdf}
+          exportingPdf={exportingPdf}
           exportCount={visible.length}
           advanced={advanced}
           onAdvancedChange={setAdvanced}

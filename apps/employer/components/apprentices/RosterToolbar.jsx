@@ -67,6 +67,8 @@ export function RosterToolbar({
   onSearch,
   onEnrol,
   onExportCsv,
+  onExportPdf,
+  exportingPdf = false,
   exportCount = 0,
   advanced = {},
   onAdvancedChange,
@@ -177,21 +179,24 @@ export function RosterToolbar({
         >
           ↓ CSV
         </button>
-        {/* PDF export needs a server-side template that does not exist yet
-            (the same gap as the levy charts). Disabled rather than left
-            looking clickable — an inert control is a broken promise. */}
         <button
           type="button"
-          disabled
-          title="PDF export is not available yet"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 opacity-40 cursor-not-allowed"
+          onClick={onExportPdf}
+          disabled={!exportCount || exportingPdf}
+          aria-busy={exportingPdf}
+          title={
+            exportCount
+              ? `Export ${exportCount} apprentice${exportCount === 1 ? "" : "s"} as PDF`
+              : "Nothing to export"
+          }
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold hover:opacity-80 transition-opacity shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
           style={{
             backgroundColor: "#f5f4f2",
             color: T.subtle,
             border: `1px solid ${T.border}`,
           }}
         >
-          ↓ PDF
+          {exportingPdf ? "Preparing…" : "↓ PDF"}
         </button>
       </div>
 

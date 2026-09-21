@@ -11,6 +11,7 @@ import {
   matchesRosterFilter,
   matchesRosterSearch,
   toRosterCsv,
+  toRosterExportQuery,
 } from "./roster-export";
 
 const apprentice = (overrides = {}) => ({
@@ -436,5 +437,52 @@ describe("toRosterCsv — F1.2.1 AC6", () => {
 
   it("produces only a header when there are no rows", () => {
     expect(toRosterCsv([]).split("\r\n")).toHaveLength(1);
+  });
+});
+
+describe("toRosterExportQuery — F1.2.1 AC6 (the PDF is the table on screen)", () => {
+  it("sends every piece of screen state the list was built from", () => {
+    expect(
+      toRosterExportQuery({
+        filter: "at_risk",
+        search: "  Priya ",
+        advanced: {
+          provider: "Midlands Technical College",
+          standard: "Software Developer (ST0116)",
+          epaMonth: "2026-10",
+          cohort: "2025-09",
+        },
+        sort: { sortBy: "epaDate", sortOrder: "desc" },
+      }),
+    ).toEqual({
+      filter: "at_risk",
+      search: "Priya",
+      provider: "Midlands Technical College",
+      standard: "Software Developer (ST0116)",
+      epaMonth: "2026-10",
+      cohort: "2025-09",
+      sortBy: "epaDate",
+      sortOrder: "desc",
+    });
+  });
+
+  it("leaves out what is not applied, rather than sending empty values", () => {
+    expect(
+      toRosterExportQuery({
+        filter: "all",
+        search: "   ",
+        advanced: { provider: null, standard: "", epaMonth: undefined },
+        sort: { sortBy: null, sortOrder: "asc" },
+      }),
+    ).toEqual({});
+    expect(toRosterExportQuery()).toEqual({});
+  });
+
+  it("sends only sort columns the table has, defaulting the direction", () => {
+    expect(toRosterExportQuery({ sort: { sortBy: "nonsense" } })).toEqual({});
+    expect(toRosterExportQuery({ sort: { sortBy: "name" } })).toEqual({
+      sortBy: "name",
+      sortOrder: "asc",
+    });
   });
 });
