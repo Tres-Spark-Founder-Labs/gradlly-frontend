@@ -21,6 +21,11 @@ export const LEARNER_STATUS = Object.freeze({
   BREAK_IN_LEARNING: "break_in_learning",
   WITHDRAWN: "withdrawn",
   EPA_READY: "epa_ready",
+  /**
+   * Not in F2.2.1 AC3 — deviation D-01 (graddly-api docs/prd/DEVIATIONS.md).
+   * The learner's OTJ pace is missing: grey, not a flag, never "On track".
+   */
+  PACE_UNKNOWN: "pace_unknown",
 });
 
 export const LEARNER_STATUS_LABELS = Object.freeze({
@@ -30,6 +35,7 @@ export const LEARNER_STATUS_LABELS = Object.freeze({
   break_in_learning: "Break in learning",
   withdrawn: "Withdrawn",
   epa_ready: "EPA ready",
+  pace_unknown: "Pace unknown",
 });
 
 export const LEARNER_STATUS_FILTER_OPTIONS = [
@@ -40,6 +46,8 @@ export const LEARNER_STATUS_FILTER_OPTIONS = [
   { value: LEARNER_STATUS.BREAK_IN_LEARNING, text: "Break in learning" },
   { value: LEARNER_STATUS.EPA_READY, text: "EPA ready" },
   { value: LEARNER_STATUS.WITHDRAWN, text: "Withdrawn" },
+  // So the learners nobody has pace data for can be found, not just seen.
+  { value: LEARNER_STATUS.PACE_UNKNOWN, text: "Pace unknown" },
 ];
 
 // ─── Intervention flag reasons (queue) ───────────────────────────────────────

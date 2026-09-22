@@ -1,6 +1,7 @@
 import {
   AlertTriangle,
   CheckCircle2,
+  CircleHelp,
   Clock,
   PauseCircle,
   Sparkles,
@@ -42,10 +43,18 @@ const STATUS_STYLES = {
     className: "bg-violet-50 text-violet-700 ring-violet-200",
     icon: Sparkles,
   },
+  // Deviation D-01: grey, because nothing is known to be wrong or right.
+  [LEARNER_STATUS.PACE_UNKNOWN]: {
+    className: "bg-neutral-100 text-neutral-500 ring-neutral-200",
+    icon: CircleHelp,
+  },
 };
 
 export function LearnerStatusBadge({ status }) {
-  const style = STATUS_STYLES[status] ?? STATUS_STYLES[LEARNER_STATUS.ON_TRACK];
+  // An unrecognised status is not a green "On track" either: it used to fall
+  // back to that style, which is the same claim D-01 removes from the API.
+  const style =
+    STATUS_STYLES[status] ?? STATUS_STYLES[LEARNER_STATUS.PACE_UNKNOWN];
   const Icon = style.icon;
 
   return (

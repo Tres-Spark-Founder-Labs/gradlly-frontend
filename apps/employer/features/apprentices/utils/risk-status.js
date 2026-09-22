@@ -45,7 +45,11 @@ export const PACE_STATUS = Object.freeze({
   ON_TRACK: "on_track",
   AT_RISK: "at_risk",
   CRITICALLY_BEHIND: "critically_behind",
-  /** No pace level to show: see `normalisePaceStatus`. Never a flag, never green. */
+  /**
+   * No pace level to show: see `normalisePaceStatus`. Never a flag, never
+   * green. Not in F1.2.1 AC3 — deviation D-01 (graddly-api
+   * docs/prd/DEVIATIONS.md), shared with the provider cohort badge.
+   */
   UNKNOWN: "unknown",
 });
 
