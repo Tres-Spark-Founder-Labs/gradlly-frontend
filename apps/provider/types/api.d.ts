@@ -2397,6 +2397,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/export/all": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Export every audit entry in scope (JSON or CSV), unpaged
+     * @description Same filters as GET /audit/export, no paging. Responds with the whole export or an error: 413 when the scope holds more than AUDIT_EXPORT_MAX_ROWS entries, with the count in the message.
+     */
+    get: operations["AuditController_exportAll"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/export": {
     parameters: {
       query?: never;
@@ -6997,6 +7017,31 @@ export interface components {
       changes: {
         [key: string]: unknown;
       };
+    };
+    AuditCompleteExportFiltersDto: {
+      from: string | null;
+      to: string | null;
+      entityType: string | null;
+      /** @enum {string|null} */
+      action:
+        | "insert"
+        | "update"
+        | "delete"
+        | "erase"
+        | "view"
+        | "sign"
+        | "version_change"
+        | null;
+    };
+    AuditCompleteExportDto: {
+      /** Format: uuid */
+      organisationId: string;
+      /** Format: date-time */
+      exportedAt: string;
+      filters: components["schemas"]["AuditCompleteExportFiltersDto"];
+      /** @example 1234 */
+      total: number;
+      entries: components["schemas"]["AuditLogEntryDto"][];
     };
     KsbDefinitionResponseDto: {
       /** Format: uuid */
@@ -16998,6 +17043,83 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
+  AuditController_exportAll: {
+    parameters: {
+      query?: {
+        format?: "json" | "csv";
+        entityType?: string;
+        action?:
+          | "insert"
+          | "update"
+          | "delete"
+          | "erase"
+          | "view"
+          | "sign"
+          | "version_change";
+        /** @description Inclusive lower bound on createdAt. */
+        from?: string;
+        /** @description Inclusive upper bound on createdAt. */
+        to?: string;
+      };
+      header?: {
+        /** @description Active organisation UUID (optional override) */
+        "x-organisation-id"?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The complete export, with its scope and total */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json":
+            | {
+                message?: string;
+                data?: components["schemas"]["AuditCompleteExportDto"];
+              }
+            | string;
+          "text/csv":
+            | {
+                message?: string;
+                data?: components["schemas"]["AuditCompleteExportDto"];
+              }
+            | string;
+        };
+      };
+      /** @description Missing or invalid bearer token */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description Insufficient permissions or no active organisation */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description More entries in scope than one export may hold */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+          "text/csv": components["schemas"]["ErrorResponseDto"];
         };
       };
     };
