@@ -385,12 +385,9 @@ function GettingStartedCard({ user, activeOrganisation, profileStatus }) {
       done: false,
       href: "/register",
     },
-    {
-      id: "levy",
-      label: "Connect a donor DAS account",
-      done: false,
-      href: "/donor-links",
-    },
+    // No "connect a donor DAS account" step: donor links are created in the
+    // employer portal (the donor side), and this portal has no page for it.
+    // The tile pointed at /donor-links, which does not exist here.
   ];
 
   const doneCount = steps.filter((s) => s.done).length;
