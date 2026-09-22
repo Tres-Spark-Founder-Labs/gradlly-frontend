@@ -9,6 +9,8 @@ export const ILR_PATHS = Object.freeze({
   submit: (id) => `/api/v1/ilr/learner-records/${id}/submit`,
   amend: (id) => `/api/v1/ilr/learner-records/${id}/amend`,
   recordSubmissions: (id) => `/api/v1/ilr/learner-records/${id}/submissions`,
+  // 5.4 — the whole return for a collection period as one ILR XML file.
+  returnFile: "/api/v1/ilr/learner-records/return-file",
 
   // F2.3.2 AC7 — funding claim tracker.
   fundingClaims: "/api/v1/ilr/funding-claims",

@@ -23,6 +23,24 @@ export async function buildIlrRecord(payload) {
   }
 }
 
+/**
+ * 5.4 — the whole ILR return for a collection period: every learner record,
+ * or an error saying why not (409 with the count of records that have not
+ * passed validation, 404 for an empty period, 422 without a UKPRN).
+ *
+ * @param {string} collectionPeriod YYYY-MM
+ */
+export async function getIlrReturnFile(collectionPeriod) {
+  try {
+    const result = await $apiClient.get(ILR_PATHS.returnFile, {
+      params: { collectionPeriod },
+    });
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
 /** @param {IlrRecordsQuery} [options] */
 export async function listIlrRecords({
   page = 1,

@@ -1,6 +1,12 @@
 "use client";
 
-import { Eye, FileSpreadsheet, Plus } from "lucide-react";
+import {
+  AlertCircle,
+  Download,
+  Eye,
+  FileSpreadsheet,
+  Plus,
+} from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -8,12 +14,14 @@ import { InputField } from "@/components/form/InputField";
 import { SingleSelectField } from "@/components/form/SingleSelectField";
 import Button from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
+import { toastSuccess } from "@/hooks/useToast";
 import { cn } from "@/utils/helper";
 
 import { BuildIlrModal } from "./BuildIlrModal";
 import { IlrRecordStatusBadge } from "./IlrBadges";
 import { ILR_RECORD_STATUS_FILTER_OPTIONS } from "../constants";
 import { useIlrRecords } from "../queries/ilr.query";
+import { getIlrReturnFile } from "../services/ilr.service";
 
 function RecordCell({ record }) {
   return (
@@ -39,6 +47,41 @@ export function IlrRecordsTable() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
   const [buildOpen, setBuildOpen] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [returnProblem, setReturnProblem] = useState(null);
+
+  /**
+   * 5.4 — the whole return for the chosen collection period as one ILR XML
+   * file for ESFA Submit Learner Data. The API sends every learner record in
+   * the period or refuses with the reason (records not yet validated, an
+   * empty period, no UKPRN); a refusal is shown here and no file is saved.
+   */
+  const handleDownloadReturn = async () => {
+    setReturnProblem(null);
+    setDownloading(true);
+    try {
+      const file = await getIlrReturnFile(collectionPeriod);
+      if (!file?.xml || !file?.filename) {
+        setReturnProblem("The ILR file came back empty. No file was saved.");
+        return;
+      }
+      const url = URL.createObjectURL(
+        new Blob([file.xml], { type: "application/xml" }),
+      );
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = file.filename;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      toastSuccess(
+        `ILR file for ${collectionPeriod} downloaded: ${file.learnerCount} learners.`,
+      );
+    } catch (e) {
+      setReturnProblem(e?.message ?? "The ILR file could not be produced.");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const params = useMemo(
     () => ({
@@ -147,19 +190,55 @@ export function IlrRecordsTable() {
               onChange={(e) => {
                 setCollectionPeriod(e.target.value);
                 setPage(1);
+                setReturnProblem(null);
               }}
             />
           </div>
         </div>
-        <Button
-          size="sm"
-          color="green"
-          startIcon={<Plus className="size-4" />}
-          onClick={() => setBuildOpen(true)}
-        >
-          Build record
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            startIcon={<Download className="size-4" />}
+            onClick={handleDownloadReturn}
+            loading={downloading}
+            disabled={!collectionPeriod}
+            title={
+              collectionPeriod
+                ? `Every learner record for ${collectionPeriod}, as one ILR XML file`
+                : "Choose a collection period first"
+            }
+          >
+            Download ILR file
+          </Button>
+          <Button
+            size="sm"
+            color="green"
+            startIcon={<Plus className="size-4" />}
+            onClick={() => setBuildOpen(true)}
+          >
+            Build record
+          </Button>
+        </div>
       </div>
+
+      {returnProblem ? (
+        <p
+          role="alert"
+          className="flex items-start gap-2 rounded-lg bg-danger-50 px-3 py-2 text-sm text-danger-600"
+        >
+          <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
+          <span>{returnProblem}</span>
+        </p>
+      ) : null}
+      {collectionPeriod ? (
+        <p className="text-xs text-neutral-500">
+          The ILR file holds every learner record for {collectionPeriod}, and
+          only once each has passed validation. It uses the v1 ILR field
+          mapping, not the full ESFA schema, so Submit Learner Data may reject
+          it until the mapping is complete. The file says the same at the top.
+        </p>
+      ) : null}
 
       <DataTable
         columns={columns}

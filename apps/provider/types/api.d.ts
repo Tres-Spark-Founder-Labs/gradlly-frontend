@@ -3746,6 +3746,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/ilr/learner-records/return-file": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Download the whole ILR return for a collection period as XML
+     * @description Every learner record in the period, or an error: 409 when any record has not passed validation (with the count), 404 when the period has no records, 422 when the organisation has no UKPRN. The XML covers the v1 field mapping, not the full ESFA schema; the coverage field says so.
+     */
+    get: operations["IlrLearnerRecordsController_returnFile"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/ilr/learner-records/{id}": {
     parameters: {
       query?: never;
@@ -8858,6 +8878,36 @@ export interface components {
       requestedByUserId?: string | null;
       createdAt: string;
       updatedAt: string;
+    };
+    IlrReturnFileDto: {
+      /**
+       * @description ESFA file name: ILR-{UKPRN}-{year}-{yyyymmdd}-{hhmmss}-{serial}.XML
+       * @example ILR-10000001-2526-20251005-101500-01.XML
+       */
+      filename: string;
+      /** @example 10000001 */
+      ukprn: string;
+      /** @example 2025-26 */
+      academicYear: string;
+      /** @example 2025-10 */
+      collectionPeriod: string;
+      /**
+       * @description Learners in the file — every learner record in the period.
+       * @example 42
+       */
+      learnerCount: number;
+      /**
+       * @example [
+       *       1
+       *     ]
+       */
+      mappingConfigVersions: number[];
+      /** Format: date-time */
+      generatedAt: string;
+      /** @description What the file does and does not cover. Shown on screen and written into the file. */
+      coverage: string;
+      /** @description The ILR XML file content. */
+      xml: string;
     };
     BuildIlrLearnerRecordDto: {
       /** Format: uuid */
@@ -21504,6 +21554,61 @@ export interface operations {
       };
       /** @description No active organisation context */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+    };
+  };
+  IlrLearnerRecordsController_returnFile: {
+    parameters: {
+      query: {
+        /** @description Collection period (YYYY-MM) whose learner records make up the return. */
+        collectionPeriod: string;
+      };
+      header?: {
+        /** @description Active organisation UUID (optional override) */
+        "x-organisation-id"?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            message?: string;
+            data?: components["schemas"]["IlrReturnFileDto"];
+          };
+        };
+      };
+      /** @description Missing or invalid bearer token */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description No active organisation context */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseDto"];
+        };
+      };
+      /** @description Some learner records have not passed validation */
+      409: {
         headers: {
           [name: string]: unknown;
         };
