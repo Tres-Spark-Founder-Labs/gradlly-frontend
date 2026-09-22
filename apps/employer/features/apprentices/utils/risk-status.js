@@ -45,6 +45,8 @@ export const PACE_STATUS = Object.freeze({
   ON_TRACK: "on_track",
   AT_RISK: "at_risk",
   CRITICALLY_BEHIND: "critically_behind",
+  /** No pace level to show: see `normalisePaceStatus`. Never a flag, never green. */
+  UNKNOWN: "unknown",
 });
 
 /** What `GET /enrolments` actually returns for `otjPaceAlertLevel`. */
@@ -63,16 +65,26 @@ const API_TO_UI = Object.freeze({
 /**
  * Translates an API pace level into the UI vocabulary.
  *
- * A null level means the pace could not be computed — an enrolment with no
- * planned duration or no end date. That is *not* the same as being on track,
- * but the roster has no "unknown" column, and showing a red flag for missing
- * programme dates would be a false alarm about the apprentice rather than a
- * true one about the data. It reads as on track, and the gap is listed as open
- * work rather than hidden.
+ * ── ABSENT MEANS ABSENT ─────────────────────────────────────────────────────
+ *
+ * A missing level is `UNKNOWN`, which the badge prints as "Pace unknown" —
+ * never `ON_TRACK`. It used to be on track, on the argument that a red flag
+ * for missing programme dates would blame the apprentice for the data. The
+ * trouble is that "missing" has more than one cause, and one of them was the
+ * roster itself: it read only the first page of enrolments, so above 100 an
+ * apprentice's enrolment — and their pace level with it — fell off the page,
+ * and an at-risk apprentice rendered green. The same fault class as the
+ * hardcoded `commitmentSigned: false`: a value the screen did not have,
+ * stated as if it did.
+ *
+ * Grey "unknown" answers the original concern without the lie: it is not a
+ * flag (`isFlagged` is false, so it is in neither the at-risk card nor the
+ * alert banner), and it is not green. An unrecognised level is unknown for
+ * the same reason.
  */
 export function normalisePaceStatus(level) {
-  if (!level) return PACE_STATUS.ON_TRACK;
-  return API_TO_UI[level] ?? PACE_STATUS.ON_TRACK;
+  if (!level) return PACE_STATUS.UNKNOWN;
+  return API_TO_UI[level] ?? PACE_STATUS.UNKNOWN;
 }
 
 /** True when the apprentice carries either off-the-job flag (AC5). */

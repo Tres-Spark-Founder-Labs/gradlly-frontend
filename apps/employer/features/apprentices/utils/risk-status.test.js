@@ -39,15 +39,21 @@ describe("normalisePaceStatus", () => {
     );
   });
 
-  it("treats a null level as on track", () => {
-    // Pace is not computable without a planned duration and end date. Showing
-    // a red flag there would blame the apprentice for missing programme data.
-    expect(normalisePaceStatus(null)).toBe(PACE_STATUS.ON_TRACK);
-    expect(normalisePaceStatus(undefined)).toBe(PACE_STATUS.ON_TRACK);
+  it("never reads a missing level as on track", () => {
+    // Absent means absent. Above 100 apprentices the roster used to drop the
+    // enrolment (and its level) off page 1, and an at-risk apprentice
+    // rendered green.
+    expect(normalisePaceStatus(null)).toBe(PACE_STATUS.UNKNOWN);
+    expect(normalisePaceStatus(undefined)).toBe(PACE_STATUS.UNKNOWN);
   });
 
   it("does not invent a status for an unrecognised level", () => {
-    expect(normalisePaceStatus("something_new")).toBe(PACE_STATUS.ON_TRACK);
+    expect(normalisePaceStatus("something_new")).toBe(PACE_STATUS.UNKNOWN);
+  });
+
+  it("does not flag an unknown level either", () => {
+    expect(isFlagged(PACE_STATUS.UNKNOWN)).toBe(false);
+    expect(isCriticallyBehind(PACE_STATUS.UNKNOWN)).toBe(false);
   });
 });
 
@@ -84,6 +90,12 @@ describe("statusMeta after normalisation", () => {
 
   it("labels at risk in amber", () => {
     expect(statusMeta(PACE_STATUS.AT_RISK).label).toBe("At risk");
+  });
+
+  it("says a missing level is unknown, in grey, never on track", () => {
+    const meta = statusMeta(normalisePaceStatus(null));
+    expect(meta.label).toBe("Pace unknown");
+    expect(meta.color).not.toBe(statusMeta(PACE_STATUS.ON_TRACK).color);
   });
 });
 

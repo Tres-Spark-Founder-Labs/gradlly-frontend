@@ -2,6 +2,7 @@
 
 import { APPRENTICE_PATHS } from "@/features/apprentices/constants";
 import { $apiClient } from "@/lib/api/client";
+import { API_MAX_PER_PAGE, fetchAllPages } from "@/lib/api/fetch-all-pages";
 import { normalizeApiClientError } from "@/lib/errors";
 
 import { ENROLMENT_PATHS } from "../constants";
@@ -21,6 +22,17 @@ export async function getEnrolments({ orgId, page = 1, perPage = 100 } = {}) {
   } catch (e) {
     throw normalizeApiClientError(e);
   }
+}
+
+/**
+ * Every enrolment, not page 1 (F1.2.1 AC7). The roster joins each apprentice
+ * to their enrolment, and an enrolment missing from a truncated list took the
+ * apprentice's standard, provider and pace level with it.
+ */
+export function getAllEnrolments({ orgId } = {}) {
+  return fetchAllPages((page) =>
+    getEnrolments({ orgId, page, perPage: API_MAX_PER_PAGE }),
+  );
 }
 
 export async function listEnrolments({ page = 1, perPage = 20, orgId } = {}) {

@@ -37,7 +37,8 @@ export function ApprenticesDashboard() {
   const [contact, setContact] = useState(null);
   const [enrol, setEnrol] = useState(false);
 
-  const { roster, isLoading } = useApprenticeRoster();
+  const { roster, isLoading, isError, error, refetch, isRefetching } =
+    useApprenticeRoster();
 
   // F1.2.4 AC5 — the alert banner covers both flagged levels. Filtering on
   // `at_risk` alone silently excluded the overdue cases, which are the ones
@@ -103,6 +104,42 @@ export function ApprenticesDashboard() {
         style={{ color: T.muted }}
       >
         <p className="text-sm">Loading apprentices…</p>
+      </div>
+    );
+  }
+
+  /**
+   * A failed read is shown as a failure. This used to fall through to the
+   * dashboard with an empty roster — "0 active apprentices", "no apprentices
+   * match" — which is a statement about the employer's apprentices, not a
+   * blank. No stat card, table or export is rendered from a list that did not
+   * arrive.
+   */
+  if (isError) {
+    return (
+      <div
+        role="alert"
+        className="rounded-2xl px-6 py-10 text-center space-y-3"
+        style={{ backgroundColor: T.surface, border: `1px solid ${T.border}` }}
+      >
+        <p className="text-sm font-semibold" style={{ color: T.ink }}>
+          Your apprentices could not be loaded.
+        </p>
+        <p className="text-xs" style={{ color: T.muted }}>
+          {error?.message
+            ? `The server said: ${error.message}`
+            : "The request did not complete."}{" "}
+          Nothing below would be accurate until it does.
+        </p>
+        <button
+          type="button"
+          onClick={() => void refetch()}
+          disabled={isRefetching}
+          className="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs font-bold hover:opacity-80 transition-opacity disabled:opacity-40"
+          style={{ backgroundColor: T.blue, color: "#fff" }}
+        >
+          {isRefetching ? "Trying again…" : "Try again"}
+        </button>
       </div>
     );
   }

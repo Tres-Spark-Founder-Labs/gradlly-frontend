@@ -3,6 +3,7 @@
 import { AlertTriangle, BookOpen, CalendarCheck, Users } from "lucide-react";
 
 import {
+  PACE_STATUS,
   isFlagged,
   isCriticallyBehind,
 } from "@/features/apprentices/utils/risk-status";
@@ -62,6 +63,11 @@ export function StatCards({ roster = [], onFilter }) {
    */
   const flagged = roster.filter((a) => isFlagged(a.status));
   const overdue = flagged.filter((a) => isCriticallyBehind(a.status));
+  // Neither on track nor at risk: said on the card so the cards still add up
+  // to the roster rather than quietly losing these apprentices.
+  const paceUnknown = roster.filter(
+    (a) => a.status === PACE_STATUS.UNKNOWN,
+  ).length;
   const soonest = epaImm.sort(
     (a, b) => (a.epaDaysLeft ?? 0) - (b.epaDaysLeft ?? 0),
   )[0];
@@ -77,9 +83,13 @@ export function StatCards({ roster = [], onFilter }) {
       />
       <Card
         icon={<BookOpen className="h-4 w-4" />}
-        value={roster.filter((a) => a.status === "on_track").length}
+        value={roster.filter((a) => a.status === PACE_STATUS.ON_TRACK).length}
         label="On track"
-        sub="Progressing well"
+        sub={
+          paceUnknown > 0
+            ? `${paceUnknown} with pace unknown`
+            : "Progressing well"
+        }
         onClick={() => onFilter?.("on_track")}
       />
       <Card

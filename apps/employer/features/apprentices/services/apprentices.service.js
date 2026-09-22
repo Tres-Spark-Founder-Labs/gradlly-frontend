@@ -1,6 +1,7 @@
 "use client";
 
 import { $apiClient } from "@/lib/api/client";
+import { API_MAX_PER_PAGE, fetchAllPages } from "@/lib/api/fetch-all-pages";
 import { normalizeApiClientError } from "@/lib/errors";
 
 import { APPRENTICE_PATHS } from "../constants";
@@ -35,6 +36,16 @@ export async function exportRosterPdf({ orgId, body }) {
   } catch (e) {
     throw normalizeApiClientError(e);
   }
+}
+
+/**
+ * F1.2.1 AC7 — every apprentice, not page 1. See `fetchAllPages` for why
+ * this is five parallel pages at 500 rather than one large request.
+ */
+export function getAllApprentices({ orgId } = {}) {
+  return fetchAllPages((page) =>
+    getApprentices({ orgId, page, perPage: API_MAX_PER_PAGE }),
+  );
 }
 
 export async function getApprentice({ orgId, id }) {

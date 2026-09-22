@@ -21,7 +21,10 @@ export const statusMeta = (s) =>
           ? { label: "EPA Ready", color: "#1847d4", bg: "#e8eefb" }
           : s === "epa_imminent"
             ? { label: "EPA imminent", color: T.red, bg: T.redLight }
-            : { label: "Unknown", color: T.muted, bg: T.card };
+            : s === "unknown"
+              ? // PACE_STATUS.UNKNOWN: no level to show, and the badge says so.
+                { label: "Pace unknown", color: T.muted, bg: T.card }
+              : { label: "Unknown", color: T.muted, bg: T.card };
 
 /**
  * Is this a number we can compare to a threshold?
