@@ -1,3 +1,4 @@
+// Twin: graddly-api src/apprentices/apprentice-roster.rules.ts applies these rules to the roster PDF — change one, change the other.
 /**
  * Roster filtering and CSV export (F1.2.1 AC1, AC5, AC6).
  *
