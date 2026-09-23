@@ -32,7 +32,7 @@ const VOCABULARY = {
   },
   open: {
     sector: ["Construction", "Digital & Technology"],
-    programmeType: ["ST0415 Software Developer"],
+    programmeType: ["ST0116 Software developer"],
   },
 };
 
@@ -120,7 +120,7 @@ describe("TransferPreferences (F4.1.3)", () => {
         sectors: ["Construction"],
         regions: ["London"],
         sizeBands: ["10-49"],
-        programmeTypes: ["ST0415 Software Developer"],
+        programmeTypes: ["ST0116 Software developer"],
         maxPerRecipient: "25000.00",
       }),
     });
@@ -130,7 +130,7 @@ describe("TransferPreferences (F4.1.3)", () => {
       "Construction",
       "London",
       "10-49",
-      "ST0415 Software Developer",
+      "ST0116 Software developer",
     ]) {
       expect(screen.getByText(value)).toBeVisible();
     }

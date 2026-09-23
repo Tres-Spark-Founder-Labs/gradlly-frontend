@@ -16,7 +16,7 @@ const VOCABULARY = {
   },
   open: {
     sector: ["Construction", "Engineering & Manufacturing"],
-    programmeType: ["ST0415 Software Developer"],
+    programmeType: ["ST0116 Software developer"],
   },
 };
 
@@ -33,7 +33,7 @@ const sme = (overrides = {}) => ({
   sector: "Engineering & Manufacturing",
   region: "West Midlands",
   employeeCountBand: "10-49",
-  programmeType: "ST0415 Software Developer",
+  programmeType: "ST0116 Software developer",
   transferAmountRequired: "15000.00",
   hasDasAccount: true,
   isListed: true,
@@ -72,7 +72,7 @@ describe("SmeDirectory — F1.1.4 AC2 (search or browse)", () => {
 
     expect(screen.getByText("Engineering & Manufacturing")).toBeVisible();
     expect(screen.getByText(/West Midlands · 10-49/)).toBeVisible();
-    expect(screen.getByText("ST0415 Software Developer")).toBeVisible();
+    expect(screen.getByText("ST0116 Software developer")).toBeVisible();
     // Amount required is money, so 2dp per the shared formatter.
     expect(screen.getByText("£15,000.00")).toBeVisible();
   });
@@ -111,13 +111,13 @@ describe("SmeDirectory — F1.1.4 AC2 (search or browse)", () => {
       target: { value: "West Midlands" },
     });
     fireEvent.change(screen.getByLabelText(/programme type/i), {
-      target: { value: "ST0415 Software Developer" },
+      target: { value: "ST0116 Software developer" },
     });
 
     expect(mockUseRecipientDirectory).toHaveBeenLastCalledWith({
       sector: "Manufacturing",
       region: "West Midlands",
-      programmeType: "ST0415 Software Developer",
+      programmeType: "ST0116 Software developer",
     });
   });
 
@@ -153,7 +153,7 @@ describe("SmeDirectory — F1.1.4 AC2 (search or browse)", () => {
       "Engineering & Manufacturing",
     ]);
     expect(suggested(screen.getByLabelText(/programme type/i))).toEqual([
-      "ST0415 Software Developer",
+      "ST0116 Software developer",
     ]);
     // The old placeholder was not a vocabulary value, and typed as shown it
     // matched nothing once the directory went exact.

@@ -88,7 +88,7 @@ describe("ApprenticesDashboard — failed and pending reads", () => {
             name: "Priya Sharma",
             initials: "PS",
             avatarColor: "#3b5fe0",
-            standard: "Software Developer (ST0116)",
+            standard: "Software developer (ST0116)",
             provider: "Midlands Technical College",
             status: "unknown",
             epaDate: "—",

@@ -5203,7 +5203,7 @@ export interface components {
       apprenticeDisplayName: string | null;
       /**
        * @description Standard title and code for display
-       * @example Software Developer (ST0123)
+       * @example Software developer (ST0116)
        */
       standardDisplayName: string | null;
       /** @enum {string} */
@@ -7921,7 +7921,7 @@ export interface components {
       label: string;
       /**
        * @description Standard code when groupBy=standard
-       * @example ST0123
+       * @example ST0116
        */
       code?: string;
       /** @example 4 */
@@ -8371,7 +8371,7 @@ export interface components {
       employeeCountBand: "1-9" | "10-49" | "50-249" | "250+";
       /**
        * @description Open field: any value, normalised on write. Suggestions from GET /levy-exchange/vocabulary (open.programmeType).
-       * @example ST0415 Software Developer
+       * @example ST0116 Software developer
        */
       programmeType: string;
       /**
@@ -8447,7 +8447,7 @@ export interface components {
       /**
        * @description Open field: any values, each normalised on write. Suggestions from GET /levy-exchange/vocabulary (open.programmeType). Empty accepts every programme type.
        * @example [
-       *       "ST0415 Software Developer"
+       *       "ST0116 Software developer"
        *     ]
        */
       programmeTypes: string[];
@@ -8759,9 +8759,9 @@ export interface components {
       /**
        * @description Suggestions for the recipient profile’s `programmeType` and the donor preference’s `programmeTypes`. Any value is accepted.
        * @example [
-       *       "ST0145 Engineering Technician",
-       *       "ST0415 Software Developer",
-       *       "ST0215 Senior Healthcare Support Worker"
+       *       "ST0457 Engineering technician",
+       *       "ST0116 Software developer",
+       *       "ST0217 Senior healthcare support worker"
        *     ]
        */
       programmeType: string[];

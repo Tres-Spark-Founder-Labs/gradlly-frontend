@@ -158,7 +158,7 @@ export function StandardFormModal({ open, onClose, standard = null }) {
             required
             name="code"
             label="Code"
-            placeholder="ST0123"
+            placeholder="ST0116"
             register={register}
             error={errors.code?.message}
             disabled={disabled}

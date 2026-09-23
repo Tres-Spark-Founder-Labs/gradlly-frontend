@@ -39,7 +39,7 @@ const enrolments = Array.from({ length: TOTAL }, (_, k) => {
     id: `enr-${i}`,
     apprenticeId: `app-${i}`,
     status: "active",
-    standardDisplayName: "Software Developer (ST0116)",
+    standardDisplayName: "Software developer (ST0116)",
     providerOrganisationName: "Midlands Technical College",
     otjPaceAlertLevel: i === 0 ? "at_risk" : i === 1 ? null : "on_track",
   };
@@ -111,7 +111,7 @@ describe("useApprenticeRoster", () => {
     await waitFor(() => expect(result.current.roster).toHaveLength(TOTAL));
     const atRisk = result.current.roster.find((a) => a.id === "app-0");
     expect(atRisk.status).toBe("at_risk");
-    expect(atRisk.standard).toBe("Software Developer (ST0116)");
+    expect(atRisk.standard).toBe("Software developer (ST0116)");
     expect(atRisk.provider).toBe("Midlands Technical College");
   });
 
