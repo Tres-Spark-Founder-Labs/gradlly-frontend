@@ -47,8 +47,11 @@ const MATRIX = {
     },
     { type: "message", label: "New messages", channels: channels(false, true) },
     {
-      type: "milestone_completed",
-      label: "Milestones completed",
+      // Never emailed, so the API marks its email channel unconfigurable.
+      // (It used to be milestone_completed, which is emailed as of F3.4.3
+      // AC2 and now carries a switch like the rest.)
+      type: "caseload_at_risk",
+      label: "Tutor caseload over the at-risk threshold",
       channels: channels(true, false),
     },
   ],
@@ -82,8 +85,10 @@ describe("NotificationPreferences — F3.4.3 AC3", () => {
     expect(
       screen.getByRole("switch", { name: "New messages" }),
     ).toHaveAttribute("aria-checked", "false");
-    // Declared but never emailed: a switch here would do nothing.
-    expect(screen.queryByText("Milestones completed")).toBeNull();
+    // Never emailed: a switch here would do nothing.
+    expect(
+      screen.queryByText("Tutor caseload over the at-risk threshold"),
+    ).toBeNull();
   });
 
   it("sends the one change — email, for that type — when a switch is flipped", async () => {
