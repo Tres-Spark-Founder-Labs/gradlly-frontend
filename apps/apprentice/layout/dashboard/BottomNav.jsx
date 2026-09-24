@@ -42,20 +42,20 @@ export function BottomNav() {
               href={href}
               aria-label={label}
               aria-current={isActive ? "page" : undefined}
-              className="relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-[#16a34a] focus-visible:-outline-offset-2"
+              className="relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-primary-700 focus-visible:-outline-offset-2"
             >
               <Icon
                 aria-hidden
                 strokeWidth={isActive ? 2 : 1.75}
                 className={cn(
                   "h-5 w-5 transition-colors duration-150",
-                  isActive ? "text-[#16a34a]" : "text-[#9ca3af]",
+                  isActive ? "text-primary-700" : "text-[#9ca3af]",
                 )}
               />
               <span
                 className={cn(
                   "text-[10px] font-medium transition-colors duration-150",
-                  isActive ? "text-[#15803d]" : "text-[#9ca3af]",
+                  isActive ? "text-primary-700" : "text-[#9ca3af]",
                 )}
               >
                 {label}
@@ -63,7 +63,7 @@ export function BottomNav() {
               {isActive && (
                 <span
                   aria-hidden
-                  className="absolute top-0 h-0.5 w-8 rounded-full bg-[#16a34a]"
+                  className="absolute top-0 h-0.5 w-8 rounded-full bg-primary-700"
                 />
               )}
             </Link>

@@ -27,7 +27,9 @@ export function OverviewStat({
       <div className="flex items-start justify-between mb-3">
         <div
           className="h-8 w-8 rounded-xl flex items-center justify-center shrink-0"
-          style={{ backgroundColor: `${accent}14` }}
+          style={{
+            backgroundColor: `color-mix(in srgb, ${accent} 7.8431372549%, transparent)`,
+          }}
         >
           <span style={{ color: accent }}>{icon}</span>
         </div>

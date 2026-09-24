@@ -68,7 +68,7 @@ export function CreateOrgBanner({ onCreate, className }) {
               className="relative overflow-hidden rounded-2xl border border-primary-200 shadow-sm"
               style={{
                 background:
-                  "linear-gradient(120deg, #f1f7f3 0%, #ffffff 45%, #f1f7f3 100%)",
+                  "linear-gradient(120deg, var(--color-primary-50) 0%, #ffffff 45%, var(--color-primary-50) 100%)",
               }}
             >
               {/* Decorative accents */}

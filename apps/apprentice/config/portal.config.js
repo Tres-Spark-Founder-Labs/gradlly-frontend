@@ -1,7 +1,7 @@
 import { clientEnv } from "./env/client";
 
 const PORTAL_KEY = clientEnv.NEXT_PUBLIC_PORTAL || "apprentice";
-const themeColor = "#1b4f32";
+const themeColor = "#0F7A53";
 const capitalize = (word) =>
   word ? word[0]?.toUpperCase() + word?.slice(1) : "";
 

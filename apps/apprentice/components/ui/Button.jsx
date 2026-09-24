@@ -9,10 +9,10 @@ import { cn } from "@/utils/helper";
 // ─────────────────────────────────────────────────────────────────────────────
 // Design tokens
 //
-//   Green    #1e6b3a  dark green (solid bg / outline text+border)
-//            #175430  hover dark
-//            #eaf5ee  neutral bg (very light green tint)
-//            #d9eede  neutral hover
+//   Primary  --color-primary-700  (legacy green prop) solid / outline
+//            --color-primary-800  hover background
+//            --color-primary-50   neutral background
+//            --color-primary-100  neutral hover; 200 active
 //
 //   Yellow   #b07e00  dark yellow/amber (readable solid)
 //            #906800  hover dark
@@ -31,19 +31,19 @@ const VARIANTS = {
   // ── Green ──────────────────────────────────────────────────────────────────
   green: {
     solid:
-      "bg-[#1e6b3a] text-white border-[#1e6b3a] " +
-      "hover:bg-[#175430] hover:border-[#175430] active:bg-[#124428] " +
-      "focus-visible:ring-[#1e6b3a]",
+      "bg-primary-700 text-white border-primary-700 " +
+      "hover:bg-primary-800 hover:border-primary-800 active:bg-primary-900 " +
+      "focus-visible:ring-primary-700",
 
     outline:
-      "bg-transparent text-[#1e6b3a] border-[#1e6b3a] " +
-      "hover:bg-[#f0faf3] active:bg-[#e1f5e8] " +
-      "focus-visible:ring-[#1e6b3a]",
+      "bg-transparent text-primary-700 border-primary-700 " +
+      "hover:bg-primary-50 active:bg-primary-100 " +
+      "focus-visible:ring-primary-700",
 
     neutral:
-      "bg-[#eaf5ee] text-[#1e6b3a] border-transparent " +
-      "hover:bg-[#d9eede] active:bg-[#c8e6cf] " +
-      "focus-visible:ring-[#1e6b3a]",
+      "bg-primary-50 text-primary-700 border-transparent " +
+      "hover:bg-primary-100 active:bg-primary-200 " +
+      "focus-visible:ring-primary-700",
   },
 
   // ── Yellow ─────────────────────────────────────────────────────────────────

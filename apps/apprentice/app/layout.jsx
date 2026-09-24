@@ -1,4 +1,4 @@
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 
 import "@/assets/css/globals.css";
 import { PORTAL } from "@/config/portal.config";
@@ -7,11 +7,11 @@ import { createPageSeo } from "@/utils/metadata";
 
 export const { metadata, viewport } = createPageSeo();
 
-const inter = Inter({
+const portalFont = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
-  weight: ["300", "400", "500", "600", "700", "800"],
+  fallback: ["Arial", "Helvetica", "sans-serif"],
 });
 
 export default function RootLayout({ children }) {
@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
     <html
       lang={PORTAL.locale.replace("_", "-")}
       data-scroll-behavior="smooth"
-      className={`h-full antialiased ${inter.variable}`}
+      className={`h-full antialiased ${portalFont.variable}`}
     >
       <body>
         <AppProvider>{children}</AppProvider>

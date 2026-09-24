@@ -19,7 +19,7 @@ export const CheckboxField = forwardRef(function CheckboxField(
     // Uncontrolled / register usage: pass register only
     checked,
     onChange,
-    color = "#1e6b3a",
+    color = "var(--color-primary-700)",
     register,
     ...rest
   },

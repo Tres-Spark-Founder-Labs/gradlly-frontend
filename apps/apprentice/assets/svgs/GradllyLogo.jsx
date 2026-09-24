@@ -14,7 +14,7 @@ export function GradllyLogo({ size = 36, className }) {
       }}
     >
       {/* bg-primary-700 */}
-      <rect width="36" height="36" rx="8" fill="#1b4f32" />
+      <rect width="36" height="36" rx="8" fill="var(--color-primary-700)" />
       {/* ring-1 ring-primary-700/30 */}
       <rect
         x="0.5"
@@ -22,7 +22,7 @@ export function GradllyLogo({ size = 36, className }) {
         width="35"
         height="35"
         rx="7.5"
-        stroke="#1b4f32"
+        stroke="var(--color-primary-700)"
         strokeOpacity="0.3"
         strokeWidth="1"
       />
@@ -30,7 +30,7 @@ export function GradllyLogo({ size = 36, className }) {
       <text
         x="18"
         y="25"
-        fontFamily="Poppins, ui-sans-serif, system-ui, -apple-system, sans-serif"
+        fontFamily="var(--font-sans)"
         fontSize="20"
         fontWeight="700"
         fill="white"

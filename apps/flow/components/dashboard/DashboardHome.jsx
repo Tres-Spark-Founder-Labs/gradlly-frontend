@@ -168,7 +168,7 @@ function HeroSection({ user, activeOrganisation, greeting }) {
       className="relative overflow-hidden rounded-2xl"
       style={{
         background:
-          "linear-gradient(135deg, #14532d 0%, #166534 45%, #15803d 80%, #16a34a 100%)",
+          "linear-gradient(135deg, var(--color-primary-950) 0%, var(--color-primary-950) 45%, var(--color-primary-900) 80%, var(--color-primary-900) 100%)",
       }}
     >
       <div
@@ -186,7 +186,7 @@ function HeroSection({ user, activeOrganisation, greeting }) {
         className="absolute inset-x-0 top-0 h-[2px] pointer-events-none"
         style={{
           background:
-            "linear-gradient(90deg, transparent 0%, rgba(94,164,120,0.65) 50%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--color-primary-400) 65%, transparent) 50%, transparent 100%)",
         }}
       />
       <div
@@ -194,7 +194,7 @@ function HeroSection({ user, activeOrganisation, greeting }) {
         className="absolute -top-24 -right-24 h-80 w-80 rounded-full pointer-events-none"
         style={{
           background:
-            "radial-gradient(circle, rgba(78,163,106,0.14), transparent 70%)",
+            "radial-gradient(circle, color-mix(in srgb, var(--color-primary-400) 14%, transparent), transparent 70%)",
         }}
       />
 
@@ -203,7 +203,7 @@ function HeroSection({ user, activeOrganisation, greeting }) {
         <div className="min-w-0">
           <p
             className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em]"
-            style={{ color: "#8cc4a1" }}
+            style={{ color: "var(--color-primary-300)" }}
           >
             Flow Portal
           </p>
@@ -486,7 +486,8 @@ function WorkspaceCard({ activeOrganisation }) {
       <div
         className="flex items-center gap-3 px-5 py-4"
         style={{
-          background: "linear-gradient(135deg, #1a0a33 0%, #5b21b6 100%)",
+          background:
+            "linear-gradient(135deg, var(--color-primary-950) 0%, var(--color-primary-900) 100%)",
         }}
       >
         <div

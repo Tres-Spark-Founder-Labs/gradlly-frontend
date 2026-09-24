@@ -18,7 +18,7 @@ function Pill({ label, value, color, bg, onClick }) {
       className="flex flex-col items-center gap-1 rounded-xl py-3 px-2 text-center transition-opacity hover:opacity-80"
       style={{
         backgroundColor: bg,
-        border: `1px solid ${color}18`,
+        border: `1px solid color-mix(in srgb, ${color} 9.4117647059%, transparent)`,
         cursor: onClick ? "pointer" : "default",
       }}
     >
@@ -134,7 +134,7 @@ export function LevyUtilisation({ segments, isLoading, onExpiryModal }) {
           className="rounded-xl p-4 space-y-3"
           style={{
             backgroundColor: T.blueLight,
-            border: `1px solid ${T.blue}18`,
+            border: `1px solid color-mix(in srgb, ${T.blue} 9.4117647059%, transparent)`,
           }}
         >
           {/* Judgment call: the previous "projected utilisation" bar lived here

@@ -1,7 +1,7 @@
 import { clientEnv } from "./env/client";
 
 const PORTAL_KEY = clientEnv.NEXT_PUBLIC_PORTAL || "flow";
-const themeColor = "#1b4f32";
+const themeColor = "#0E7490";
 const capitalize = (word) =>
   word ? word[0]?.toUpperCase() + word?.slice(1) : "";
 

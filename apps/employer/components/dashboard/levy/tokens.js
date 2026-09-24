@@ -1,7 +1,7 @@
 export const T = {
-  blue: "#1b4f32",
-  blueLight: "#dceee2",
-  blueMid: "#2c6b44",
+  blue: "var(--color-primary-700)",
+  blueLight: "var(--color-primary-100)",
+  blueMid: "var(--color-primary-600)",
   green: "#0d7a52",
   greenLight: "#eaf6f1",
   amber: "#b85c0a",

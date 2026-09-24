@@ -4,7 +4,7 @@
 import { clientEnv } from "./env/client";
 
 const PORTAL_KEY = clientEnv.NEXT_PUBLIC_PORTAL || "provider";
-const themeColor = "#1b4f32";
+const themeColor = "#3D52D5";
 const capitalize = (word) =>
   word ? word[0]?.toUpperCase() + word?.slice(1) : "";
 

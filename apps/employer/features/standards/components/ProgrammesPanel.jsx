@@ -26,8 +26,8 @@ const T = {
   greenLight: "#eaf5ee",
   amber: "#b07e00",
   amberLight: "#fdf5d6",
-  blue: "#1847d4",
-  blueLight: "#eff3ff",
+  blue: "var(--color-primary-700)",
+  blueLight: "var(--color-primary-50)",
 };
 
 // ─── Status badge ─────────────────────────────────────────────────────────────

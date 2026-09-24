@@ -11,21 +11,23 @@
 
 @theme {
   /* ── Fonts ─────────────────────────────────────────────── */
-  --font-sans: "Poppins", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: "Bricolage Grotesque", Arial, Helvetica, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  /* ── Primary · Forest Green (monochromatic) ────────────── */
-  --color-primary-50: #f1f7f3;
-  --color-primary-100: #dceee2;
-  --color-primary-200: #b7dcc4;
-  --color-primary-300: #8cc4a1;
-  --color-primary-400: #5ea478;
-  --color-primary-500: #3d8358;
-  --color-primary-600: #2c6b44;
-  --color-primary-700: #1b4f32;
-  --color-primary-800: #143d27;
-  --color-primary-900: #0d2918;
-  --color-primary-950: #06170d;
+  /* Primary · Blue. PRD anchor at 700; rounded sRGB channel mixes.
+     50–600: 96/92/80/60/35/20/10% white. 800/900/950: 25/65/90% black.
+     Contrast adjustments and surface pairs: see PORTAL-IDENTITY.md. */
+  --color-primary-50: #f6f8fd;
+  --color-primary-100: #edf0fc;
+  --color-primary-200: #d1daf6;
+  --color-primary-300: #a3b5ee;
+  --color-primary-400: #6987e3;
+  --color-primary-500: #466cdd;
+  --color-primary-600: #2f59d8;
+  --color-primary-700: #1847d4;
+  --color-primary-800: #12359f;
+  --color-primary-900: #08194a;
+  --color-primary-950: #020715;
 
   /* ── Neutral · Cool Slate (monochromatic) ──────────────── */
   --color-neutral-0: #ffffff;
@@ -383,7 +385,7 @@
   background-image:
     radial-gradient(
       ellipse 65% 55% at 50% 50%,
-      rgba(27, 79, 50, 0.06) 0%,
+      color-mix(in srgb, var(--color-primary-700) 6%, transparent) 0%,
       transparent 100%
     ),
     radial-gradient(circle, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
@@ -421,13 +423,13 @@
   0%,
   100% {
     box-shadow:
-      0 0 0 0 rgba(27, 79, 50, 0),
+      0 0 0 0 color-mix(in srgb, var(--color-primary-700) 0%, transparent),
       0 4px 20px rgba(0, 0, 0, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.5);
   }
   50% {
     box-shadow:
-      0 0 28px 8px rgba(27, 79, 50, 0.15),
+      0 0 28px 8px color-mix(in srgb, var(--color-primary-700) 15%, transparent),
       0 4px 20px rgba(0, 0, 0, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.5);
   }
@@ -529,7 +531,8 @@
   width: 260px;
   z-index: 220;
   background-color: var(--color-primary-950);
-  border-right: 1px solid rgba(94, 164, 120, 0.18);
+  border-right: 1px solid
+    color-mix(in srgb, var(--color-primary-400) 18%, transparent);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -565,7 +568,7 @@
   background: transparent;
 }
 .sidebar-nav::-webkit-scrollbar-thumb {
-  background: rgba(94, 164, 120, 0.25);
+  background: color-mix(in srgb, var(--color-primary-400) 25%, transparent);
   border-radius: 2px;
 }
 

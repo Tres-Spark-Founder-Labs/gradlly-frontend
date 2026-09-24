@@ -48,14 +48,14 @@ const MENU_BTN = cn(
   "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
   "border border-neutral-200 bg-white text-neutral-500 transition-colors duration-150",
   "hover:border-neutral-300 hover:bg-neutral-100 hover:text-neutral-700",
-  "focus-visible:outline-2 focus-visible:outline-[#16a34a] focus-visible:outline-offset-2",
+  "focus-visible:outline-2 focus-visible:outline-primary-700 focus-visible:outline-offset-2",
 );
 
 const ICON_BTN = cn(
   "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
   "border border-neutral-200 bg-white text-neutral-500 transition-colors duration-150",
   "hover:border-green-300 hover:bg-green-50 hover:text-green-700",
-  "focus-visible:outline-2 focus-visible:outline-[#16a34a] focus-visible:outline-offset-2",
+  "focus-visible:outline-2 focus-visible:outline-primary-700 focus-visible:outline-offset-2",
 );
 
 export function Header({
@@ -139,7 +139,7 @@ export function Header({
               "flex items-center gap-2 rounded-xl px-2 py-1.5",
               "transition-colors duration-150",
               "hover:bg-[#f9fafb]",
-              "focus-visible:outline-2 focus-visible:outline-[#16a34a] focus-visible:outline-offset-2",
+              "focus-visible:outline-2 focus-visible:outline-primary-700 focus-visible:outline-offset-2",
               userMenuOpen && "bg-[#f9fafb]",
             )}
           >

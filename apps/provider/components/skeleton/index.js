@@ -30,8 +30,9 @@ export function DashboardSkeleton() {
       <div
         className="fixed left-0 top-0 hidden h-dvh w-65 flex-col overflow-hidden lg:flex"
         style={{
-          backgroundColor: "#06170d",
-          borderRight: "1px solid rgba(94,164,120,0.18)",
+          backgroundColor: "var(--color-primary-950)",
+          borderRight:
+            "1px solid color-mix(in srgb, var(--color-primary-400) 18%, transparent)",
         }}
       >
         {/* Brand lockup */}
@@ -126,7 +127,7 @@ export function DashboardSkeleton() {
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-360 space-y-6 px-8 py-8 sm:px-6 sm:py-6 max-sm:px-4 max-sm:py-4">
             {/* Hero panel */}
-            <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-[#14532d] via-[#15803d] to-[#16a34a] p-6 sm:p-8 lg:p-10">
+            <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-primary-950 via-primary-900 to-primary-900 p-6 sm:p-8 lg:p-10">
               <div className="space-y-3">
                 <div className="h-2.5 w-28 animate-pulse rounded bg-white/15" />
                 <div className="h-9 w-64 animate-pulse rounded-md bg-white/15" />

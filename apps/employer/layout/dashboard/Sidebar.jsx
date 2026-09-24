@@ -137,12 +137,15 @@ export function Sidebar({ isOpen, onClose }) {
         {/* Brand */}
         <div
           className="flex shrink-0 items-center justify-between px-5 py-4"
-          style={{ borderBottom: "1px solid rgba(94,164,120,0.12)" }}
+          style={{
+            borderBottom:
+              "1px solid color-mix(in srgb, var(--color-primary-400) 12%, transparent)",
+          }}
         >
           <Link
             href="/"
             aria-label="Gradlly home"
-            className="flex items-center gap-2.5 rounded-lg focus-visible:outline-2 focus-visible:outline-[#5ea478] focus-visible:outline-offset-2"
+            className="flex items-center gap-2.5 rounded-lg focus-visible:outline-2 focus-visible:outline-primary-400 focus-visible:outline-offset-2"
           >
             <GradllyLogo size={34} />
             <span className="text-[15px] font-bold tracking-tight text-white">
@@ -150,7 +153,11 @@ export function Sidebar({ isOpen, onClose }) {
             </span>
             <span
               className="rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest"
-              style={{ background: "rgba(94,164,120,0.18)", color: "#5ea478" }}
+              style={{
+                background:
+                  "color-mix(in srgb, var(--color-primary-400) 18%, transparent)",
+                color: "var(--color-primary-400)",
+              }}
             >
               Employer
             </span>
@@ -172,7 +179,8 @@ export function Sidebar({ isOpen, onClose }) {
               className="rounded-xl p-3"
               style={{
                 background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(94,164,120,0.15)",
+                border:
+                  "1px solid color-mix(in srgb, var(--color-primary-400) 15%, transparent)",
               }}
             >
               <div className="flex items-center gap-3">
@@ -304,7 +312,7 @@ export function Sidebar({ isOpen, onClose }) {
                           className={cn(
                             "group mx-2 flex w-[calc(100%-1rem)] items-center gap-3 rounded-lg px-3 py-3.5",
                             "text-[13px] font-medium transition-colors duration-150",
-                            "focus-visible:outline-2 focus-visible:outline-[#5ea478] focus-visible:-outline-offset-2",
+                            "focus-visible:outline-2 focus-visible:outline-primary-400 focus-visible:-outline-offset-2",
                             isActive
                               ? "bg-primary-400/14 text-white"
                               : "text-white/55 hover:bg-primary-400/8 hover:text-white/85",
@@ -312,7 +320,8 @@ export function Sidebar({ isOpen, onClose }) {
                           style={
                             isActive
                               ? {
-                                  borderLeft: "3px solid #5ea478",
+                                  borderLeft:
+                                    "3px solid var(--color-primary-400)",
                                   paddingLeft: "9px",
                                 }
                               : undefined
@@ -353,7 +362,7 @@ export function Sidebar({ isOpen, onClose }) {
                                   href={child.href}
                                   className={cn(
                                     "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[12.5px] font-medium transition-colors duration-150",
-                                    "focus-visible:outline-2 focus-visible:outline-[#5ea478] focus-visible:-outline-offset-2",
+                                    "focus-visible:outline-2 focus-visible:outline-primary-400 focus-visible:-outline-offset-2",
                                     isHrefActive(child.href)
                                       ? "text-white"
                                       : "text-white/45 hover:text-white/75",
@@ -383,7 +392,7 @@ export function Sidebar({ isOpen, onClose }) {
                       className={cn(
                         "group mx-2 flex items-center gap-3 rounded-lg px-3 py-3.5 mb-0.5",
                         "text-[13px] font-medium transition-colors duration-150",
-                        "focus-visible:outline-2 focus-visible:outline-[#5ea478] focus-visible:-outline-offset-2",
+                        "focus-visible:outline-2 focus-visible:outline-primary-400 focus-visible:-outline-offset-2",
                         isActive
                           ? "bg-primary-400/14 text-white"
                           : "text-white/55 hover:bg-primary-400/8 hover:text-white/85",
@@ -391,7 +400,7 @@ export function Sidebar({ isOpen, onClose }) {
                       style={
                         isActive
                           ? {
-                              borderLeft: "3px solid #5ea478",
+                              borderLeft: "3px solid var(--color-primary-400)",
                               paddingLeft: "9px",
                             }
                           : undefined
@@ -423,7 +432,10 @@ export function Sidebar({ isOpen, onClose }) {
         {/* User block */}
         <div
           className="shrink-0 px-3 py-3"
-          style={{ borderTop: "1px solid rgba(94,164,120,0.12)" }}
+          style={{
+            borderTop:
+              "1px solid color-mix(in srgb, var(--color-primary-400) 12%, transparent)",
+          }}
         >
           <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5">
             <div className="relative shrink-0">
@@ -437,7 +449,7 @@ export function Sidebar({ isOpen, onClose }) {
                 <span
                   aria-hidden
                   className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#22c55e]"
-                  style={{ outline: "2px solid #06170d" }}
+                  style={{ outline: "2px solid var(--color-primary-950)" }}
                 />
               )}
             </div>
