@@ -3,13 +3,20 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FileSignature, Save } from "lucide-react";
 import { useEffect, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 import { ServerErrorAlert } from "@/components/error/ServerErrorAlert";
 import { InputField } from "@/components/form/InputField";
+import { SingleSelectField } from "@/components/form/SingleSelectField";
 import { TextareaField } from "@/components/form/TextareaField";
 import Button from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
+import {
+  selectParticipantOptions,
+  useParticipantOptions,
+} from "@/features/enrolments/queries/enrolments.query";
+import { participantPlaceholder } from "@/features/enrolments/utils/participant-placeholder";
 import { applyServerErrors } from "@/lib/errors";
 
 import {
@@ -59,6 +66,8 @@ export function CommitmentFormModal({
     register,
     handleSubmit,
     reset,
+    setValue,
+    control,
     setError,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -66,6 +75,72 @@ export function CommitmentFormModal({
     defaultValues: defaults,
     mode: "onBlur",
   });
+
+  /**
+   * Creating, the enrolment arrives as context; editing or versioning, the
+   * statement carries it. Either way the enrolment is what entitles this user
+   * to see the three parties, so the pickers stay closed until it is known.
+   */
+  const enrolmentId = context.enrolmentId ?? statement?.enrolmentId ?? null;
+  const { user } = useAuthUser();
+  const { data: participants, isLoading: loadingParticipants } =
+    useParticipantOptions(enrolmentId, {
+      enabled: open && !!enrolmentId,
+      select: selectParticipantOptions,
+    });
+
+  // Memoised: the `?? []` fallback is a new array each render, which would
+  // re-run the defaulting effect below every time.
+  const apprenticeOptions = useMemo(
+    () => participants?.apprenticeOptions ?? [],
+    [participants],
+  );
+  const tutorOptions = useMemo(
+    () => participants?.tutorOptions ?? [],
+    [participants],
+  );
+  const employerManagerOptions = useMemo(
+    () => participants?.employerManagerOptions ?? [],
+    [participants],
+  );
+
+  const apprenticeUserId = useWatch({ control, name: "apprenticeUserId" });
+  const tutorUserId = useWatch({ control, name: "tutorUserId" });
+  const employerManagerUserId = useWatch({
+    control,
+    name: "employerManagerUserId",
+  });
+
+  /** Fill only blanks, so an edited statement keeps the parties it was signed with. */
+  useEffect(() => {
+    if (!open || !participants) return;
+
+    if (!apprenticeUserId && apprenticeOptions.length === 1) {
+      setValue("apprenticeUserId", apprenticeOptions[0].value);
+    }
+    if (!employerManagerUserId && employerManagerOptions.length === 1) {
+      setValue("employerManagerUserId", employerManagerOptions[0].value);
+    }
+    if (!tutorUserId) {
+      const self = tutorOptions.find((option) => option.value === user?.id);
+      if (self) {
+        setValue("tutorUserId", self.value);
+      } else if (tutorOptions.length === 1) {
+        setValue("tutorUserId", tutorOptions[0].value);
+      }
+    }
+  }, [
+    open,
+    participants,
+    apprenticeUserId,
+    tutorUserId,
+    employerManagerUserId,
+    apprenticeOptions,
+    tutorOptions,
+    employerManagerOptions,
+    setValue,
+    user?.id,
+  ]);
 
   const create = useCreateCommitmentStatement();
   const update = useUpdateCommitmentStatement();
@@ -154,36 +229,73 @@ export function CommitmentFormModal({
             Signing parties
           </legend>
           <p className="-mt-2 text-xs text-neutral-500">
-            Platform user IDs that will sign each slot, in order: apprentice →
-            tutor → employer manager.
+            Who signs each slot, in order: apprentice → tutor → employer
+            manager. Everyone listed here is on this enrolment.
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <InputField
+            <SingleSelectField
               required
               name="apprenticeUserId"
-              label="Apprentice user ID"
-              placeholder="UUID"
+              label="Apprentice"
+              options={apprenticeOptions}
               register={register}
+              setValue={setValue}
+              value={apprenticeUserId ?? ""}
               error={errors.apprenticeUserId?.message}
-              disabled={disabled}
+              placeholder={participantPlaceholder(
+                loadingParticipants,
+                enrolmentId,
+                apprenticeOptions,
+                "Select the apprentice",
+                "This learner has no portal account yet. Invite them first.",
+              )}
+              disabled={
+                disabled ||
+                loadingParticipants ||
+                apprenticeOptions.length === 0
+              }
             />
-            <InputField
+            <SingleSelectField
               required
               name="tutorUserId"
-              label="Tutor user ID"
-              placeholder="UUID"
+              label="Tutor"
+              options={tutorOptions}
               register={register}
+              setValue={setValue}
+              value={tutorUserId ?? ""}
               error={errors.tutorUserId?.message}
-              disabled={disabled}
+              placeholder={participantPlaceholder(
+                loadingParticipants,
+                enrolmentId,
+                tutorOptions,
+                "Select a tutor",
+                "No colleagues yet. Invite someone to your organisation.",
+              )}
+              disabled={
+                disabled || loadingParticipants || tutorOptions.length === 0
+              }
             />
-            <InputField
+            <SingleSelectField
               required
               name="employerManagerUserId"
-              label="Employer manager user ID"
-              placeholder="UUID"
+              label="Employer manager"
+              options={employerManagerOptions}
               register={register}
+              setValue={setValue}
+              value={employerManagerUserId ?? ""}
               error={errors.employerManagerUserId?.message}
-              disabled={disabled}
+              placeholder={participantPlaceholder(
+                loadingParticipants,
+                enrolmentId,
+                employerManagerOptions,
+                "Select the employer manager",
+                "No employer contacts yet. Link an employer organisation first.",
+              )}
+              disabled={
+                disabled ||
+                loadingParticipants ||
+                employerManagerOptions.length === 0
+              }
             />
           </div>
         </fieldset>

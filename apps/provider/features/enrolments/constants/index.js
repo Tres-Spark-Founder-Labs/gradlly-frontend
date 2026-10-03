@@ -4,6 +4,10 @@ export const ENROLMENT_PATHS = Object.freeze({
     "/api/v1/enrolments/counterpart-organisations/lookup",
   byId: (id) => `/api/v1/enrolments/${id}`,
   participantOptions: (id) => `/api/v1/enrolments/${id}/participant-options`,
+  // Active members of the caller's own organisation. Named for the enrol form
+  // that needed it first, but it is not employer-specific: any field asking for
+  // "someone in my organisation" is served by it.
+  employerManagerOptions: "/api/v1/enrolments/employer-manager-options",
   journey: (id) => `/api/v1/enrolments/${id}/journey`,
   participants: (id) => `/api/v1/enrolments/${id}/participants`,
   organisationLinks: (id) => `/api/v1/enrolments/${id}/organisation-links`,

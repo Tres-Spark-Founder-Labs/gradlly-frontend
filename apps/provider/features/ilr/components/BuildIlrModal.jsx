@@ -2,14 +2,19 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FilePlus2 } from "lucide-react";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useMemo } from "react";
+import { useForm, useWatch } from "react-hook-form";
 
 import { ServerErrorAlert } from "@/components/error/ServerErrorAlert";
 import { InputField } from "@/components/form/InputField";
+import { SingleSelectField } from "@/components/form/SingleSelectField";
 import Button from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import { useApprentices } from "@/features/apprentices/queries/apprentices.query";
+import { useEnrolments } from "@/features/enrolments/queries/enrolments.query";
+import { useStandards } from "@/features/standards/queries/standards.query";
 import { applyServerErrors } from "@/lib/errors";
+import { getFullName } from "@/utils/helper";
 
 import { useBuildIlrRecord } from "../queries/ilr.query";
 import { ilrBuildDefaults, ilrBuildSchema, toBuildPayload } from "../schemas";
@@ -23,6 +28,8 @@ export function BuildIlrModal({ open, onClose, onBuilt }) {
     register,
     handleSubmit,
     reset,
+    setValue,
+    control,
     setError,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -30,6 +37,49 @@ export function BuildIlrModal({ open, onClose, onBuilt }) {
     defaultValues: ilrBuildDefaults,
     mode: "onBlur",
   });
+
+  const enrolmentId = useWatch({ control, name: "enrolmentId" });
+
+  /**
+   * Enrolment rows carry `apprenticeId` and `standardId` only — no server-side
+   * join — so the label is assembled the same way the enrolments table already
+   * assembles it, from the separately cached apprentice and standard lists.
+   * Submitting an ILR record against the wrong learner is not a mistake anyone
+   * should be able to make by mistyping a character.
+   */
+  const { data: enrolmentData, isLoading: loadingEnrolments } = useEnrolments({
+    page: 1,
+    perPage: 100,
+  });
+  const { data: apprenticeData } = useApprentices({ perPage: 100 });
+  const { data: standardData } = useStandards({ perPage: 100 });
+
+  const enrolmentOptions = useMemo(() => {
+    const apprenticeNameById = new Map(
+      (apprenticeData?.apprentices ?? []).map((a) => [a.id, getFullName(a)]),
+    );
+    const standardNameById = new Map(
+      (standardData?.standards ?? []).map((s) => [
+        s.id,
+        `${s.title} (${s.code})`,
+      ]),
+    );
+
+    return (enrolmentData?.enrolments ?? []).map((enrolment) => {
+      const learner =
+        apprenticeNameById.get(enrolment.apprenticeId) ?? "Unnamed learner";
+      const standard = standardNameById.get(enrolment.standardId);
+      const started = enrolment.plannedStartDate
+        ? ` · from ${enrolment.plannedStartDate}`
+        : "";
+      return {
+        value: enrolment.id,
+        text: standard
+          ? `${learner} · ${standard}${started}`
+          : `${learner}${started}`,
+      };
+    });
+  }, [enrolmentData, apprenticeData, standardData]);
 
   const { mutateAsync, isPending, error: serverError } = useBuildIlrRecord();
   const disabled = isSubmitting || isPending;
@@ -79,14 +129,25 @@ export function BuildIlrModal({ open, onClose, onBuilt }) {
       >
         <ServerErrorAlert error={serverError} />
 
-        <InputField
+        <SingleSelectField
           required
           name="enrolmentId"
-          label="Enrolment ID"
-          placeholder="UUID of the enrolment"
+          label="Learner"
+          options={enrolmentOptions}
           register={register}
+          setValue={setValue}
+          value={enrolmentId ?? ""}
           error={errors.enrolmentId?.message}
-          disabled={disabled}
+          placeholder={
+            loadingEnrolments
+              ? "Loading enrolments…"
+              : enrolmentOptions.length > 0
+                ? "Select the learner to build a record for"
+                : "No enrolments yet. Create one first."
+          }
+          disabled={
+            disabled || loadingEnrolments || enrolmentOptions.length === 0
+          }
         />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

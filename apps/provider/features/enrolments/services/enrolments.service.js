@@ -58,6 +58,23 @@ export async function getParticipantOptions(enrolmentId) {
   }
 }
 
+/**
+ * Active members of the caller's own organisation.
+ *
+ * Used wherever a form asks for a colleague rather than for someone on a
+ * specific enrolment — the QIP action owner, for one. The organisation comes
+ * from the session, not from a parameter, so there is nothing here a caller
+ * could widen.
+ */
+export async function getOrganisationMemberOptions() {
+  try {
+    const result = await $apiClient.get(ENROLMENT_PATHS.employerManagerOptions);
+    return unwrap(result);
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}
+
 export async function getEnrolmentJourney(id) {
   try {
     const result = await $apiClient.get(ENROLMENT_PATHS.journey(id));

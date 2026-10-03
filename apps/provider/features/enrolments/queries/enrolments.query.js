@@ -22,6 +22,7 @@ import {
   endBreakInLearning,
   getEnrolment,
   getEnrolmentJourney,
+  getOrganisationMemberOptions,
   getParticipantOptions,
   listBreaksInLearning,
   listEnrolments,
@@ -62,6 +63,41 @@ export function useEnrolment(id, options = {}) {
   });
 }
 
+/**
+ * "Name · role · email" — never the id.
+ *
+ * `displayName` from the API is name and email only. The role comes from which
+ * list the person arrived in, which is what the endpoint actually tells us: a
+ * tutor is a member of the provider organisation, an employer manager a member
+ * of the linked employer organisation. Forms that assign all three parties need
+ * that distinction on screen; `mapParticipantOptions` below keeps the plainer
+ * label for the participants screen, where each field is already titled.
+ */
+function toRoleOption(user, role) {
+  const name = `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim();
+  const label = name || user?.email || "Unnamed user";
+  return {
+    value: user.id,
+    text: user?.email
+      ? `${label} · ${role} · ${user.email}`
+      : `${label} · ${role}`,
+  };
+}
+
+export function selectParticipantOptions(response) {
+  return {
+    apprenticeOptions: (response?.apprenticeCandidates ?? []).map((user) =>
+      toRoleOption(user, "Apprentice"),
+    ),
+    tutorOptions: (response?.tutors ?? []).map((user) =>
+      toRoleOption(user, "Tutor"),
+    ),
+    employerManagerOptions: (response?.employerManagers ?? []).map((user) =>
+      toRoleOption(user, "Employer manager"),
+    ),
+  };
+}
+
 function mapParticipantOptions(response) {
   const mapList = (items = []) =>
     items.map((user) => ({
@@ -84,6 +120,27 @@ export function useParticipantOptions(enrolmentId, options = {}) {
     queryFn: () => getParticipantOptions(enrolmentId),
     enabled: !!orgId && !!enrolmentId,
     select: mapParticipantOptions,
+    ...options,
+  });
+}
+
+/**
+ * Colleagues in the signed-in organisation, as pickable options.
+ *
+ * For fields that assign work to a member of staff rather than to someone on a
+ * particular enrolment. Deliberately not a user search: the endpoint answers
+ * only for the caller's own organisation, which is the whole reason it is safe
+ * to call from a form.
+ */
+export function useOrganisationMemberOptions(options = {}) {
+  const { orgId } = useAuthUser();
+
+  return useQuery({
+    queryKey: ENROLMENT_QUERY_KEYS.organisationMemberOptions(orgId),
+    queryFn: () => getOrganisationMemberOptions(),
+    enabled: !!orgId,
+    select: (response) =>
+      (response ?? []).map((user) => toRoleOption(user, "Colleague")),
     ...options,
   });
 }

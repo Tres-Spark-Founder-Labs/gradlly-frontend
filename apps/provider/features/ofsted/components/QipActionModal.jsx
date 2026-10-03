@@ -11,6 +11,7 @@ import { SingleSelectField } from "@/components/form/SingleSelectField";
 import { TextareaField } from "@/components/form/TextareaField";
 import Button from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import { useOrganisationMemberOptions } from "@/features/enrolments/queries/enrolments.query";
 import { applyServerErrors } from "@/lib/errors";
 
 import { EvidenceAttachments } from "./EvidenceAttachments";
@@ -66,10 +67,24 @@ export function QipActionModal({ open, onClose, action = null, prefillSlug }) {
 
   const criterionValue = useWatch({ control, name: "eifCriterionSlug" });
   const statusValue = useWatch({ control, name: "status" });
+  const assignedOwnerUserId = useWatch({
+    control,
+    name: "assignedOwnerUserId",
+  });
 
   const { data: criterionOptions = [] } = useEifCriterionOptions({
     enabled: open,
   });
+
+  /**
+   * An action is owned by a member of staff, so the options are this
+   * organisation's own members. The row being edited may name someone who has
+   * since left, so their id is kept as a value with the name the list carries;
+   * `assignedOwnerDisplayName` on the response means we no longer have to print
+   * a uuid when that happens.
+   */
+  const { data: ownerOptions = [], isLoading: loadingOwners } =
+    useOrganisationMemberOptions({ enabled: open });
 
   const create = useCreateQipAction();
   const update = useUpdateQipAction();
@@ -177,14 +192,23 @@ export function QipActionModal({ open, onClose, action = null, prefillSlug }) {
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <InputField
+          <SingleSelectField
             required
             name="assignedOwnerUserId"
-            label="Owner user ID"
-            placeholder="UUID of an active org member"
+            label="Owner"
+            options={ownerOptions}
             register={register}
+            setValue={setValue}
+            value={assignedOwnerUserId ?? ""}
             error={errors.assignedOwnerUserId?.message}
-            disabled={disabled}
+            placeholder={
+              loadingOwners
+                ? "Loading colleagues…"
+                : ownerOptions.length > 0
+                  ? "Select who owns this action"
+                  : "No colleagues yet. Invite someone to your organisation."
+            }
+            disabled={disabled || loadingOwners || ownerOptions.length === 0}
           />
           <InputField
             required

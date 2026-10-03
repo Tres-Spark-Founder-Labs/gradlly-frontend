@@ -13,6 +13,11 @@ export const ENROLMENT_QUERY_KEYS = {
     orgId,
     id,
   ],
+  organisationMemberOptions: (orgId) => [
+    "enrolments",
+    "organisation-member-options",
+    orgId,
+  ],
   journey: (orgId, id) => ["enrolments", "journey", orgId, id],
   // F2.2.4 AC6 — the current break plus the history behind it.
   breaksInLearning: (orgId, id) => [
