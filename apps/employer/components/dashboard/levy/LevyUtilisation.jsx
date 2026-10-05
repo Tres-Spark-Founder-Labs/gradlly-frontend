@@ -36,10 +36,15 @@ function Pill({ label, value, color, bg, onClick }) {
 }
 
 /**
- * F1.1.3 AC1. The three segments are reported by DAS itself
- * (`used` / `expiringWithin90Days` / `available`) and are treated as disjoint
- * parts of the pot, so the total is their sum. Deriving the total any other way
- * would disagree with DAS the moment its figures move.
+ * F1.1.3 AC1. The three segments (`used` / `expiringWithin90Days` /
+ * `available`) are disjoint parts of the pot, so the total is their sum.
+ * Deriving the total any other way would disagree with the source the moment
+ * its figures move.
+ *
+ * The source is either DAS, which reports them directly, or the figures an
+ * employer entered by hand, which the API derives and labels as `manual` — see
+ * `segmentsSource`. Both are real; only one came from the ESFA, and the header
+ * says which.
  */
 export function segmentTotals(segments) {
   if (!segments) return null;
@@ -59,7 +64,12 @@ export function segmentTotals(segments) {
   };
 }
 
-export function LevyUtilisation({ segments, isLoading, onExpiryModal }) {
+export function LevyUtilisation({
+  segments,
+  segmentsSource,
+  isLoading,
+  onExpiryModal,
+}) {
   const totals = segmentTotals(segments);
   // Destructured rather than kept as an object: react-hooks/refs flags
   // property access on a value that holds a ref during render.
@@ -95,6 +105,18 @@ export function LevyUtilisation({ segments, isLoading, onExpiryModal }) {
             <h2 className="mt-0.5 text-base font-semibold text-neutral-900">
               {fmtGBP(totals.total)} total
             </h2>
+            {/* Says where these figures came from. A typed figure and a synced
+                one look identical on a chart, and only one of them is the
+                ESFA's. */}
+            {segmentsSource === "manual" ? (
+              <p className="mt-0.5 text-xs" style={{ color: T.muted }}>
+                Entered manually, not synced from the ESFA
+              </p>
+            ) : segmentsSource === "das" ? (
+              <p className="mt-0.5 text-xs" style={{ color: T.muted }}>
+                Synced from the ESFA
+              </p>
+            ) : null}
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <span

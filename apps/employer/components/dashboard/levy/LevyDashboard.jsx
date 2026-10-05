@@ -81,12 +81,14 @@ export function Dashboard() {
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <LevyUtilisation
             segments={utilisation?.segments}
+            segmentsSource={utilisation?.segmentsSource}
             isLoading={utilisationLoading}
             onExpiryModal={openExpiry}
           />
           <YearEndForecast
             forecast={utilisation?.forecast}
             segments={utilisation?.segments}
+            segmentsSource={utilisation?.segmentsSource}
             isLoading={utilisationLoading}
             onExport={openExport}
           />
