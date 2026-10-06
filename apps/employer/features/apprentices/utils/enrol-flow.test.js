@@ -104,6 +104,22 @@ describe("payload building", () => {
       buildEnrolmentPayload({ ...VALID_FORM, startDate: "" }, "app-1"),
     ).not.toHaveProperty("plannedStartDate");
   });
+
+  // The agreed price is what levy cost reporting averages, so a string here
+  // would be silently coerced or rejected rather than counted.
+  it("sends the agreed price as a number", () => {
+    expect(
+      buildEnrolmentPayload({ ...VALID_FORM, agreedPrice: "18000" }, "app-1"),
+    ).toMatchObject({ agreedPrice: 18000 });
+  });
+
+  it("omits the agreed price when it has not been negotiated yet", () => {
+    for (const agreedPrice of ["", "   ", undefined]) {
+      expect(
+        buildEnrolmentPayload({ ...VALID_FORM, agreedPrice }, "app-1"),
+      ).not.toHaveProperty("agreedPrice");
+    }
+  });
 });
 
 describe("runEnrolment", () => {

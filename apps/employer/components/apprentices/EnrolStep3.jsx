@@ -70,9 +70,12 @@ export function EnrolStep3({ data, missing = [] }) {
 
   const fullName = [data.firstName, data.lastName].filter(Boolean).join(" ");
   const standardName = standards.find((s) => s.id === data.standard)?.title;
-  const providerName = providers.find(
-    (p) => p.organisationId === data.provider,
-  )?.name;
+  // A provider found by UKPRN is not in the linked list -- that list is built
+  // from providers who have already accepted an enrolment -- so the wizard
+  // carries the name it resolved.
+  const providerName =
+    providers.find((p) => p.organisationId === data.provider)?.name ||
+    data.providerName;
   const managerName = managers.find((m) => m.id === data.manager)?.displayName;
 
   const summary = [
@@ -84,6 +87,12 @@ export function EnrolStep3({ data, missing = [] }) {
     ["Provider", providerName || "—"],
     ["Line manager", managerName || "—"],
     ["Start date", data.startDate || "—"],
+    [
+      "Agreed price",
+      data.agreedPrice
+        ? `£${Number(data.agreedPrice).toLocaleString()}`
+        : "Not set",
+    ],
   ];
 
   /**

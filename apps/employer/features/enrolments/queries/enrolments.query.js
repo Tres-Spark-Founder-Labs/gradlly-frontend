@@ -19,6 +19,7 @@ import {
   listEmployerManagerOptions,
   listEnrolments,
   listLinkedProviders,
+  lookupProviderByUkprn,
 } from "../services/enrolments.service";
 
 export function useEnrolments({ page = 1, perPage = 20, ...options } = {}) {
@@ -89,6 +90,21 @@ export function useLinkedProviders(options = {}) {
     enabled: !!orgId,
     staleTime: 5 * 60_000,
     ...options,
+  });
+}
+
+/**
+ * Find a provider by UKPRN, for an employer who has no linked provider yet.
+ *
+ * A mutation rather than a query: it runs when the employer asks, against a
+ * number they type, and caching "no provider with that UKPRN" would be wrong
+ * the moment they correct a typo.
+ */
+export function useLookupProviderByUkprn() {
+  const { orgId } = useAuthUser();
+
+  return useMutation({
+    mutationFn: (ukprn) => lookupProviderByUkprn(ukprn, { orgId }),
   });
 }
 

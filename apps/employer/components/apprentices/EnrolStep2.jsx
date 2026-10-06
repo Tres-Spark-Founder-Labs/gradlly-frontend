@@ -1,8 +1,11 @@
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useState } from "react";
 
 import { Modal } from "@/components/ui/Modal";
-import { useLinkedProviders } from "@/features/enrolments/queries/enrolments.query";
+import {
+  useLinkedProviders,
+  useLookupProviderByUkprn,
+} from "@/features/enrolments/queries/enrolments.query";
 import {
   useCreateStandard,
   useProgrammes,
@@ -164,6 +167,105 @@ function CreateStandardModal({ open, onClose, programmes, onCreated }) {
   );
 }
 
+/**
+ * Find a training provider by UKPRN, when none is linked yet.
+ *
+ * ── WHY THIS EXISTS ─────────────────────────────────────────────────────────
+ *
+ * This slot used to hold a warning: "No linked training providers yet. A
+ * provider appears here once they have accepted an enrolment from you." True,
+ * and a dead end — the list is populated by accepted enrolments, and an
+ * enrolment cannot be sent without a provider. A new employer had no control
+ * to click and no way out of the wizard.
+ *
+ * F1.2.5 AC2 describes a connection request, which does not exist. Until it
+ * does, this is the entry point: the employer types the UKPRN they already
+ * know from their contract, and the provider confirms by accepting the
+ * enrolment, which is the consent step that was always there.
+ */
+function ProviderUkprnFinder({ onChange }) {
+  const [ukprn, setUkprn] = useState("");
+  const [found, setFound] = useState(null);
+  const lookup = useLookupProviderByUkprn();
+
+  const search = () => {
+    const trimmed = ukprn.trim();
+    if (!trimmed || lookup.isPending) return;
+    lookup.mutate(trimmed, {
+      onSuccess: (provider) => {
+        setFound(provider);
+        // Reported as `(name, value)` -- the shape Select and Field use -- so
+        // the submit sequence links the provider without knowing which control
+        // chose it.
+        onChange("provider", provider.id);
+        // The review step resolves provider names from the linked-provider
+        // list, and a provider found this way is not on it yet -- that list is
+        // built from acceptances. Without the name, step 3 would show "--" for
+        // a provider it had just ticked as selected.
+        onChange("providerName", provider.name);
+      },
+      onError: () => setFound(null),
+    });
+  };
+
+  return (
+    <div className="space-y-2">
+      <label
+        htmlFor="provider-ukprn"
+        className="block text-xs font-semibold"
+        style={{ color: T.subtle }}
+      >
+        Training provider
+      </label>
+      <p className="text-[11px]" style={{ color: T.muted }}>
+        No provider is linked yet. Enter their UK Provider Reference Number — it
+        is on your contract — and they confirm by accepting this enrolment.
+      </p>
+      <div className="flex gap-2">
+        <input
+          id="provider-ukprn"
+          name="providerUkprn"
+          inputMode="numeric"
+          placeholder="e.g. 10012345"
+          value={ukprn}
+          onChange={(e) => setUkprn(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              search();
+            }
+          }}
+          className="flex-1 rounded-xl px-3 py-2 text-sm"
+          style={{ border: `1px solid ${T.border}`, color: T.ink }}
+        />
+        <button
+          type="button"
+          onClick={search}
+          disabled={!ukprn.trim() || lookup.isPending}
+          className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold disabled:opacity-50"
+          style={{ backgroundColor: T.blue, color: "#fff" }}
+        >
+          <Search className="h-3.5 w-3.5" aria-hidden />
+          {lookup.isPending ? "Searching…" : "Find"}
+        </button>
+      </div>
+
+      {found ? (
+        <p className="text-xs font-semibold" style={{ color: T.green }}>
+          {found.name} selected · UKPRN {found.ukprn}
+        </p>
+      ) : null}
+
+      {lookup.isError ? (
+        <p className="text-xs" style={{ color: T.amber }}>
+          No training provider found with that UKPRN. Check the number with your
+          provider — a typo is the usual cause.
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 // ─── Step 2 ───────────────────────────────────────────────────────────────────
 
 export function EnrolStep2({ data, onChange }) {
@@ -267,6 +369,30 @@ export function EnrolStep2({ data, onChange }) {
         )}
       </div>
 
+      {/*
+        The negotiated price. Nothing in the product asked for it before, and
+        it is the number the levy reporting is built on: cost per apprentice
+        averages it over completed enrolments
+        (levy-roi-report.service.ts averageCostPerCompletion) and the roster
+        footer totals it as committed spend. Both read zero until it is set.
+
+        Optional, not required: an employer part-way through a negotiation
+        should still be able to enrol, and the API treats it as optional too.
+      */}
+      <Field
+        id="agreedPrice"
+        label="Agreed price (£)"
+        type="number"
+        placeholder={
+          selectedStandard?.fundingBandMax
+            ? String(selectedStandard.fundingBandMax)
+            : "e.g. 18000"
+        }
+        hint="The total you have agreed with the provider. Levy cost reporting is based on this figure. You can add it later."
+        value={data.agreedPrice}
+        onChange={onChange}
+      />
+
       <Field
         id="startDate"
         label="Planned start date"
@@ -312,21 +438,7 @@ export function EnrolStep2({ data, onChange }) {
           style={{ backgroundColor: T.card }}
         />
       ) : providerOptions.length === 0 ? (
-        <div
-          className="rounded-xl px-3 py-2.5 text-xs space-y-1"
-          style={{
-            backgroundColor: T.amberLight,
-            color: T.amber,
-            border: `1px solid ${T.amber}30`,
-          }}
-        >
-          <p className="font-semibold">No linked training providers yet.</p>
-          <p>
-            A provider appears here once they have accepted an enrolment from
-            you. Ask your provider to send you a connection request, or contact
-            support to link them.
-          </p>
-        </div>
+        <ProviderUkprnFinder onChange={onChange} />
       ) : (
         <Select
           label="Training provider"

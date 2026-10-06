@@ -158,3 +158,23 @@ export async function listApprentices({ page = 1, perPage = 100, orgId } = {}) {
     throw normalizeApiClientError(e);
   }
 }
+
+/**
+ * Find a training provider by UKPRN.
+ *
+ * The employer half of a lookup that used to run one way only. Without it an
+ * employer could not name their own provider anywhere in the product: the
+ * enrol wizard lists providers who have already accepted an enrolment, which
+ * is empty until one has, and nothing else offered a way in.
+ */
+export async function lookupProviderByUkprn(ukprn, { orgId } = {}) {
+  try {
+    const result = await $apiClient.get(ENROLMENT_PATHS.COUNTERPART_LOOKUP, {
+      params: { ukprn },
+      headers: orgId ? { "x-organisation-id": orgId } : {},
+    });
+    return result.data?.data ?? result.data;
+  } catch (e) {
+    throw normalizeApiClientError(e);
+  }
+}

@@ -42,7 +42,11 @@ const INITIAL_FORM = {
   // touched the dropdown enrolled their apprentice on someone else's
   // apprenticeship standard.
   standard: "",
+  agreedPrice: "",
   provider: "",
+  // Display only, set when a provider is found by UKPRN rather than picked
+  // from the linked list. Never sent: the API takes the organisation id.
+  providerName: "",
   startDate: "",
 };
 

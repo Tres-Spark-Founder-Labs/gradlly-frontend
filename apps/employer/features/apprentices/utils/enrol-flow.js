@@ -84,6 +84,18 @@ export function buildEnrolmentPayload(form, apprenticeId) {
     apprenticeId,
     standardId: form.standard,
     ...(optional(form.startDate) && { plannedStartDate: form.startDate }),
+    /**
+     * The negotiated price. Sent only when given, because the API treats it as
+     * optional and an empty string is not a number.
+     *
+     * It is the figure the whole levy picture is built on: cost per apprentice
+     * averages it across completed enrolments, and the roster footer totals it
+     * as committed spend. Until the wizard asked for it, both read zero on a
+     * product whose purpose is tracking what training costs.
+     */
+    ...(optional(form.agreedPrice) && {
+      agreedPrice: Number(form.agreedPrice),
+    }),
   };
 }
 

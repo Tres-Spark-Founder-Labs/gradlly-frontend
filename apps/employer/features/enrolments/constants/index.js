@@ -11,6 +11,10 @@ export const ENROLMENT_PATHS = Object.freeze({
   // and the notification to the provider).
   organisationLinks: (id) => `/api/v1/enrolments/${id}/organisation-links`,
   LINKED_PROVIDERS: "/api/v1/enrolments/linked-providers",
+  // Find a provider by UKPRN. The counterpart of an employer is a provider,
+  // and the API now answers in that direction too -- which is the only way an
+  // employer can name a provider before one has accepted anything.
+  COUNTERPART_LOOKUP: "/api/v1/enrolments/counterpart-organisations/lookup",
   EMPLOYER_MANAGER_OPTIONS: "/api/v1/enrolments/employer-manager-options",
 });
 
