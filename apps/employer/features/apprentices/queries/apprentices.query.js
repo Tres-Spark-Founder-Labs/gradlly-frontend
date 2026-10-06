@@ -101,8 +101,12 @@ function normalizeApprentice(apprentice, enrolment) {
     epaDateIso: enrolment?.epaDate ?? null,
     startDateIso: enrolment?.plannedStartDate ?? null,
     expectedEndDate: fmtDate(enrolment?.plannedEndDate),
-    levyCost: enrolment?.agreedPrice ?? 0,
-    fundingBand: enrolment?.agreedPrice ?? 0,
+    // Coerced, not trusted. The API now returns a number, but agreedPrice is
+    // a Postgres `numeric` and those arrive as strings unless something
+    // converts them -- and the roster footer adds this field up, where a
+    // string concatenates instead ("0" + "455" = "0455") rather than failing.
+    levyCost: Number(enrolment?.agreedPrice ?? 0) || 0,
+    fundingBand: Number(enrolment?.agreedPrice ?? 0) || 0,
     pipelineState: enrolment?.pipelineState ?? null,
 
     // Also present on the enrolment response, and likewise previously discarded.
