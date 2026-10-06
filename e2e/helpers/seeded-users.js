@@ -36,6 +36,12 @@ export const USERS = {
     password: "MeridianTest2026!",
     name: "Rachel Thornton",
   },
+  /** Flow Portal owner at Kestrel Fabrication. */
+  flow: {
+    email: "o.bradshaw@kestrelfab.co.uk",
+    password: "KestrelFlow2026!",
+    name: "Olivia Bradshaw",
+  },
 };
 
 /**
@@ -53,9 +59,27 @@ export async function login(page, user, baseURL) {
   await page.locator('input[name="email"]').fill(user.email);
   await page.locator('input[name="password"]').fill(user.password);
   await page.getByRole("button", { name: /sign in|log in/i }).click();
-  await page.waitForURL((url) => !url.pathname.startsWith("/login"), {
-    timeout: 30_000,
-  });
+
+  try {
+    await page.waitForURL((url) => !url.pathname.startsWith("/login"), {
+      timeout: 30_000,
+    });
+  } catch (error) {
+    const mfaPrompt = page.getByText(/verification code|authenticator app/i);
+    if (
+      await mfaPrompt
+        .first()
+        .isVisible()
+        .catch(() => false)
+    ) {
+      throw new Error(
+        "Audit precondition failed: this seeded owner was challenged for MFA. " +
+          "Set MFA_REQUIRED_FOR_ADMINS=false on the pinned API deployment before running the browser audit.",
+        { cause: error },
+      );
+    }
+    throw error;
+  }
 }
 
 /**

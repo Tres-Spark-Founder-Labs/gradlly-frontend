@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Download, Plus } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { T } from "@/components/dashboard/levy/tokens";
@@ -85,13 +85,6 @@ export function CommitmentsDashboard() {
             style={{ backgroundColor: T.blue, color: "#fff" }}
           >
             <Plus className="h-3.5 w-3.5" /> New statement
-          </button>
-          <button
-            type="button"
-            className="flex h-8 w-8 items-center justify-center rounded-xl border hover:opacity-75 transition-opacity"
-            style={{ borderColor: T.border, color: T.subtle }}
-          >
-            <Bell className="h-4 w-4" />
           </button>
         </div>
       </div>

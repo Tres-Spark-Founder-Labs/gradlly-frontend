@@ -155,6 +155,7 @@ export function ProfilePanel({ apprentice, onClose, onContact }) {
             <button
               type="button"
               onClick={onClose}
+              aria-label="Close apprentice profile"
               className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors"
               style={{ color: T.muted }}
             >

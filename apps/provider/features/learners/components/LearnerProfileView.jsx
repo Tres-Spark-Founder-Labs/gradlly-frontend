@@ -534,7 +534,7 @@ export function LearnerProfileView({ enrolmentId }) {
         </>
       ) : (
         <Card>
-          <CardContent className="py-10 text-center text-sm text-neutral-400">
+          <CardContent className="py-10 text-center text-sm text-neutral-500">
             Loading learner…
           </CardContent>
         </Card>

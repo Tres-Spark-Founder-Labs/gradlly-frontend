@@ -119,7 +119,7 @@ export function EifScoresDashboard({ onCreateAction }) {
       </CardHeader>
       <CardContent className="space-y-5">
         {isLoading ? (
-          <p className="flex items-center gap-2 text-sm text-neutral-400">
+          <p className="flex items-center gap-2 text-sm text-neutral-500">
             <Loader2 className="size-4 animate-spin" aria-hidden />
             Loading scores…
           </p>

@@ -77,6 +77,8 @@ export function FileUploadButton({
         ref={fileRef}
         type="file"
         accept={accept}
+        aria-label={label}
+        tabIndex={-1}
         className="sr-only"
         onChange={(e) => handleFile(e.target.files?.[0])}
       />

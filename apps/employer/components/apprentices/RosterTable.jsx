@@ -82,21 +82,6 @@ export function RosterTable({
             }}
           >
             <tr>
-              <th
-                className="px-4 py-3 w-10"
-                style={{
-                  position: "sticky",
-                  left: 0,
-                  zIndex: 2,
-                  backgroundColor: T.card,
-                }}
-              >
-                <input
-                  type="checkbox"
-                  className="rounded"
-                  style={{ accentColor: T.blue }}
-                />
-              </th>
               {/* Standard and Provider are now sortable too: they carry real
                   values since the mapper stopped discarding them. */}
               <TH sticky sortKey="name" sort={sort} onSort={onSort}>
@@ -135,7 +120,7 @@ export function RosterTable({
             {apprentices.length === 0 ? (
               <tr>
                 <td
-                  colSpan={10}
+                  colSpan={9}
                   className="px-4 py-10 text-center text-sm"
                   style={{ color: T.muted }}
                 >
@@ -168,7 +153,7 @@ export function RosterTable({
               }}
             >
               <td
-                colSpan={10}
+                colSpan={9}
                 className="px-5 py-3 text-xs"
                 style={{ color: T.muted }}
               >

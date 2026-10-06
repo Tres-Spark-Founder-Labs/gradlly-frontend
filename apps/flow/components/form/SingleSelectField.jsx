@@ -269,7 +269,7 @@ export const SingleSelectField = memo(function SingleSelectField({
           <span
             className={cn(
               "flex-1 truncate text-sm",
-              !selectedOption && "text-neutral-400",
+              !selectedOption && "text-neutral-500",
             )}
           >
             {selectedOption?.text ?? placeholder}

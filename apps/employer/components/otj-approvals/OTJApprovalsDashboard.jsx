@@ -221,6 +221,7 @@ export function OTJApprovalsDashboard() {
           <button
             type="button"
             onClick={() => setNotif(true)}
+            aria-label="Open notification settings"
             className="flex h-8 w-8 items-center justify-center rounded-xl border hover:opacity-75 transition-opacity"
             style={{ borderColor: T.border, color: T.subtle }}
           >

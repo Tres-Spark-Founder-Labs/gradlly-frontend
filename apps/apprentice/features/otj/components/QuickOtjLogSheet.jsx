@@ -168,13 +168,13 @@ function ConfirmationState({
       </p>
 
       <div className="mt-4 rounded-xl bg-neutral-50 px-4 py-3">
-        <p className="text-xs uppercase tracking-wide text-neutral-400">
+        <p className="text-xs uppercase tracking-wide text-neutral-500">
           Approved so far
         </p>
         <p className="mt-0.5 text-xl font-semibold tabular-nums text-neutral-900">
           {approvedHours === null ? "—" : `${approvedHours}h`}
         </p>
-        <p className="mt-0.5 text-xs text-neutral-400">
+        <p className="mt-0.5 text-xs text-neutral-500">
           {approvedHours === null
             ? "Not available yet"
             : "This session is not counted until approved."}

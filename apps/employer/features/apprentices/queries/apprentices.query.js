@@ -24,7 +24,7 @@ const AVATAR_COLORS = [
   "#7c3aed",
   "#b85c0a",
   "#1847d4",
-  "#e04b3b",
+  "#c0272d",
 ];
 
 function avatarColor(id = "") {

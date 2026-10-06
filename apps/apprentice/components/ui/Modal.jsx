@@ -113,6 +113,24 @@ export function Modal({
     return () => clearTimeout(id);
   }, [open]);
 
+  // Return keyboard users to the control that opened the dialog. Capturing
+  // the element when the modal opens also makes this work for every caller,
+  // rather than requiring each trigger to maintain its own ref.
+  useEffect(() => {
+    if (!open) return;
+    const returnFocusTarget = document.activeElement;
+
+    return () => {
+      if (
+        returnFocusTarget instanceof HTMLElement &&
+        returnFocusTarget !== document.body &&
+        returnFocusTarget.isConnected
+      ) {
+        returnFocusTarget.focus();
+      }
+    };
+  }, [open]);
+
   // Focus trap + ESC handling.
   const handleKey = useCallback(
     (e) => {

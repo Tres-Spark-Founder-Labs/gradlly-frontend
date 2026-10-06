@@ -57,7 +57,7 @@ export function DashboardLayout({ children }) {
         />
         <main
           id="main-content"
-          tabIndex={-1}
+          tabIndex={0}
           className="flex-1 overflow-y-auto pb-16 focus-visible:outline-none md:pb-0"
         >
           <div className="mx-auto w-full max-w-360 px-8 py-8 sm:px-6 sm:py-6 max-sm:px-4 max-sm:py-4">

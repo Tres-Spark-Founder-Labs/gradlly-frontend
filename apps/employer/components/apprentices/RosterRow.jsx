@@ -1,7 +1,5 @@
 "use client";
 
-import { MoreHorizontal } from "lucide-react";
-
 import { isCriticallyBehind } from "@/features/apprentices/utils/risk-status";
 
 import { ApprenticeAvatar } from "./ApprenticeAvatar";
@@ -80,22 +78,6 @@ export function RosterRow({ a, index, onView, onContact, isFiltered }) {
         style={{
           position: "sticky",
           left: 0,
-          zIndex: 1,
-          backgroundColor: T.surface,
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <input
-          type="checkbox"
-          className="rounded"
-          style={{ accentColor: T.blue }}
-        />
-      </td>
-      <td
-        className="px-4 py-3"
-        style={{
-          position: "sticky",
-          left: 52,
           zIndex: 1,
           backgroundColor: T.surface,
           boxShadow: "2px 0 4px rgba(0,0,0,0.06)",
@@ -205,13 +187,6 @@ export function RosterRow({ a, index, onView, onContact, isFiltered }) {
             style={{ backgroundColor: T.blueLight, color: T.blue }}
           >
             View
-          </button>
-          <button
-            type="button"
-            className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors"
-            style={{ color: T.muted }}
-          >
-            <MoreHorizontal className="h-4 w-4" />
           </button>
         </div>
       </td>

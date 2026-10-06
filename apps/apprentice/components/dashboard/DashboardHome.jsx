@@ -171,7 +171,7 @@ function getProfileStatus(user) {
 function MiniRow({ label, value }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="shrink-0 text-xs text-neutral-400">{label}</span>
+      <span className="shrink-0 text-xs text-neutral-500">{label}</span>
       <span className="truncate text-right text-xs font-medium text-neutral-700">
         {value}
       </span>
@@ -188,7 +188,7 @@ function DetailRow({ icon: Icon, label, value, href }) {
         aria-hidden
       />
       <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
           {label}
         </p>
         {href ? (
@@ -480,7 +480,7 @@ function MetricCard({ stat, value, isLoading }) {
           >
             <Icon className={cn("h-5 w-5", iconColor)} aria-hidden />
           </div>
-          <span className="mt-0.5 text-right text-[10px] leading-tight text-neutral-400">
+          <span className="mt-0.5 text-right text-[10px] leading-tight text-neutral-500">
             {hint}
           </span>
         </div>
@@ -490,7 +490,7 @@ function MetricCard({ stat, value, isLoading }) {
             className={cn(
               "text-3xl font-bold tracking-tight",
               display === "N/A" || display === "…"
-                ? "text-neutral-300"
+                ? "text-neutral-500"
                 : "text-neutral-900",
             )}
           >
@@ -752,7 +752,7 @@ function ProfileCard({ user, activeOrganisation, profileStatus }) {
               />
             </div>
             {missing.length > 0 && (
-              <p className="mt-2 text-xs leading-relaxed text-neutral-400">
+              <p className="mt-2 text-xs leading-relaxed text-neutral-500">
                 Add{" "}
                 {missing
                   .slice(0, 3)

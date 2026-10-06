@@ -104,7 +104,7 @@ export function Header({
         </button>
 
         <div className="min-w-0">
-          <p className="hidden text-[10px] font-semibold uppercase tracking-widest text-[#9ca3af] sm:block">
+          <p className="hidden text-[10px] font-semibold uppercase tracking-widest text-neutral-500 sm:block">
             {breadcrumb.parent}
           </p>
           <h1 className="truncate text-[17px] font-bold leading-tight text-[#111827]">
@@ -153,14 +153,14 @@ export function Header({
               <p className="text-[13px] font-semibold leading-snug text-[#111827]">
                 {fullName}
               </p>
-              <p className="truncate text-[11px] leading-none text-[#9ca3af]">
+              <p className="truncate text-[11px] leading-none text-neutral-500">
                 {email}
               </p>
             </div>
             <ChevronDown
               aria-hidden
               className={cn(
-                "hidden h-3.5 w-3.5 shrink-0 text-[#9ca3af] transition-transform duration-150 sm:block",
+                "hidden h-3.5 w-3.5 shrink-0 text-neutral-500 transition-transform duration-150 sm:block",
                 userMenuOpen && "rotate-180",
               )}
             />
