@@ -5,6 +5,7 @@ import {
   displayApprentice,
   formatCategory,
   formatSubmitted,
+  isAwaitingDecision,
 } from "./OTJQueueCard";
 
 /**
@@ -95,5 +96,35 @@ describe("formatCategory", () => {
   it("returns an empty string when absent, so nothing renders", () => {
     expect(formatCategory("")).toBe("");
     expect(formatCategory(undefined)).toBe("");
+  });
+});
+
+/**
+ * The Approved and Rejected tabs showed Approve and Reject on entries that
+ * had already been actioned, because the card never looked at the entry's
+ * status. Approving an approved entry is a second write against a row the
+ * API has closed, not a no-op.
+ */
+describe("isAwaitingDecision", () => {
+  it("is true only for a submitted entry", () => {
+    expect(isAwaitingDecision({ status: "submitted" })).toBe(true);
+  });
+
+  it("is false once a decision has been made", () => {
+    expect(isAwaitingDecision({ status: "approved" })).toBe(false);
+    expect(isAwaitingDecision({ status: "rejected" })).toBe(false);
+  });
+
+  it("is false for a draft, which has not been sent for approval", () => {
+    expect(isAwaitingDecision({ status: "draft" })).toBe(false);
+  });
+
+  it("fails closed on a missing or unrecognised status", () => {
+    // Hiding a button costs an operator a tab switch; showing one costs a
+    // duplicate decision, so the unknown case must not be actionable.
+    expect(isAwaitingDecision({})).toBe(false);
+    expect(isAwaitingDecision({ status: "withdrawn" })).toBe(false);
+    expect(isAwaitingDecision(null)).toBe(false);
+    expect(isAwaitingDecision(undefined)).toBe(false);
   });
 });

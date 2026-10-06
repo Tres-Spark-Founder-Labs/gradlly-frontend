@@ -4,6 +4,7 @@ import { Paperclip } from "lucide-react";
 import { useState } from "react";
 
 import { T } from "@/components/dashboard/levy/tokens";
+import { OTJ_STATUSES, OTJ_STATUS_LABELS } from "@/features/otj/constants";
 
 // Derive a stable display colour from the last chars of any UUID-like string.
 const AVATAR_PALETTE = [
@@ -54,6 +55,24 @@ export function apprenticeInitials(entry) {
 }
 
 /**
+ * Does this entry still need a decision?
+ *
+ * The card rendered Approve and Reject unconditionally, so the Approved and
+ * Rejected tabs offered both buttons on entries that had already been
+ * actioned. Pressing Approve on an approved entry is not a no-op either: it
+ * is a second write against a row the API has already closed.
+ *
+ * Only `submitted` is awaiting a manager. `draft` has not been sent for
+ * approval and `approved`/`rejected` are terminal, so an unrecognised or
+ * missing status is treated as "not actionable" — the safe direction, since
+ * the cost of hiding a button is an operator switching tabs and the cost of
+ * showing one is a duplicate decision.
+ */
+export function isAwaitingDecision(entry) {
+  return entry?.status === OTJ_STATUSES.SUBMITTED;
+}
+
+/**
  * AC1's "submission date" — when it arrived for approval, not when the
  * learning happened (`loggedDate`) which is what the card used to show.
  */
@@ -98,6 +117,29 @@ function Avatar({ entry }) {
   );
 }
 
+/**
+ * What happened to an entry that is no longer awaiting a decision.
+ *
+ * Occupies the slot the Approve and Reject buttons used to, so the Approved
+ * and Rejected tabs answer "what was decided" where they previously offered
+ * to decide again.
+ */
+function OutcomeBadge({ status }) {
+  const decided = {
+    [OTJ_STATUSES.APPROVED]: { mark: "✓", fg: T.green, bg: T.greenLight },
+    [OTJ_STATUSES.REJECTED]: { mark: "✗", fg: T.red, bg: T.redLight },
+  }[status] ?? { mark: "•", fg: T.subtle, bg: T.card };
+
+  return (
+    <span
+      className="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap text-center"
+      style={{ backgroundColor: decided.bg, color: decided.fg }}
+    >
+      {decided.mark} {OTJ_STATUS_LABELS[status] ?? "Not pending"}
+    </span>
+  );
+}
+
 export function OTJQueueCard({
   entry,
   selected,
@@ -117,6 +159,7 @@ export function OTJQueueCard({
   const hasEvidence = !!entry.evidence;
   const isActing = isApproving || isRejecting;
   const submitted = formatSubmitted(entry);
+  const awaitingDecision = isAwaitingDecision(entry);
 
   const confirmReject = () => {
     if (reason.trim().length < 10) return;
@@ -136,13 +179,16 @@ export function OTJQueueCard({
       }}
     >
       <div className="flex items-start gap-3 p-4 flex-wrap sm:flex-nowrap">
-        <input
-          type="checkbox"
-          checked={selected}
-          onChange={onSelect}
-          className="mt-1 shrink-0"
-          style={{ accentColor: "#1847d4" }}
-        />
+        {awaitingDecision && (
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={onSelect}
+            aria-label={`Select OTJ entry for ${displayApprentice(entry)}`}
+            className="mt-1 shrink-0"
+            style={{ accentColor: "#1847d4" }}
+          />
+        )}
         <Avatar entry={entry} />
 
         <div className="flex-1 min-w-0">
@@ -197,6 +243,19 @@ export function OTJQueueCard({
             </p>
           )}
 
+          {/* The manager's reason was captured, sent, stored and then shown
+              to nobody. On the Rejected tab it is the one thing that explains
+              the row. */}
+          {!awaitingDecision && entry.rejectionReason && (
+            <p
+              className="text-xs mt-2 rounded-lg px-3 py-2"
+              style={{ backgroundColor: T.redLight, color: T.red }}
+            >
+              <span className="font-bold">Reason for rejection: </span>
+              {entry.rejectionReason}
+            </p>
+          )}
+
           <div className="flex items-center gap-3 mt-2 flex-wrap">
             <span
               className="text-sm font-extrabold tabular-nums"
@@ -227,28 +286,34 @@ export function OTJQueueCard({
         </div>
 
         <div className="flex sm:flex-col flex-row gap-2 shrink-0 ml-auto sm:ml-0">
-          <button
-            type="button"
-            onClick={() => onApprove(entry.id)}
-            disabled={isActing}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold hover:opacity-80 transition-opacity whitespace-nowrap disabled:opacity-40"
-            style={{ backgroundColor: T.green, color: "#fff" }}
-          >
-            ✓ Approve
-          </button>
-          <button
-            type="button"
-            onClick={() => setRejecting((r) => !r)}
-            disabled={isActing}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold border hover:opacity-80 transition-opacity whitespace-nowrap disabled:opacity-40"
-            style={{ borderColor: T.red, color: T.red }}
-          >
-            ✗ Reject
-          </button>
+          {awaitingDecision ? (
+            <>
+              <button
+                type="button"
+                onClick={() => onApprove(entry.id)}
+                disabled={isActing}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold hover:opacity-80 transition-opacity whitespace-nowrap disabled:opacity-40"
+                style={{ backgroundColor: T.green, color: "#fff" }}
+              >
+                ✓ Approve
+              </button>
+              <button
+                type="button"
+                onClick={() => setRejecting((r) => !r)}
+                disabled={isActing}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold border hover:opacity-80 transition-opacity whitespace-nowrap disabled:opacity-40"
+                style={{ borderColor: T.red, color: T.red }}
+              >
+                ✗ Reject
+              </button>
+            </>
+          ) : (
+            <OutcomeBadge status={entry.status} />
+          )}
         </div>
       </div>
 
-      {rejecting && (
+      {awaitingDecision && rejecting && (
         <div
           className="px-4 pb-4 pt-0 space-y-2"
           style={{
