@@ -1,471 +1,301 @@
-/* ============================================================
-   GRADLLY — base.css
-   Tailwind v4 · Provider Portal (extendable to all portals)
-   ============================================================ */
+/* ==========================================================================
+   Gradlly marketing site
+   Tailwind v4. Scoped to apps/main and shared with nothing.
+
+   This file replaced a copy of the provider portal's stylesheet, which
+   declared Poppins and JetBrains Mono and loaded neither. There are no shared
+   packages in this repository (see docs/marketing/SURVEY.md section 4), so
+   nothing here reaches a portal and nothing a portal defines reaches here.
+
+   Tokens are documented in docs/marketing/DESIGN-SPEC.md section 3.
+   ========================================================================== */
 
 @import "tailwindcss";
 
-/* ============================================================
-   DESIGN TOKENS
-   ============================================================ */
-
 @theme {
-  /* ── Fonts ─────────────────────────────────────────────── */
-  --font-sans: "Poppins", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  /* ── Brand ───────────────────────────────────────────────────────────────
+     Verified by sampling the approved mockup. Colour carries product
+     identity: teal is Continuo, brass is Gradlly AMS and the Apprenticeship
+     Passport. It is never spent on decoration, which is why there is no
+     gradient token anywhere in this file. */
+  --color-navy: #13233a;
+  --color-teal: #0f5b5f;
+  --color-brass: #8c6420;
+  --color-paper: #f3f4f1;
+  --color-white: #ffffff;
+  --color-slate: #4b5566;
 
-  /* ── Primary · Forest Green (monochromatic) ────────────── */
-  --color-primary-50: #f1f7f3;
-  --color-primary-100: #dceee2;
-  --color-primary-200: #b7dcc4;
-  --color-primary-300: #8cc4a1;
-  --color-primary-400: #5ea478;
-  --color-primary-500: #3d8358;
-  --color-primary-600: #2c6b44;
-  --color-primary-700: #1b4f32;
-  --color-primary-800: #143d27;
-  --color-primary-900: #0d2918;
-  --color-primary-950: #06170d;
+  --color-teal-tint: #e3eeec;
+  --color-brass-tint: #f3ebdc;
+  --color-rule: #d6d9d4;
 
-  /* ── Neutral · Cool Slate (monochromatic) ──────────────── */
-  --color-neutral-0: #ffffff;
-  --color-neutral-50: #f8fafb;
-  --color-neutral-100: #eef1f3;
-  --color-neutral-200: #dde2e6;
-  --color-neutral-300: #bcc4cb;
-  --color-neutral-400: #8b96a0;
-  --color-neutral-500: #5d6770;
-  --color-neutral-600: #424b53;
-  --color-neutral-700: #2e353b;
-  --color-neutral-800: #1c2126;
-  --color-neutral-900: #0f1316;
-  --color-neutral-950: #060809;
+  /* Brass is 4.47:1 on either tint, which fails AA for body text. This is the
+     same brass darkened 6%: 4.92:1 on both. Used only below 24px on a tint.
+     #89621F also clears, at 4.63, and was rejected because 0.13 of headroom
+     survives no antialiasing and no rounding difference between engines. */
+  --color-brass-ink: #845e1e;
 
-  /* ── Success · Verdant (monochromatic) ─────────────────── */
-  --color-success-50: #ecf6ef;
-  --color-success-100: #d4ecdb;
-  --color-success-200: #a8d8b6;
-  --color-success-300: #78bf8d;
-  --color-success-400: #4ea36a;
-  --color-success-500: #2f8a52;
-  --color-success-600: #246e41;
-  --color-success-700: #1b5e36;
-  --color-success-800: #14492a;
-  --color-success-900: #0c2f1b;
+  /* ── Type ────────────────────────────────────────────────────────────────
+     Newsreader for display and headings, Public Sans for body and controls.
+     Both self-hosted. Deliberately not Playfair and not Inter. */
+  --font-display: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-public-sans), system-ui, -apple-system, sans-serif;
 
-  /* ── Warning · Amber (monochromatic) ───────────────────── */
-  --color-warning-50: #fdf6e8;
-  --color-warning-100: #fbecc9;
-  --color-warning-200: #f5d88f;
-  --color-warning-300: #ecbf5a;
-  --color-warning-400: #dba32b;
-  --color-warning-500: #c98a14;
-  --color-warning-600: #a87210;
-  --color-warning-700: #8a5d0c;
-  --color-warning-800: #654309;
-  --color-warning-900: #422c05;
+  /* Fluid between 390 and 1440. Line height is baked in: these levels are
+     used as a pair, never a size without its leading. */
+  --text-display: clamp(2.5rem, 1.6rem + 3.7vw, 4rem);
+  --text-display--line-height: 1.03;
+  --text-display--letter-spacing: -0.02em;
 
-  /* ── Danger · Brick (monochromatic) ────────────────────── */
-  --color-danger-50: #fbeceb;
-  --color-danger-100: #f5d3d0;
-  --color-danger-200: #eba79f;
-  --color-danger-300: #df7c70;
-  --color-danger-400: #cf5648;
-  --color-danger-500: #c0392b;
-  --color-danger-600: #a02e22;
-  --color-danger-700: #8a2820;
-  --color-danger-800: #5f1c17;
-  --color-danger-900: #3b110e;
+  --text-section: clamp(1.875rem, 1.49rem + 1.6vw, 2.5rem);
+  --text-section--line-height: 1.12;
+  --text-section--letter-spacing: -0.015em;
 
-  /* ── Info · Steel Blue (monochromatic) ─────────────────── */
-  --color-info-50: #ecf2f7;
-  --color-info-100: #d4e1ec;
-  --color-info-200: #a9c2d8;
-  --color-info-300: #7ba2c0;
-  --color-info-400: #5285a8;
-  --color-info-500: #3a6b8c;
-  --color-info-600: #2d5774;
-  --color-info-700: #244a64;
-  --color-info-800: #1a3548;
-  --color-info-900: #0f212d;
+  --text-plate: clamp(1.625rem, 1.37rem + 1.05vw, 2.125rem);
+  --text-plate--line-height: 1.13;
+  --text-plate--letter-spacing: -0.015em;
 
-  /* ── Radius ────────────────────────────────────────────── */
-  /* Compact, consistent radius scale used across the whole product.
-     Pills, avatars and circular header buttons stay round via --radius-full. */
-  --radius-xs: 0.1875rem;
-  --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.625rem;
-  --radius-2xl: 0.75rem;
-  --radius-full: 9999px;
+  --text-subhead: clamp(1.25rem, 1.2rem + 0.21vw, 1.375rem);
+  --text-subhead--line-height: 1.26;
+  --text-subhead--letter-spacing: -0.01em;
 
-  /* ── Shadows ───────────────────────────────────────────── */
-  --shadow-xs: 0 1px 1px 0 rgb(0 0 0 / 0.04);
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 8px -2px rgb(0 0 0 / 0.08);
-  --shadow-lg: 0 12px 24px -6px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 24px 48px -12px rgb(0 0 0 / 0.16);
-  --shadow-focus: 0 0 0 3px var(--color-primary-100);
+  --text-lead: clamp(1.1875rem, 1.04rem + 0.62vw, 1.5rem);
+  --text-lead--line-height: 1.38;
+  --text-lead--letter-spacing: -0.005em;
 
-  /* ── Motion ────────────────────────────────────────────── */
-  --duration-fast: 120ms;
-  --duration-base: 180ms;
-  --duration-slow: 280ms;
-  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --text-body: clamp(1rem, 0.98rem + 0.1vw, 1.0625rem);
+  --text-body--line-height: 1.65;
+
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.6;
+
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.5;
+
+  /* ── Spacing, 4px base ──────────────────────────────────────────────────── */
+  --spacing: 0.25rem;
+
+  /* ── Radius is hierarchy, not habit ──────────────────────────────────────
+     Plates are edge-anchored surfaces and take none. Cards are held objects.
+     Controls are controls. Markers are markers, and they are the only round
+     thing on the page. */
+  --radius-plate: 0;
+  --radius-card: 10px;
+  --radius-control: 6px;
+
+  /* ── The one shadow, used on the two hero plates and nowhere else ───────── */
+  --shadow-plate:
+    0 1px 2px rgb(19 35 58 / 0.04), 0 8px 24px -12px rgb(19 35 58 / 0.14);
 }
 
-/* ============================================================
-   RESET & DEFAULTS
-   ============================================================ */
+/* ==========================================================================
+   Base
+   ========================================================================== */
 
-@layer base {
-  html {
-    -webkit-text-size-adjust: 100%;
-    -webkit-tap-highlight-color: transparent;
-    scroll-behavior: smooth;
-  }
-
-  button {
-    cursor: pointer;
-  }
-
-  body {
-    font-family: var(--font-sans);
-    color: var(--color-neutral-900);
-    background-color: var(--color-neutral-50);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-    min-height: 100dvh;
-  }
-
-  /* Prevent iOS zoom-on-focus for form inputs */
-  @media (max-width: 768px) {
-    input,
-    select,
-    textarea {
-      font-size: max(16px, 1rem);
-    }
-  }
+:root {
+  /* Read by the spine. Overridden per section so one rule paints every
+     segment in the colour of whichever product owns it. */
+  --spine: var(--color-rule);
+  color-scheme: light;
 }
 
-/* ============================================================
-   ACCESSIBILITY
-   ============================================================ */
-
-@layer base {
-  :focus {
-    outline: none;
-  }
-
-  :focus-visible {
-    outline: 2px solid var(--color-primary-700);
-    outline-offset: 2px;
-    border-radius: var(--radius-sm);
-  }
-
-  ::selection {
-    background: var(--color-primary-100);
-    color: var(--color-primary-900);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
+html {
+  /* Sticky nav is 72px; anchors land below it rather than under it. */
+  scroll-padding-top: 6rem;
+  -webkit-text-size-adjust: 100%;
 }
 
-/* ============================================================
-   SCROLLBAR
-   ============================================================ */
-
-@layer base {
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-neutral-300) transparent;
-  }
-
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-neutral-300);
-    border-radius: var(--radius-full);
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-neutral-400);
-  }
+body {
+  background-color: var(--color-paper);
+  color: var(--color-navy);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* ============================================================
-   UTILITY CLASSES
-   Reusable patterns used across components. Kept minimal —
-   if a pattern isn't reused 3+ times, it stays in the component.
-   ============================================================ */
-
-@layer components {
-  /* ── Surfaces ──────────────────────────────────────────── */
-  .surface-card {
-    background-color: var(--color-neutral-0);
-    border: 1px solid var(--color-neutral-200);
-    border-radius: var(--radius-lg);
-  }
-
-  .surface-muted {
-    background-color: var(--color-neutral-100);
-    border-radius: var(--radius-md);
-  }
-
-  /* ── Typography helpers ────────────────────────────────── */
-  .eyebrow {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--color-primary-700);
-  }
-
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  .text-pretty {
-    text-wrap: pretty;
-  }
-
-  /* ── Layout helpers ────────────────────────────────────── */
-  .container-page {
-    width: 100%;
-    max-width: 80rem;
-    margin-inline: auto;
-    padding-inline: 1rem;
-  }
-
-  @media (min-width: 768px) {
-    .container-page {
-      padding-inline: 2rem;
-    }
-  }
-
-  /* ── Visually hidden (a11y) ────────────────────────────── */
-  .sr-only-focusable {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  .sr-only-focusable:focus-visible {
-    position: static;
-    width: auto;
-    height: auto;
-    margin: 0;
-    overflow: visible;
-    clip: auto;
-    white-space: normal;
-  }
-
-  /* ── Skeleton ──────────────────────────────────────────── */
-  .skeleton {
-    background: linear-gradient(
-      90deg,
-      var(--color-neutral-100) 0%,
-      var(--color-neutral-200) 50%,
-      var(--color-neutral-100) 100%
-    );
-    background-size: 200% 100%;
-    animation: skeleton-shimmer 1.4s ease-in-out infinite;
-    border-radius: var(--radius-sm);
-  }
+::selection {
+  background-color: var(--color-teal-tint);
+  color: var(--color-navy);
 }
 
-/* ============================================================
-   ANIMATIONS
-   Globally reusable. Component-specific motion stays local.
-   ============================================================ */
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+/* One focus treatment for the whole site. Keyboard only, because a mouse user
+   clicking a button does not need to be told where the keyboard is. */
+:focus-visible {
+  outline: 2px solid var(--color-navy);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* On a saturated plate, navy would vanish: it is 2.02:1 on teal and 2.98:1 on
+   brass. */
+.on-plate :focus-visible,
+.on-navy :focus-visible {
+  outline-color: var(--color-white);
 }
 
-@keyframes skeleton-shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
+/* ==========================================================================
+   The spine
 
-/* loading page  */
-/* ── Background ──────────────────────────────────────────── */
-.gl-bg {
-  background-color: #ffffff;
-  background-image:
-    radial-gradient(
-      ellipse 65% 55% at 50% 50%,
-      rgba(27, 79, 50, 0.06) 0%,
-      transparent 100%
-    ),
-    radial-gradient(circle, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
-  background-size:
-    100% 100%,
-    28px 28px;
-}
+   A 2px column down the left of the content, whose colour says which product
+   you are reading about. It is the page's one structural idea and its one
+   piece of non-interaction motion: each segment is drawn as its section comes
+   into view, by the reader's own scrolling rather than on a timer.
+   ========================================================================== */
 
-/* ── Grain overlay ───────────────────────────────────────── */
-.gl-grain::after {
-  content: "";
+.spine {
   position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 160px 160px;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.4;
+  inset-block: 0;
+  inline-size: 2px;
+  background-color: var(--spine);
+  transform-origin: top center;
+  /* Drawn state is the default, so every engine that cannot animate this
+     still shows a complete line rather than nothing. */
+  scale: 1 1;
 }
 
-/* ── Keyframes ───────────────────────────────────────────── */
-@keyframes gl-cw {
-  to {
-    transform: rotate(360deg);
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .spine {
+      animation: spine-draw linear both;
+      animation-timeline: view();
+      /* Finishes a little before the section is centred, so the line leads
+         the reading rather than chasing it. */
+      animation-range: entry 10% cover 55%;
+    }
   }
-}
-@keyframes gl-ccw {
-  to {
-    transform: rotate(-360deg);
-  }
-}
 
-@keyframes gl-breathe {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 0 rgba(27, 79, 50, 0),
-      0 4px 20px rgba(0, 0, 0, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  }
-  50% {
-    box-shadow:
-      0 0 28px 8px rgba(27, 79, 50, 0.15),
-      0 4px 20px rgba(0, 0, 0, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  /* Engines without a native scroll timeline get four coarse steps from an
+     IntersectionObserver instead. Coarse on purpose: the job is to avoid a
+     scroll handler, not to match the native version frame for frame. */
+  @supports not (animation-timeline: view()) {
+    .spine {
+      scale: 1 var(--spine-drawn, 0);
+      transition: scale 220ms linear;
+    }
   }
 }
 
-@keyframes gl-arc-glow {
-  0%,
-  100% {
-    opacity: 0.35;
-  }
-  50% {
-    opacity: 0.85;
-  }
-}
-
-@keyframes gl-rise {
+@keyframes spine-draw {
   from {
-    opacity: 0;
-    transform: translateY(10px);
+    scale: 1 0;
   }
   to {
+    scale: 1 1;
+  }
+}
+
+/* The join between the two products. An SVG path, so the dashes are real
+   geometry rather than a border trick, drawn once left to right when both
+   plates are in view. It does not reverse on scroll up: it is a statement,
+   not a meter. */
+.join-path {
+  stroke-dasharray: var(--join-length, 240);
+  stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .join-path[data-draw="pending"] {
+    stroke-dashoffset: var(--join-length, 240);
+  }
+
+  .join-path[data-draw="drawn"] {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 520ms cubic-bezier(0.3, 0.8, 0.3, 1);
+  }
+}
+
+/* ==========================================================================
+   Hero entrance
+
+   The one orchestrated moment on the page. Transform and opacity only, and
+   every element holds its final box from first paint, so this cannot move the
+   layout and cannot contribute to CLS.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  .enter {
+    opacity: 0;
+    translate: 0 10px;
+    animation: enter-up 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: var(--enter-delay, 0ms);
+  }
+
+  .enter-plate {
+    opacity: 0;
+    translate: 0 12px;
+    animation: enter-up 400ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: var(--enter-delay, 0ms);
+  }
+}
+
+@keyframes enter-up {
+  to {
     opacity: 1;
-    transform: translateY(0);
+    translate: 0 0;
   }
 }
 
-@keyframes gl-dot {
-  0%,
-  70%,
-  100% {
-    transform: scale(0.55);
-    opacity: 0.2;
+/* ==========================================================================
+   Reduced motion
+
+   Not a blanket `animation: none`, which would leave anything that animates
+   from a hidden start state invisible. Everything is forced to its end state.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-  35% {
-    transform: scale(1);
+
+  .enter,
+  .enter-plate {
     opacity: 1;
+    translate: none;
+  }
+
+  .spine {
+    scale: 1 1;
+  }
+
+  .join-path {
+    stroke-dashoffset: 0;
   }
 }
 
-@keyframes gl-track {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(500%);
-  }
+/* ==========================================================================
+   Utilities used in more than one section
+   ========================================================================== */
+
+/* Skip link. Visible the instant it is focused and not before. */
+.skip-link {
+  position: absolute;
+  inset-inline-start: 1rem;
+  inset-block-start: -4rem;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background-color: var(--color-navy);
+  color: var(--color-paper);
+  border-radius: var(--radius-control);
+  font-weight: 600;
+  transition: inset-block-start 140ms ease-out;
 }
 
-/* ── Ring animations ─────────────────────────────────────── */
-.gl-ring-outer {
-  animation: gl-ccw 7s linear infinite;
-}
-.gl-ring-inner {
-  animation: gl-cw 3.8s linear infinite;
-}
-.gl-arc-outer {
-  animation: gl-arc-glow 3s ease-in-out infinite;
+.skip-link:focus {
+  inset-block-start: 1rem;
 }
 
-/* ── Icon ────────────────────────────────────────────────── */
-.gl-icon {
-  animation: gl-breathe 3s ease-in-out infinite;
+/* Body copy measure. Long enough to read, short enough not to lose the line. */
+.measure {
+  max-width: 68ch;
 }
 
-/* ── Entrance sequences ──────────────────────────────────── */
-.gl-e1 {
-  animation: gl-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
-}
-.gl-e2 {
-  animation: gl-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
-}
-.gl-e3 {
-  animation: gl-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
-}
-.gl-e4 {
-  animation: gl-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
-}
-
-/* ── Pulse dots ──────────────────────────────────────────── */
-.gl-d1 {
-  animation: gl-dot 1.5s ease-in-out 0s infinite;
-}
-.gl-d2 {
-  animation: gl-dot 1.5s ease-in-out 0.2s infinite;
-}
-.gl-d3 {
-  animation: gl-dot 1.5s ease-in-out 0.4s infinite;
+.measure-lead {
+  max-width: 60ch;
 }
