@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { PAGES } from "@/config/site.config";
+import { NAV, SECTIONS } from "@/config/nav";
 
 import { Wordmark } from "./Wordmark";
 
@@ -102,32 +102,30 @@ export function Header() {
 
           <nav aria-label="Primary" className="hidden xl:block">
             <ul className="flex list-none items-center gap-1">
-              {PAGES.filter(({ href }) => href !== "/book-a-demo").map(
-                ({ href, navLabel }) => {
-                  const current = pathname === href;
-                  return (
-                    <li key={href}>
-                      <a
-                        href={href}
-                        aria-current={current ? "page" : undefined}
-                        className={`relative block px-3 py-5 text-body-sm transition-colors duration-[140ms] ease-out hover:text-navy ${
-                          current
-                            ? "font-semibold text-navy"
-                            : "font-medium text-graphite"
-                        }`}
-                      >
-                        {navLabel}
-                        {current ? (
-                          <span
-                            className="absolute inset-x-3 bottom-3 block h-0.5 bg-teal"
-                            aria-hidden
-                          />
-                        ) : null}
-                      </a>
-                    </li>
-                  );
-                },
-              )}
+              {NAV.map(({ href, label, external }) => {
+                const current = external && pathname === "/gradlly-ams";
+                return (
+                  <li key={href}>
+                    <a
+                      href={href}
+                      aria-current={current ? "page" : undefined}
+                      className={`relative block px-3 py-5 text-body-sm transition-colors duration-[140ms] ease-out hover:text-navy ${
+                        current
+                          ? "font-semibold text-navy"
+                          : "font-medium text-graphite"
+                      }`}
+                    >
+                      {label}
+                      {current ? (
+                        <span
+                          className="absolute inset-x-3 bottom-3 block h-0.5 bg-teal"
+                          aria-hidden
+                        />
+                      ) : null}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
 
@@ -173,28 +171,19 @@ export function Header() {
           } transition-[opacity,transform,visibility] ease-out`}
         >
           <ul className="list-none px-5 md:px-8">
-            {PAGES.map(({ number, href, label }) => {
-              const current = pathname === href;
-              return (
+            {[...SECTIONS, { href: "/gradlly-ams", label: "Gradlly AMS" }].map(
+              ({ href, label }) => (
                 <li key={href} className="border-b border-mist last:border-b-0">
                   <a
                     href={href}
                     onClick={close}
-                    aria-current={current ? "page" : undefined}
-                    className="flex items-baseline gap-4 py-4"
+                    className="block py-4 text-heading-sm font-medium text-navy"
                   >
-                    <span className="font-mono text-ref text-steel">
-                      {number}
-                    </span>
-                    <span
-                      className={`text-heading-sm ${current ? "font-semibold text-navy" : "font-medium text-graphite"}`}
-                    >
-                      {label}
-                    </span>
+                    {label}
                   </a>
                 </li>
-              );
-            })}
+              ),
+            )}
           </ul>
         </div>
       </header>

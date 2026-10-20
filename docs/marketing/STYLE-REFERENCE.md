@@ -304,6 +304,68 @@ list, then a 1px rule and the copyright line at caption size.
 
 ---
 
+## Glass, bento and mockups
+
+Added 21 October, and they override three earlier rules in this document. The
+rules they replace are kept above rather than deleted, so the record shows what
+changed and when.
+
+### Glass
+
+Translucent surfaces, used on **tiles and mockup frames only**. Not on buttons,
+which need an edge you can trust, and not on a body surface, which would cost
+legibility this audience will not forgive.
+
+```css
+.tile {
+  border: 1px solid rgb(255 255 255 / 0.7);
+  background-color: rgb(255 255 255 / 0.62);
+  backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: var(--shadow-tile);
+}
+```
+
+The border is paper, not Mist. Against a translucent fill a grey hairline reads
+as grime.
+
+**This supersedes "there is no elevation".** Glass needs a shadow or it has no
+relationship to what is behind it. Two are defined: `--shadow-tile` at rest and
+`--shadow-glass` on hover, both tight and low-opacity rather than the soft grey
+blur that marks a template.
+
+Glass also needs something to refract, which is what the washes are for: two
+radial fields in the product colours at 15% opacity, blurred 90px, sitting
+behind content and never over it. **This supersedes "no gradients".** They carry
+no information, so they are `aria-hidden`.
+
+### Bento
+
+A tile grid where span encodes importance. One dark tile per grid carries the
+section's conclusion; the rest are glass. Tiles are 24px radius, which is the
+one radius above 12px in the system and exists because a mockup frame inside a
+12px tile looks pasted on.
+
+Grid: `lg:grid-cols-3` with the lead tile at `lg:col-span-2`. Gap 16px, tighter
+than the old 40px card padding, because a bento reads as one object and wide
+gutters break it into separate cards again.
+
+### Mockups
+
+Drawn in markup, not shipped as images: sharp at any density, nothing to
+download, correctable in a line when the interface changes.
+
+**They carry no figures, no names and no dates.** Where a value would sit there
+is a neutral block. This is not a stylistic choice: the mockups these replaced
+carried £142,400, 94% and £8,000 inside simulated dashboards, which reads as a
+screenshot of real data, and that is the fabricated proof this site had stripped
+from it. A mockup shows the _shape_ of the product. The moment it shows a
+measurement it is a claim.
+
+Three exist: a skills record with its confirmation lines, a cohort with progress
+drawn as a bar rather than stated, and a Passport with its entries.
+
+---
+
 ## Surfaces
 
 | Level | Name                   | Value                 | Purpose                                                                      |

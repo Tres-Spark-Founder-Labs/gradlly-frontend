@@ -78,9 +78,25 @@
   --text-ref--line-height: 1.4;
 
   /* ── Shape ─────────────────────────────────────────────────────────────────
-     One radius per component group. Never 8px or 10px as a compromise. */
+     One radius per component group. Never an in-between value as a compromise.
+     The larger radii arrived with the bento grid: a tile that holds a mockup
+     needs a softer corner than a button, or the frame inside it looks pasted
+     on. */
   --radius-sm: 6px;
   --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-bento: 24px;
+
+  /* ── Glass ─────────────────────────────────────────────────────────────────
+     Translucent surfaces need something behind them to refract, which is what
+     the washes in Mocks.jsx are for. Glass is used on tiles and mockup frames
+     only: a translucent button has no edge you can trust, and a translucent
+     body surface costs legibility this audience will not forgive. */
+  --shadow-glass:
+    0 1px 2px rgb(19 35 58 / 0.04), 0 16px 40px -20px rgb(19 35 58 / 0.22);
+  --shadow-tile:
+    0 1px 2px rgb(19 35 58 / 0.04), 0 10px 28px -18px rgb(19 35 58 / 0.18);
 
   --spacing: 0.25rem;
 }
@@ -140,6 +156,41 @@ body {
   display: block;
   inline-size: 4px;
   background-color: var(--mark);
+}
+
+/* A bento tile: glass over the wash, with a hairline that lifts on hover.
+   The border is paper rather than mist, because against a translucent fill a
+   grey hairline reads as grime. */
+.tile {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-bento);
+  border: 1px solid rgb(255 255 255 / 0.7);
+  background-color: rgb(255 255 255 / 0.62);
+  box-shadow: var(--shadow-tile);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  transition:
+    box-shadow 180ms ease-out,
+    border-color 180ms ease-out;
+}
+
+.tile:hover,
+.tile:focus-within {
+  border-color: rgb(255 255 255 / 0.95);
+  box-shadow: var(--shadow-glass);
+}
+
+/* The dark tile, for the one tile per grid that carries the conclusion. */
+.tile-dark {
+  border-color: rgb(255 255 255 / 0.1);
+  background-color: rgb(19 35 58 / 0.92);
+  color: var(--color-paper);
+}
+
+.tile-dark:hover,
+.tile-dark:focus-within {
+  border-color: rgb(255 255 255 / 0.22);
 }
 
 /* Body measure. Long enough to read, short enough not to lose the line. */

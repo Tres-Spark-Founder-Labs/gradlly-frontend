@@ -1,4 +1,5 @@
-import { LEGAL_PAGES, PAGES, PORTAL_SIGN_IN, SITE } from "@/config/site.config";
+import { SECTIONS } from "@/config/nav";
+import { LEGAL_PAGES, PORTAL_SIGN_IN, SITE } from "@/config/site.config";
 
 import { Wordmark } from "./Wordmark";
 
@@ -19,18 +20,18 @@ export function Footer() {
         </div>
 
         <div className="grid gap-10 pt-10 md:grid-cols-[1.5fr_1fr_1fr] md:gap-14">
-          <nav aria-label="All pages">
-            <h2 className="font-mono text-ref text-paper/40">Pages</h2>
+          <nav aria-label="Sections">
+            <h2 className="font-mono text-ref text-paper/40">On this page</h2>
             <ul className="mt-4 grid list-none gap-x-10 sm:grid-cols-2">
-              {PAGES.map(({ number, href, label }) => (
+              {[
+                ...SECTIONS,
+                { href: "/gradlly-ams", label: "Gradlly AMS" },
+              ].map(({ href, label }) => (
                 <li key={href}>
                   <a
                     href={href}
-                    className="flex items-baseline gap-3 py-2 text-body-sm text-paper/75 transition-colors duration-[140ms] ease-out hover:text-paper"
+                    className="block py-2 text-body-sm text-paper/75 transition-colors duration-[140ms] ease-out hover:text-paper"
                   >
-                    <span className="font-mono text-ref text-paper/35">
-                      {number}
-                    </span>
                     {label}
                   </a>
                 </li>
