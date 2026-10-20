@@ -1,42 +1,38 @@
-import { Footer } from "@/components/landing/Footer";
-import { Nav } from "@/components/landing/Nav";
+import { Band, PageHeader } from "@/components/site/PageHeader";
 import { createPageSeo } from "@/utils/metadata";
 
-export const metadata = createPageSeo({
-  title: "Terms",
-  path: "/terms",
-});
+export const metadata = createPageSeo({ title: "Terms", path: "/terms" });
 
 /**
- * Placeholder. The page exists so the footer link resolves instead of 404ing,
- * and says plainly that the content is not written rather than showing an
- * empty page that looks broken.
+ * Placeholder. Published so the footer link resolves instead of 404ing, and
+ * says plainly that the content is not written rather than showing an empty
+ * page that looks broken.
  *
  * Tracked in docs/marketing/LAUNCH-CHECKLIST.md.
  */
 export default function TermsPage() {
   return (
     <>
-      <Nav />
-      <main id="main-content" className="px-5 py-20 md:px-10 md:py-28 lg:px-16">
-        <div className="mx-auto max-w-[1140px]">
-          <h1 className="font-display text-section text-navy">Terms</h1>
-          <p className="measure mt-6 text-body text-slate">
-            This page is not written yet. It is published so the link to it
-            works, and it will carry Gradlly&rsquo;s terms content before
-            launch.
-          </p>
-          <p className="mt-6 text-small text-slate">
-            <a
-              href="/"
-              className="font-medium text-navy underline decoration-rule decoration-2 underline-offset-4 hover:decoration-navy"
-            >
-              Back to the home page
-            </a>
-          </p>
-        </div>
-      </main>
-      <Footer />
+      <PageHeader
+        number="&mdash;"
+        label="Legal"
+        title="Terms"
+        lead="Not written yet."
+      />
+      <Band>
+        <p className="measure text-body text-slate">
+          This page is published so the link to it works. It will carry
+          Gradlly&rsquo;s terms content before launch.
+        </p>
+        <p className="mt-8">
+          <a
+            href="/"
+            className="text-small font-semibold text-navy underline decoration-rule decoration-2 underline-offset-[6px] transition-colors duration-[120ms] ease-out hover:decoration-navy"
+          >
+            Back to the overview
+          </a>
+        </p>
+      </Band>
     </>
   );
 }

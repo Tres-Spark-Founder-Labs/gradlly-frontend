@@ -2,23 +2,35 @@
    Gradlly marketing site
    Tailwind v4. Scoped to apps/main and shared with nothing.
 
-   This file replaced a copy of the provider portal's stylesheet, which
-   declared Poppins and JetBrains Mono and loaded neither. There are no shared
-   packages in this repository (see docs/marketing/SURVEY.md section 4), so
-   nothing here reaches a portal and nothing a portal defines reaches here.
+   ── THE DIRECTION ────────────────────────────────────────────────────────────
 
-   Tokens are documented in docs/marketing/DESIGN-SPEC.md section 3.
+   A dossier, not a brochure. This product is a register of who confirmed what,
+   on what date, with what evidence, and the page is built to look like
+   something you could look a record up in.
+
+   What that means concretely, and what it changed from the first attempt:
+
+   1. The ground is inverted. White carries the content; navy carries the shell.
+      The first attempt made warm paper the dominant surface, which is the
+      mockup's look and the look of most generated marketing pages.
+   2. No serif anywhere. One grotesque with a width axis does the whole
+      hierarchy. See app/fonts.js.
+   3. Colour is status, not surface. Teal and brass appear as 4px marks and
+      rules against white, never as large fills. The first attempt put the two
+      products on big saturated plates, which is the mockup's hero.
+   4. Nothing is rounded. A record has corners.
+   5. The pages are numbered, because there are seven of them and the number is
+      real information about where you are in the set.
    ========================================================================== */
 
 @import "tailwindcss";
 
 @theme {
   /* ── Brand ───────────────────────────────────────────────────────────────
-     Verified by sampling the approved mockup. Colour carries product
-     identity: teal is Continuo, brass is Gradlly AMS and the Apprenticeship
-     Passport. It is never spent on decoration, which is why there is no
-     gradient token anywhere in this file. */
+     The palette is fixed. Teal is Continuo, brass is Gradlly AMS and the
+     Apprenticeship Passport, and neither is ever spent on decoration. */
   --color-navy: #13233a;
+  --color-navy-deep: #0b1526;
   --color-teal: #0f5b5f;
   --color-brass: #8c6420;
   --color-paper: #f3f4f1;
@@ -28,64 +40,57 @@
   --color-teal-tint: #e3eeec;
   --color-brass-tint: #f3ebdc;
   --color-rule: #d6d9d4;
+  --color-rule-dark: #2a3a55;
 
-  /* Brass is 4.47:1 on either tint, which fails AA for body text. This is the
-     same brass darkened 6%: 4.92:1 on both. Used only below 24px on a tint.
-     #89621F also clears, at 4.63, and was rejected because 0.13 of headroom
-     survives no antialiasing and no rounding difference between engines. */
+  /* Brass is 4.47:1 on either tint and fails AA for body text. This is the
+     same brass darkened 6%: 4.92:1 on both tints, 5.28 on paper. Used only
+     below 24px on a tint. #89621F also clears at 4.63 and was rejected,
+     because 0.13 of headroom survives no antialiasing and no rounding
+     difference between engines. */
   --color-brass-ink: #845e1e;
 
   /* ── Type ────────────────────────────────────────────────────────────────
-     Newsreader for display and headings, Public Sans for body and controls.
-     Both self-hosted. Deliberately not Playfair and not Inter. */
-  --font-display: var(--font-newsreader), Georgia, "Times New Roman", serif;
-  --font-sans: var(--font-public-sans), system-ui, -apple-system, sans-serif;
+     One family. Width and weight carry the hierarchy. */
+  --font-sans: var(--font-archivo), system-ui, -apple-system, sans-serif;
 
-  /* Fluid between 390 and 1440. Line height is baked in: these levels are
-     used as a pair, never a size without its leading. */
-  --text-display: clamp(2.5rem, 1.6rem + 3.7vw, 4rem);
-  --text-display--line-height: 1.03;
-  --text-display--letter-spacing: -0.02em;
+  /* Display is set tight and wide: signage, not a masthead. */
+  --text-hero: clamp(2.75rem, 1.5rem + 5.2vw, 5.5rem);
+  --text-hero--line-height: 0.96;
+  --text-hero--letter-spacing: -0.035em;
 
-  --text-section: clamp(1.875rem, 1.49rem + 1.6vw, 2.5rem);
-  --text-section--line-height: 1.12;
-  --text-section--letter-spacing: -0.015em;
+  --text-display: clamp(2.25rem, 1.6rem + 2.7vw, 3.75rem);
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -0.03em;
 
-  --text-plate: clamp(1.625rem, 1.37rem + 1.05vw, 2.125rem);
-  --text-plate--line-height: 1.13;
-  --text-plate--letter-spacing: -0.015em;
+  --text-section: clamp(1.75rem, 1.45rem + 1.25vw, 2.5rem);
+  --text-section--line-height: 1.08;
+  --text-section--letter-spacing: -0.025em;
 
-  --text-subhead: clamp(1.25rem, 1.2rem + 0.21vw, 1.375rem);
-  --text-subhead--line-height: 1.26;
-  --text-subhead--letter-spacing: -0.01em;
+  --text-subhead: clamp(1.1875rem, 1.12rem + 0.3vw, 1.375rem);
+  --text-subhead--line-height: 1.25;
+  --text-subhead--letter-spacing: -0.015em;
 
-  --text-lead: clamp(1.1875rem, 1.04rem + 0.62vw, 1.5rem);
-  --text-lead--line-height: 1.38;
-  --text-lead--letter-spacing: -0.005em;
+  --text-lead: clamp(1.125rem, 1.03rem + 0.4vw, 1.375rem);
+  --text-lead--line-height: 1.5;
+  --text-lead--letter-spacing: -0.01em;
 
   --text-body: clamp(1rem, 0.98rem + 0.1vw, 1.0625rem);
-  --text-body--line-height: 1.65;
+  --text-body--line-height: 1.62;
 
   --text-small: 0.9375rem;
-  --text-small--line-height: 1.6;
+  --text-small--line-height: 1.58;
 
-  --text-meta: 0.8125rem;
-  --text-meta--line-height: 1.5;
+  /* Reference data. Not a label style: this size carries page numbers, counts
+     and the "confirmed by" lines, which are content. */
+  --text-ref: 0.8125rem;
+  --text-ref--line-height: 1.45;
 
-  /* ── Spacing, 4px base ──────────────────────────────────────────────────── */
   --spacing: 0.25rem;
 
-  /* ── Radius is hierarchy, not habit ──────────────────────────────────────
-     Plates are edge-anchored surfaces and take none. Cards are held objects.
-     Controls are controls. Markers are markers, and they are the only round
-     thing on the page. */
-  --radius-plate: 0;
-  --radius-card: 10px;
-  --radius-control: 6px;
-
-  /* ── The one shadow, used on the two hero plates and nowhere else ───────── */
-  --shadow-plate:
-    0 1px 2px rgb(19 35 58 / 0.04), 0 8px 24px -12px rgb(19 35 58 / 0.14);
+  /* ── Nothing is rounded ──────────────────────────────────────────────────
+     Except a status pill, which is round because it is a pill. */
+  --radius-none: 0;
+  --radius-pill: 999px;
 }
 
 /* ==========================================================================
@@ -93,141 +98,86 @@
    ========================================================================== */
 
 :root {
-  /* Read by the spine. Overridden per section so one rule paints every
-     segment in the colour of whichever product owns it. */
-  --spine: var(--color-rule);
+  --mark: var(--color-navy);
   color-scheme: light;
 }
 
 html {
-  /* Sticky nav is 72px; anchors land below it rather than under it. */
-  scroll-padding-top: 6rem;
+  scroll-padding-top: 5.5rem;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background-color: var(--color-paper);
+  background-color: var(--color-white);
   color: var(--color-navy);
   font-family: var(--font-sans);
   font-size: var(--text-body);
-  line-height: 1.65;
+  line-height: 1.62;
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background-color: var(--color-teal-tint);
-  color: var(--color-navy);
+  background-color: var(--color-navy);
+  color: var(--color-white);
 }
 
-/* One focus treatment for the whole site. Keyboard only, because a mouse user
-   clicking a button does not need to be told where the keyboard is. */
 :focus-visible {
   outline: 2px solid var(--color-navy);
-  outline-offset: 2px;
-  border-radius: 2px;
+  outline-offset: 3px;
 }
 
-/* On a saturated plate, navy would vanish: it is 2.02:1 on teal and 2.98:1 on
-   brass. */
-.on-plate :focus-visible,
-.on-navy :focus-visible {
+.on-dark :focus-visible {
   outline-color: var(--color-white);
 }
 
 /* ==========================================================================
-   The spine
+   The attestation block
 
-   A 2px column down the left of the content, whose colour says which product
-   you are reading about. It is the page's one structural idea and its one
-   piece of non-interaction motion: each segment is drawn as its section comes
-   into view, by the reader's own scrolling rather than on a timer.
+   The page's one recurring idea. A claim, a hairline, and who stands behind
+   it. Every section that makes a promise carries the confirmation underneath
+   it in the same shape, because that is the product: not that something is
+   true, but that somebody confirmed it.
+
+   The left mark is the product's colour, which is the only place colour
+   appears at any size.
    ========================================================================== */
 
-.spine {
-  position: absolute;
-  inset-block: 0;
-  inline-size: 2px;
-  background-color: var(--spine);
-  transform-origin: top center;
-  /* Drawn state is the default, so every engine that cannot animate this
-     still shows a complete line rather than nothing. */
-  scale: 1 1;
+.attest {
+  border-left: 4px solid var(--mark);
+  padding-left: 1.25rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    .spine {
-      animation: spine-draw linear both;
-      animation-timeline: view();
-      /* Finishes a little before the section is centred, so the line leads
-         the reading rather than chasing it. */
-      animation-range: entry 10% cover 55%;
-    }
-  }
-
-  /* Engines without a native scroll timeline get four coarse steps from an
-     IntersectionObserver instead. Coarse on purpose: the job is to avoid a
-     scroll handler, not to match the native version frame for frame. */
-  @supports not (animation-timeline: view()) {
-    .spine {
-      scale: 1 var(--spine-drawn, 0);
-      transition: scale 220ms linear;
-    }
-  }
+.attest-rule {
+  border-top: 1px solid var(--color-rule);
 }
 
-@keyframes spine-draw {
-  from {
-    scale: 1 0;
-  }
-  to {
-    scale: 1 1;
-  }
-}
-
-/* The join between the two products. An SVG path, so the dashes are real
-   geometry rather than a border trick, drawn once left to right when both
-   plates are in view. It does not reverse on scroll up: it is a statement,
-   not a meter. */
-.join {
-  /* Drawn is the default, so an engine that cannot transform an SVG still
-     shows a complete connector rather than nothing. */
-  transform-origin: var(--join-origin, left center);
-  scale: 1 1;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .join[data-draw="pending"] {
-    scale: var(--join-pending, 0 1);
-  }
-
-  .join[data-draw="drawn"] {
-    scale: 1 1;
-    transition: scale 520ms cubic-bezier(0.3, 0.8, 0.3, 1);
-  }
+.on-dark .attest-rule {
+  border-top-color: var(--color-rule-dark);
 }
 
 /* ==========================================================================
-   Hero entrance
+   Motion
 
-   The one orchestrated moment on the page. Transform and opacity only, and
-   every element holds its final box from first paint, so this cannot move the
-   layout and cannot contribute to CLS.
+   One orchestrated moment per page, on load, and nothing on scroll. Transform
+   and opacity only; every element holds its final box from first paint, so
+   none of this can move the layout.
    ========================================================================== */
 
 @media (prefers-reduced-motion: no-preference) {
   .enter {
     opacity: 0;
-    translate: 0 10px;
-    animation: enter-up 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    translate: 0 12px;
+    animation: enter-up 440ms cubic-bezier(0.16, 0.8, 0.3, 1) both;
     animation-delay: var(--enter-delay, 0ms);
   }
 
-  .enter-plate {
-    opacity: 0;
-    translate: 0 12px;
-    animation: enter-up 400ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  /* The rule under a page title draws across rather than fading in: it is the
+     line being ruled, which is what the rest of the page then hangs from. */
+  .rule-draw {
+    transform-origin: left center;
+    scale: 0 1;
+    animation: rule-draw 520ms cubic-bezier(0.16, 0.8, 0.3, 1) both;
     animation-delay: var(--enter-delay, 0ms);
   }
 }
@@ -239,13 +189,14 @@ body {
   }
 }
 
-/* ==========================================================================
-   Reduced motion
+@keyframes rule-draw {
+  to {
+    scale: 1 1;
+  }
+}
 
-   Not a blanket `animation: none`, which would leave anything that animates
-   from a hidden start state invisible. Everything is forced to its end state.
-   ========================================================================== */
-
+/* Not a blanket `animation: none`, which leaves anything animating from a
+   hidden start state invisible. Everything is forced to its end state. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -256,36 +207,30 @@ body {
     scroll-behavior: auto !important;
   }
 
-  .enter,
-  .enter-plate {
+  .enter {
     opacity: 1;
     translate: none;
   }
 
-  .spine {
-    scale: 1 1;
-  }
-
-  .join {
+  .rule-draw {
     scale: 1 1;
   }
 }
 
 /* ==========================================================================
-   Utilities used in more than one section
+   Utilities
    ========================================================================== */
 
-/* Skip link. Visible the instant it is focused and not before. */
 .skip-link {
   position: absolute;
   inset-inline-start: 1rem;
   inset-block-start: -4rem;
   z-index: 100;
   padding: 0.75rem 1.25rem;
-  background-color: var(--color-navy);
-  color: var(--color-paper);
-  border-radius: var(--radius-control);
+  background-color: var(--color-white);
+  color: var(--color-navy);
   font-weight: 600;
+  outline: 2px solid var(--color-navy);
   transition: inset-block-start 140ms ease-out;
 }
 
@@ -293,11 +238,22 @@ body {
   inset-block-start: 1rem;
 }
 
-/* Body copy measure. Long enough to read, short enough not to lose the line. */
 .measure {
-  max-width: 68ch;
+  max-width: 64ch;
 }
 
 .measure-lead {
-  max-width: 60ch;
+  max-width: 48ch;
+}
+
+/* Display type: the width axis pushed out, which is what makes this read as
+   stationery rather than as a magazine. */
+.wide {
+  font-stretch: 112%;
+  font-weight: 700;
+}
+
+.wide-md {
+  font-stretch: 106%;
+  font-weight: 600;
 }

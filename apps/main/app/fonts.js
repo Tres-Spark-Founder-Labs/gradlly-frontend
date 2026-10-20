@@ -1,48 +1,35 @@
-import { Newsreader, Public_Sans } from "next/font/google";
+import { Archivo } from "next/font/google";
 
 /**
- * Two families, self-hosted.
+ * One family, doing all of it.
  *
- * `next/font/google` fetches these at build time and serves them from this
- * origin. No request reaches Google at runtime, so there is no third-party
- * connection to warm up, nothing to consent to, and no render-blocking
- * stylesheet on a cold visit.
+ * ── WHY NOT A SERIF ─────────────────────────────────────────────────────────
  *
- * ── WHY THESE TWO ────────────────────────────────────────────────────────────
+ * The previous attempt paired a high-contrast editorial serif with a humanist
+ * sans, which is the pairing the mockup uses and the pairing most generated
+ * marketing pages use. It gave the page a literary voice, and this product is
+ * not literary: it is a register of who confirmed what, on what date, with what
+ * evidence. Site cards, DBS certificates and ILR returns are set in grotesques,
+ * not in Didones.
  *
- * Newsreader for display: a high-contrast editorial serif with ball terminals
- * and an italic with real personality, which this page needs because the
- * supporting line is set in it. Playfair Display would be the obvious pick and
- * is the default display serif of generated pages.
+ * Archivo is a grotesque with a width axis. Headlines run at 600 to 700 weight
+ * with the width pushed out, which reads as signage and official stationery
+ * rather than as a magazine. Body runs at normal width and 400. One family with
+ * two axes carries the whole hierarchy, so nothing on the page is a second
+ * voice.
  *
- * Public Sans for everything else: the humanist face of the US Web Design
- * System, drawn for civic interfaces. Apt for a product about statutory checks,
- * and legible at 13px where a display serif is not. Inter would be the obvious
- * pick and is the default sans of generated pages.
+ * Tabular figures throughout, because this design puts reference data in the
+ * open and numbers that shift width between rows read as careless.
  *
- * Both are provisional pending designer confirmation. The mockup's actual
- * faces are named in no file in this repository; these are a judgement about
- * the closest free, self-hostable match. Swapping either is a one-line change
- * here, because nothing references a family name directly.
+ * Provisional pending designer confirmation.
  */
-
-export const newsreader = Newsreader({
+export const archivo = Archivo({
   subsets: ["latin"],
-  // Variable across the range this design uses: 400 for display and section
-  // headings, 500 for subheads. Nothing is set bolder than 500, because a
-  // high-contrast serif at 700 reads as a masthead rather than a document.
-  weight: ["400", "500"],
-  style: ["normal", "italic"],
+  // No weight array: axes can only be requested on the variable font, and
+  // asking for named weights pins it to static instances. The variable font
+  // covers 100 to 900, so every weight this design uses comes from one file.
+  axes: ["wdth"],
   display: "swap",
-  variable: "--font-newsreader",
-  // Keeps the fallback's metrics close enough that the swap does not reflow.
-  adjustFontFallback: true,
-});
-
-export const publicSans = Public_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  display: "swap",
-  variable: "--font-public-sans",
+  variable: "--font-archivo",
   adjustFontFallback: true,
 });
