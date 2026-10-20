@@ -8,22 +8,46 @@ Phase 2. No code. Builds on [SURVEY.md](SURVEY.md) and the rulings of
 **Copy** is `content-v1.md`, verbatim. Nothing is invented. Bracketed items
 render as visible placeholders.
 
-**The mockup is a guide, not a standard.** Per the instruction of 20 October,
-this is an original design that takes its direction from
-`mockups/desktop.png` and `mockups/mobile-hero.png` rather than a reproduction
-of them. What carries over unchanged: the palette (verified below), the serif
-display and humanist sans pairing, colour as product identity, and the idea
-that the two products are drawn as connected. What is designed fresh: the
-structure, the type system, the spacing, the radius hierarchy, and every
-section's composition.
+**The mockup is a guide, not a standard.** It provides exactly three things,
+and no fidelity check is run against it in any phase:
 
-**Two readings recorded for correction.** Ruling 2 says the Gradlly OS page "is
-rebuilt to content-v1.md and the mockup like every other section" and that
-components with no place in `content-v1.md` are deleted. `content-v1.md`'s
-navigation (§1) has no Gradlly OS item. So this spec builds **one page**, with
-no preserved legacy page and no Gradlly OS nav item, and treats the earlier
-instruction about a Gradlly OS nav link as withdrawn by ruling 2. Say so if that
-is wrong; it is one nav item and one route either way.
+1. The brand palette, verified by sampling in section 3.
+2. The colour rule: teal means Continuo, brass means Gradlly AMS and the
+   Passport.
+3. Nothing else. Section order and content come from `content-v1.md`.
+
+Layout, composition, type treatment, the spine, the radius hierarchy and every
+undesigned section are original work under the frontend-design skill.
+
+**Settled: one page.** The instruction of 20 October to keep the current
+landing page at `/gradlly-os` and link to it from the nav was reversed the same
+day by ruling 6 of the second correction: "One page. No Gradlly OS route or nav
+item. Delete the components listed in the spec, including Reveal.jsx and every
+piece of fabricated proof."
+
+So `components/Home/` is deleted in full, the new page is built fresh at `/`
+under `components/landing/`, and navigation is the five items
+`content-v1.md` §1 lists. The paragraphs below are the superseded version, kept
+for the record only.
+
+~~It moves to
+`/gradlly-os` and the new nav links to it. Two consequences for this spec:
+
+1. The components in `components/Home/` are **not** deleted. They are no longer
+   unused, because they serve that route, so the clause in ruling 2 about
+   deleting unused components does not apply to them. They move with the page.
+2. **Ruling 1 still applies to them.** Keeping the page is not keeping its
+   fabricated proof. Every testimonial and every unsourced figure listed in
+   section 9 is removed from the kept page too, and nothing is put in its place.
+   `Testimonials.jsx` and `Pricing.jsx` are deleted outright, because removing
+   the invented content empties them: one is six fabricated quotes, the other
+   three prices that appear in no approved copy.
+
+The new page is built fresh at `/` to `content-v1.md`. The kept page is not
+redesigned, not rebuilt and not brought onto these tokens. It is the previous
+site, preserved, with the invented evidence taken out.
+
+Navigation gains a sixth item, "Gradlly OS", after "How it works".~~
 
 ---
 
@@ -581,11 +605,16 @@ ruled, not dotted.
 
 ## 8. Motion
 
-Ruling 3. No scroll-reveal and no entrance animation on any section. Every
-item below is inside `@media (prefers-reduced-motion: no-preference)`; under
-`reduce`, durations collapse to `0.01ms` and the end state applies immediately.
+No fade-and-slide-up on any section: the spine carries the scroll story, which
+is the whole reason it exists. Every item below is inside
+`@media (prefers-reduced-motion: no-preference)`; under `reduce` the end state
+applies immediately and the spine is drawn full length from first paint.
 
-### 8a. The one orchestrated moment: hero on load
+Nothing here animates a property that triggers layout. Every element occupies
+its final box at first paint, so CLS is structurally zero rather than merely
+measured low.
+
+### 8a. Hero, on load
 
 | Step | Element           | Properties                               | Delay | Duration | Easing                     |
 | ---- | ----------------- | ---------------------------------------- | ----- | -------- | -------------------------- |
@@ -594,13 +623,35 @@ item below is inside `@media (prefers-reduced-motion: no-preference)`; under
 | 3    | Body and controls | same                                     | 210ms | 360ms    | same                       |
 | 4    | Teal plate        | `opacity 0 to 1`, `translateY 12px to 0` | 320ms | 400ms    | same                       |
 | 5    | Brass plate       | same                                     | 380ms | 400ms    | same                       |
-| 6    | Dotted connector  | `opacity 0 to 1` only                    | 700ms | 60ms     | linear                     |
 
-Total 760ms. Transform and opacity only, so nothing lays out twice and CLS is
+The connector between the two plates is not in this sequence. It has its own
+moment, in 8b.
+
+Total 780ms, inside the 900ms ceiling. Transform and opacity only, so nothing lays out twice and CLS is
 unaffected: every element occupies its final box from first paint, and only
 `opacity` and `transform` change. No element starts at `display:none`.
 
-### 8b. Interaction
+### 8b. The signature: the spine draws as you scroll
+
+Scroll-linked, not triggered. The spine is a 2px column whose painted height
+tracks scroll position, so it is drawn by the reader rather than played at them.
+
+| Property       | Value                                                                                                                                                                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Technique      | CSS scroll-driven animation: `animation-timeline: view()` on each section's spine segment, `scale-y` from 0 to 1 with `transform-origin: top`                                                                                                                       |
+| Range          | `animation-range: entry 10% cover 55%`, so a segment finishes drawing a little before its section is centred                                                                                                                                                        |
+| Fallback       | `@supports not (animation-timeline: view())`: an IntersectionObserver sets a `--spine-drawn` custom property per segment at four thresholds. Coarse on purpose, because the fallback is for engines without the native timeline and should not run a scroll handler |
+| Colour         | The segment's own product colour, so the line changes hue as it passes from Continuo into AMS                                                                                                                                                                       |
+| Reduced motion | `scale-y: 1` with no timeline. The line is simply there                                                                                                                                                                                                             |
+
+**The join is its own moment.** Where the two products meet, the spine is not a
+line but a dotted connector between the teal and brass plates. It draws left to
+right rather than top to bottom, once, when the hero's plates are both in view:
+`stroke-dashoffset` from full to 0 over 520ms, `cubic-bezier(.3,.8,.3,1)`, as
+an SVG path so the dashes are real geometry rather than a border trick. It plays
+once and does not reverse on scroll up, because it is a statement, not a meter.
+
+### 8c. Interaction
 
 | Trigger                    | What moves            | Properties                                         | Duration   | Easing                     |
 | -------------------------- | --------------------- | -------------------------------------------------- | ---------- | -------------------------- |
@@ -680,15 +731,22 @@ any of them serve.
 | `components/Home/constants.js:180` | "£80"                                                      |
 | `components/Home/Pricing.jsx`      | Whole file. There is no pricing section in `content-v1.md` |
 
-### Components deleted for having no section in `content-v1.md`
+### Components deleted
 
-`CTA.jsx`, `FlowPortal.jsx`, `Marquee.jsx`, `Mockups.jsx`, `Pricing.jsx`,
-`Results.jsx`, `Stats.jsx`, `Testimonials.jsx`, `Why.jsx`, `constants.js`,
-`Reveal.jsx` (the scroll-reveal wrapper, which ruling 3 forbids).
+All of `components/Home/`: `CTA.jsx`, `FlowPortal.jsx`, `Footer.jsx`,
+`Hero.jsx`, `HowItWorks.jsx`, `Marquee.jsx`, `Mockups.jsx`, `Nav.jsx`,
+`Portals.jsx`, `Pricing.jsx`, `Problem.jsx`, `Results.jsx`, `Reveal.jsx`,
+`Stats.jsx`, `Testimonials.jsx`, `Why.jsx`, `constants.js`.
 
-`Hero.jsx`, `Nav.jsx`, `Problem.jsx`, `Portals.jsx`, `HowItWorks.jsx` and
-`Footer.jsx` are replaced rather than edited: the new copy, structure and tokens
-leave nothing of the originals. Git history is the restore point.
+Two further figures were found while reading `Stats.jsx` in full and are
+recorded here for completeness: `Stats.jsx:3` "750K", "UK apprentices
+underserved", and the simulated-dashboard numbers in `Mockups.jsx`, which read
+as a screenshot of real data.
+
+`components/Home/` is deleted in full, all seventeen files. The new page reuses
+nothing from it and is built fresh under `components/landing/`. `Reveal.jsx`
+goes with the rest: it is a scroll-reveal wrapper, and the motion rules forbid
+what it does. Git history is the restore point.
 
 **Checked, and the list above is complete.** `Results.jsx` and `Why.jsx` hold no
 literals of their own: each is two imports and a render
