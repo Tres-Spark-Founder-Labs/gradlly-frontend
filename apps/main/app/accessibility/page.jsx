@@ -1,5 +1,4 @@
-import { PageHeader } from "@/components/site/PageHeader";
-import { Band } from "@/components/site/ui";
+import { Band, TextLink } from "@/components/site/ui";
 import { createPageSeo } from "@/utils/metadata";
 
 export const metadata = createPageSeo({
@@ -16,27 +15,18 @@ export const metadata = createPageSeo({
  */
 export default function AccessibilityPage() {
   return (
-    <>
-      <PageHeader
-        number="&mdash;"
-        label="Legal"
-        title="Accessibility"
-        lead="Not written yet."
-      />
-      <Band>
-        <p className="measure text-body text-graphite">
-          This page is published so the link to it works. It will carry
-          Gradlly&rsquo;s accessibility content before launch.
-        </p>
-        <p className="mt-8">
-          <a
-            href="/"
-            className="text-body-sm font-semibold text-navy underline decoration-rule decoration-2 underline-offset-[6px] transition-colors duration-[120ms] ease-out hover:decoration-navy"
-          >
-            Back to the overview
-          </a>
-        </p>
-      </Band>
-    </>
+    <Band>
+      <p className="text-caption text-ink-muted">Legal</p>
+      <h1 className="display mt-6 max-w-[14ch] text-title text-ink">
+        Accessibility
+      </h1>
+      <p className="measure mt-8 text-lead text-ink-soft">
+        This page is published so the link to it works. It will carry
+        Gradlly&rsquo;s accessibility content before launch.
+      </p>
+      <p className="mt-10">
+        <TextLink href="/">Back to the home page</TextLink>
+      </p>
+    </Band>
   );
 }

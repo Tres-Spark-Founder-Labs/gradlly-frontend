@@ -1,75 +1,94 @@
 /**
- * The component set from docs/marketing/STYLE-REFERENCE.md.
+ * The component set for the Kindsight-derived visual system.
  *
- * Every visual decision here is made in that document, including the reasoning
- * and the contrast measurements. Nothing in this file invents a value.
+ * Rules this file holds to, from the brief:
+ *
+ *   The serif carries display type only, never body, labels or controls.
+ *   Terracotta carries the actions. Outlined is the secondary.
+ *   Chartreuse is emphasis, never body text, and appears once per page.
+ *   Thin low-contrast borders and tonal surface change, not shadows.
+ *   10px on controls, up to 24px on cards.
+ *   Whitespace does most of the work: no extra dividers, no decoration.
  */
 
 const MARK = {
-  teal: "var(--color-teal)",
-  brass: "var(--color-brass)",
-  navy: "var(--color-navy)",
+  olive: "var(--color-olive)",
+  terracotta: "var(--color-terracotta)",
 };
 
+/**
+ * Text in a product's colour. Olive passes on every surface at 9.77:1.
+ * Terracotta does not, at 2.84:1 on cream, so text uses the darker
+ * terracotta-ink and the plain terracotta stays a fill.
+ */
 const MARK_INK = {
-  teal: "text-teal",
-  brass: "text-brass-ink",
-  navy: "text-navy",
+  olive: "text-olive",
+  terracotta: "text-terracotta-ink",
 };
 
 /* ── Layout ───────────────────────────────────────────────────────────────── */
 
 /**
- * A section. Separated from its neighbours by surface change or a hairline,
- * never by empty space, which is what keeps the page reading as one document.
+ * A section.
+ *
+ * Vertical rhythm is 80px at mobile rising to 120px at wide, which is the
+ * spacing the reference uses and the main reason its pages read as calm. The
+ * container is 1200px, narrower than the 1320 this site used before, because an
+ * oversized serif needs the page to stop before the headline runs out of
+ * breath.
  */
-export function Band({
-  id,
-  children,
-  tone = "paper",
-  bordered = false,
-  className = "",
-}) {
-  const surface =
-    tone === "fog"
-      ? "bg-fog"
-      : tone === "navy"
-        ? "on-dark bg-navy text-paper"
-        : "bg-paper";
+export function Band({ id, children, tone = "cream", className = "" }) {
+  const surface = {
+    cream: "bg-cream",
+    linen: "bg-linen",
+    sand: "bg-sand",
+    olive: "on-olive bg-olive text-linen",
+  }[tone];
 
   return (
     <section
       id={id}
-      className={`${surface} ${bordered ? "border-t border-mist" : ""} px-5 py-14 md:px-8 md:py-20 lg:px-12 lg:py-24 ${className}`}
+      className={`${surface} px-6 py-20 md:px-10 md:py-28 lg:px-12 lg:py-30 ${className}`}
     >
-      <div className="mx-auto max-w-[1320px]">{children}</div>
+      <div className="mx-auto max-w-[1200px]">{children}</div>
     </section>
   );
 }
 
 /**
- * A band heading.
+ * A section heading.
  *
- * Two columns when there is a note: heading left, note right, both aligned to
- * the same baseline. One column when there is not. The first version stacked
- * them in a narrow left measure, which left two thirds of a 1440 screen empty
- * beside three lines of text.
+ * Asymmetric where there is a note: heading on the left at serif display scale,
+ * note on the right as sans body. The brief asks for asymmetrical compositions
+ * where the content supports one, and a heading plus its summary is the case
+ * that always does.
  */
-export function BandHead({ id, eyebrow, children, note, mark = "navy" }) {
+export function BandHead({
+  id,
+  eyebrow,
+  children,
+  note,
+  mark = "olive",
+  dark = false,
+}) {
   return (
     <div
       className={
         note
-          ? "grid gap-6 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:items-end lg:gap-16"
+          ? "grid gap-8 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:items-end lg:gap-20"
           : ""
       }
     >
       <div>
         {eyebrow ? (
-          <p className="flex items-center gap-2.5 text-caption text-steel">
+          <p
+            className={`flex items-center gap-3 text-caption ${dark ? "text-linen/60" : "text-ink-muted"}`}
+          >
             <span
-              className="mark h-3"
-              style={{ "--mark": MARK[mark] }}
+              className="mark h-3.5"
+              style={{
+                "--mark": dark ? "var(--color-chartreuse)" : MARK[mark],
+              }}
               aria-hidden
             />
             {eyebrow}
@@ -77,24 +96,24 @@ export function BandHead({ id, eyebrow, children, note, mark = "navy" }) {
         ) : null}
         <h2
           id={id}
-          className={`max-w-[20ch] text-heading-lg font-semibold text-navy ${eyebrow ? "mt-4" : ""}`}
+          className={`display measure-display text-section ${dark ? "text-linen" : "text-ink"} ${eyebrow ? "mt-6" : ""}`}
         >
           {children}
         </h2>
       </div>
-      {note ? <p className="measure text-lead text-graphite">{note}</p> : null}
+      {note ? (
+        <p
+          className={`measure text-lead ${dark ? "text-linen/75" : "text-ink-soft"}`}
+        >
+          {note}
+        </p>
+      ) : null}
     </div>
   );
 }
 
 /* ── Actions ──────────────────────────────────────────────────────────────── */
 
-/**
- * The one saturated fill in the system. One per region.
- *
- * `inverse` is for the navy band, where teal on navy is 2.02:1 and unreadable;
- * there the button is paper with navy text.
- */
 export function Button({
   href,
   children,
@@ -102,28 +121,35 @@ export function Button({
   className = "",
 }) {
   const style = {
-    primary: "bg-teal text-paper hover:bg-[#0c4a4d] border border-transparent",
-    outline: "border border-navy text-navy hover:bg-navy hover:text-paper",
-    inverse: "bg-paper text-navy hover:bg-fog border border-transparent",
-    "outline-inverse": "border border-paper/40 text-paper hover:border-paper",
+    primary:
+      "bg-terracotta text-linen hover:bg-coral border border-transparent",
+    outline: "border border-ink text-ink hover:bg-ink hover:text-linen",
+    "outline-coral":
+      "border border-coral text-coral hover:bg-coral hover:text-linen",
+    "on-olive":
+      "bg-chartreuse text-ink hover:bg-linen border border-transparent",
+    "outline-olive": "border border-linen/40 text-linen hover:border-linen",
   }[variant];
 
   return (
     <a
       href={href}
-      className={`inline-flex items-center justify-center rounded-md px-6 py-3 text-body-sm font-semibold transition-colors duration-[140ms] ease-out ${style} ${className}`}
+      className={`inline-flex items-center justify-center rounded-control px-7 py-3.5 text-body-sm font-medium transition-colors duration-200 ease-out ${style} ${className}`}
     >
       {children}
     </a>
   );
 }
 
-/** Navy, underlined in mist. Never teal: teal means "this is the action". */
-export function TextLink({ href, children, className = "" }) {
+export function TextLink({ href, children, dark = false, className = "" }) {
   return (
     <a
       href={href}
-      className={`text-body-sm font-medium text-navy underline decoration-mist decoration-1 underline-offset-[3px] transition-colors duration-[140ms] ease-out hover:decoration-navy ${className}`}
+      className={`text-body-sm font-medium underline decoration-1 underline-offset-[5px] transition-colors duration-200 ease-out ${
+        dark
+          ? "text-linen decoration-linen/40 hover:decoration-linen"
+          : "text-ink decoration-ink/30 hover:decoration-ink"
+      } ${className}`}
     >
       {children}
     </a>
@@ -133,24 +159,75 @@ export function TextLink({ href, children, className = "" }) {
 /* ── Content ──────────────────────────────────────────────────────────────── */
 
 /**
- * The signature component, and the one that says what the product is.
+ * The hand-drawn chartreuse underline, under one italic word in a display
+ * headline.
  *
- * A claim, a hairline, and who stands behind it. The product's proposition is
- * not that something is true but that somebody confirmed it, so every promise
- * on the site carries the confirmation in the same shape.
+ * An SVG stroke rather than a border: a straight rule under a 112px serif reads
+ * as a link underline. The path is uneven on purpose, and it sits behind the
+ * glyphs so a descender crosses it.
+ *
+ * One per page. The brief calls this a selective gesture and it stops being one
+ * the moment a second heading carries it.
  */
-export function Attestation({ claim, by, mark = "teal", children }) {
+export function Accent({ children }) {
+  return (
+    <span className="accent">
+      {children}
+      <svg
+        viewBox="0 0 200 12"
+        preserveAspectRatio="none"
+        aria-hidden
+        focusable="false"
+      >
+        <path
+          d="M2 8.2 C 38 3.1, 74 10.4, 112 5.6 S 170 2.4, 198 6.9"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="5"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+    </span>
+  );
+}
+
+/**
+ * A claim with the confirmation under it.
+ *
+ * Gradlly's own recurring idea, kept through the restyle: the product's
+ * proposition is not that something is true but that somebody confirmed it, so
+ * a promise carries who stands behind it. Now set in the warm palette, with the
+ * mark in the product's colour.
+ */
+export function Attestation({
+  claim,
+  by,
+  mark = "olive",
+  dark = false,
+  children,
+}) {
   return (
     <div>
-      <p className="text-heading-sm font-semibold text-navy">{claim}</p>
+      <h3
+        className={`text-subhead font-medium ${dark ? "text-linen" : "text-ink"}`}
+      >
+        {claim}
+      </h3>
       {children ? (
-        <p className="measure mt-2.5 text-body-sm text-graphite">{children}</p>
+        <p
+          className={`measure mt-3 text-body-sm ${dark ? "text-linen/70" : "text-ink-soft"}`}
+        >
+          {children}
+        </p>
       ) : null}
       {by ? (
-        <p className="mt-4 flex items-start gap-2.5 border-t border-mist pt-3.5 text-caption text-steel">
+        <p
+          className={`mt-4 flex items-start gap-3 text-caption ${dark ? "text-linen/55" : "text-ink-muted"}`}
+        >
           <span
-            className="mark mt-0.5 h-3.5"
-            style={{ "--mark": MARK[mark] }}
+            className="mark mt-1 h-3"
+            style={{ "--mark": dark ? "var(--color-chartreuse)" : MARK[mark] }}
             aria-hidden
           />
           {by}
@@ -160,46 +237,38 @@ export function Attestation({ claim, by, mark = "teal", children }) {
   );
 }
 
-/** Paper on a hairline. No shadow; hover takes the border to navy. */
-export function Card({ title, children, mark, href }) {
-  const body = (
-    <>
-      {mark ? (
-        <span
-          className="mark absolute inset-y-0 left-0 h-full"
-          style={{ "--mark": MARK[mark] }}
-          aria-hidden
-        />
-      ) : null}
-      <p className="text-heading-sm font-semibold text-navy">{title}</p>
-      <p className="mt-2.5 text-body-sm text-graphite">{children}</p>
-      {href ? (
-        <p className="mt-5 font-mono text-ref text-steel">Read more</p>
-      ) : null}
-    </>
-  );
-
-  const shell =
-    "relative overflow-hidden rounded-md border border-mist bg-paper p-7 transition-colors duration-[140ms] ease-out hover:border-navy md:p-8";
-
-  return href ? (
-    <a href={href} className={`block ${shell}`}>
-      {body}
-    </a>
-  ) : (
-    <div className={shell}>{body}</div>
+/**
+ * A card.
+ *
+ * Linen on cream, a hairline, 24px, no shadow. The brief is explicit that
+ * surfaces separate tonally rather than by elevation, so the only thing holding
+ * this off the page is half a step of warmth.
+ */
+export function Card({ children, className = "", tone = "linen" }) {
+  const surface = tone === "sand" ? "bg-sand" : "bg-linen";
+  return (
+    <div
+      className={`rounded-card border border-hairline ${surface} p-7 md:p-9 ${className}`}
+    >
+      {children}
+    </div>
   );
 }
 
 /**
- * A ruled list, not cards.
+ * A ruled list.
  *
- * `numbered` adds a two-digit reference in the mono face, and is used only when
- * the rows genuinely are a sequence. Numbered markers applied to a set that is
- * not ordered are the commonest piece of generated-page furniture.
+ * `numbered` is used only where the rows genuinely are a sequence, which in
+ * Gradlly's copy is the two flows in How it works and nothing else.
  */
-export function SpecList({ items, numbered = false, mark = "teal" }) {
+export function SpecList({
+  items,
+  numbered = false,
+  mark = "olive",
+  dark = false,
+}) {
   const Tag = numbered ? "ol" : "ul";
+  const rule = dark ? "border-linen/15" : "border-hairline";
 
   return (
     <Tag className="list-none">
@@ -210,28 +279,30 @@ export function SpecList({ items, numbered = false, mark = "teal" }) {
         return (
           <li
             key={claim}
-            className="flex gap-5 border-t border-mist py-5 last:border-b"
+            className={`flex gap-6 border-t ${rule} py-6 last:border-b`}
           >
             {numbered ? (
               <span
-                className={`w-7 shrink-0 font-mono text-ref ${MARK_INK[mark]}`}
+                className={`display w-8 shrink-0 text-subhead ${dark ? "text-linen/50" : MARK_INK[mark]}`}
                 aria-hidden
               >
-                {String(index + 1).padStart(2, "0")}
+                {index + 1}
               </span>
             ) : null}
             <div>
               <p
                 className={
                   detail
-                    ? "text-heading-sm font-semibold text-navy"
-                    : "text-body text-navy"
+                    ? `text-subhead font-medium ${dark ? "text-linen" : "text-ink"}`
+                    : `text-body ${dark ? "text-linen/85" : "text-ink"}`
                 }
               >
                 {claim}
               </p>
               {detail ? (
-                <p className="measure mt-2 text-body-sm text-graphite">
+                <p
+                  className={`measure mt-2.5 text-body-sm ${dark ? "text-linen/70" : "text-ink-soft"}`}
+                >
                   {detail}
                 </p>
               ) : null}
@@ -240,44 +311,5 @@ export function SpecList({ items, numbered = false, mark = "teal" }) {
         );
       })}
     </Tag>
-  );
-}
-
-/**
- * One highlighted block per page, identified to a product. Decorative surface
- * only, never carrying the primary action.
- */
-export function Wash({ mark = "teal", children }) {
-  const surface = mark === "brass" ? "bg-brass-wash" : "bg-teal-wash";
-
-  return (
-    <div className={`rounded-md ${surface} p-7 md:p-10`}>
-      <span
-        className="mark mb-6 h-3.5"
-        style={{ "--mark": MARK[mark] }}
-        aria-hidden
-      />
-      {children}
-    </div>
-  );
-}
-
-/**
- * The closing band. Navy, which is the inverse of the page, and that is what
- * makes it read as the end of an argument rather than another section.
- */
-export function DarkCta({ heading, children, action }) {
-  return (
-    <Band tone="navy">
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] lg:items-end lg:gap-16">
-        <div>
-          <h2 className="measure-display text-heading-lg font-semibold text-paper">
-            {heading}
-          </h2>
-          <p className="measure mt-5 text-lead text-paper/75">{children}</p>
-        </div>
-        <div className="lg:text-right">{action}</div>
-      </div>
-    </Band>
   );
 }

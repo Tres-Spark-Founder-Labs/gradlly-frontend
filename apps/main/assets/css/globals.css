@@ -1,102 +1,106 @@
 /* ==========================================================================
    Gradlly marketing site
 
-   Implements docs/marketing/STYLE-REFERENCE.md. Read that first: it carries the
-   reasoning, the audience, the contrast measurements and the do's and don'ts.
-   This file is only the tokens and the handful of primitives Tailwind cannot
-   express as utilities.
+   Visual system taken from kindsight.io: cream surfaces, deep olive for
+   selective contrast, oversized light serif headlines, chartreuse used sparingly
+   as emphasis, terracotta carrying the actions, and whitespace doing most of
+   the work.
 
-   Scoped to apps/main. There are no shared packages in this repository, so
-   nothing here reaches a portal and nothing a portal defines reaches here.
+   Gradlly's own content, terminology, brand name and information architecture
+   are unchanged. Only the visual language moved.
+
+   ── WHAT THIS REPLACED, AND WHY THE PRODUCT COLOURS SURVIVED ─────────────────
+
+   The previous system was navy, teal and brass with glass tiles over gradient
+   washes. This brief asks for warm light surfaces, minimal cards, rare shadows
+   and no gradients, which is the opposite, so the glass and the bento are gone.
+
+   One rule had to be carried across rather than dropped: colour identifies a
+   product. Teal meant Continuo and brass meant Gradlly AMS, and the new palette
+   has neither. They are mapped onto it rather than abandoned: Continuo takes
+   deep olive, Gradlly AMS and the Passport take terracotta. Both are in the
+   reference palette, both are distinguishable at a 4px mark, and the rule the
+   site has always followed keeps working.
    ========================================================================== */
 
 @import "tailwindcss";
 
 @theme {
-  /* ── Surfaces and ink ──────────────────────────────────────────────────── */
-  --color-paper: #ffffff;
-  --color-fog: #f3f4f1;
-  --color-navy: #13233a;
-  --color-abyss: #0b1526;
-  --color-graphite: #4b5566;
-  --color-steel: #767f8f;
-  --color-mist: #d6d9d4;
+  /* ── Surfaces ──────────────────────────────────────────────────────────── */
+  --color-cream: #faf5f1;
+  --color-linen: #fefffa;
+  --color-sand: #e5e1d6;
+  --color-olive: #3d4128;
+  --color-ink: #0e0f0a;
 
-  /* ── One accent, and two product marks ─────────────────────────────────────
-     Teal is the only colour that appears on an interactive surface: primary
-     buttons, active indicators, and the Continuo mark. Brass identifies Gradlly
-     AMS and the Passport and never becomes a fill or a button. An accent that
-     is scattered stops meaning anything. */
-  --color-teal: #0f5b5f;
-  --color-teal-wash: #e3eeec;
-  --color-brass: #8c6420;
-  --color-brass-wash: #f3ebdc;
+  /* ── Accents ───────────────────────────────────────────────────────────────
+     Terracotta carries the actions. Chartreuse is emphasis only and never
+     appears in body text. Coral is an occasional outlined detail. */
+  --color-terracotta: #de7653;
+  --color-coral: #e7573d;
+  --color-chartreuse: #e1f079;
 
-  /* Brass is 4.47:1 on either wash, which fails AA for body text. This is the
-     same brass darkened 6%: 4.92:1 on both. Used only below 24px on a wash.
-     #89621F also clears at 4.63 and was rejected, because 0.13 of headroom
-     survives no antialiasing and no rounding difference between engines. */
-  --color-brass-ink: #845e1e;
+  /* Derived, for text that must not sit at full ink weight. Measured, not
+     estimated: ink-muted at #6B6D61 was 4.03:1 on sand, which fails AA for
+     normal text, and sand is the surface under two whole bands. This is the
+     same grey darkened 8%, at 4.61 on sand and 5.56 on cream. */
+  --color-ink-soft: #4a4c42;
+  --color-ink-muted: #626459;
+
+  /* Terracotta is 2.84:1 on cream, which fails even the 3:1 non-text
+     threshold, so it is a fill and never a text colour. This is terracotta for
+     text: 5.51 on cream, 4.57 on sand. */
+  --color-terracotta-ink: #975038;
+
+  /* Hairlines. Low contrast on purpose: the reference separates with tonal
+     surface change, not with drawn lines. */
+  --color-hairline: #e3ddd4;
+  --color-hairline-dark: #565a42;
 
   /* ── Type ──────────────────────────────────────────────────────────────── */
-  --font-sans: var(--font-inter-tight), system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
 
-  --text-display: clamp(3rem, 1.9rem + 4.6vw, 4.75rem);
-  --text-display--line-height: 1;
-  --text-display--letter-spacing: -0.035em;
+  /* Display scales toward 112px at wide, inside the 80 to 120 the brief asks
+     for. Line height under 1 is deliberate: an oversized serif at 1.1 reads as
+     a paragraph rather than as a statement. */
+  --text-display: clamp(2.75rem, 1.2rem + 6.4vw, 7rem);
+  --text-display--line-height: 0.95;
+  --text-display--letter-spacing: -0.03em;
 
-  --text-heading-lg: clamp(2.125rem, 1.75rem + 1.6vw, 3rem);
-  --text-heading-lg--line-height: 1.08;
-  --text-heading-lg--letter-spacing: -0.03em;
+  --text-title: clamp(2.25rem, 1.4rem + 3.4vw, 4.25rem);
+  --text-title--line-height: 1;
+  --text-title--letter-spacing: -0.028em;
 
-  --text-heading: clamp(1.625rem, 1.45rem + 0.75vw, 2.125rem);
-  --text-heading--line-height: 1.14;
-  --text-heading--letter-spacing: -0.025em;
+  --text-section: clamp(1.875rem, 1.5rem + 1.6vw, 2.75rem);
+  --text-section--line-height: 1.06;
+  --text-section--letter-spacing: -0.025em;
 
-  --text-heading-sm: 1.3125rem;
-  --text-heading-sm--line-height: 1.25;
-  --text-heading-sm--letter-spacing: -0.02em;
+  --text-subhead: clamp(1.25rem, 1.15rem + 0.4vw, 1.5rem);
+  --text-subhead--line-height: 1.22;
+  --text-subhead--letter-spacing: -0.02em;
 
+  /* Sans from here down. The serif never carries any of these. */
   --text-lead: clamp(1.125rem, 1.05rem + 0.3vw, 1.3125rem);
-  --text-lead--line-height: 1.5;
-  --text-lead--letter-spacing: -0.015em;
+  --text-lead--line-height: 1.55;
+  --text-lead--letter-spacing: -0.011em;
 
-  --text-body: 1rem;
-  --text-body--line-height: 1.6;
-  --text-body--letter-spacing: -0.01em;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.62;
+  --text-body--letter-spacing: -0.009em;
 
   --text-body-sm: 0.9375rem;
-  --text-body-sm--line-height: 1.55;
-  --text-body-sm--letter-spacing: -0.01em;
+  --text-body-sm--line-height: 1.58;
+  --text-body-sm--letter-spacing: -0.008em;
 
   --text-caption: 0.8125rem;
   --text-caption--line-height: 1.45;
-  --text-caption--letter-spacing: -0.005em;
+  --text-caption--letter-spacing: 0;
 
-  --text-ref: 0.8125rem;
-  --text-ref--line-height: 1.4;
-
-  /* ── Shape ─────────────────────────────────────────────────────────────────
-     One radius per component group. Never an in-between value as a compromise.
-     The larger radii arrived with the bento grid: a tile that holds a mockup
-     needs a softer corner than a button, or the frame inside it looks pasted
-     on. */
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-bento: 24px;
-
-  /* ── Glass ─────────────────────────────────────────────────────────────────
-     Translucent surfaces need something behind them to refract, which is what
-     the washes in Mocks.jsx are for. Glass is used on tiles and mockup frames
-     only: a translucent button has no edge you can trust, and a translucent
-     body surface costs legibility this audience will not forgive. */
-  --shadow-glass:
-    0 1px 2px rgb(19 35 58 / 0.04), 0 16px 40px -20px rgb(19 35 58 / 0.22);
-  --shadow-tile:
-    0 1px 2px rgb(19 35 58 / 0.04), 0 10px 28px -18px rgb(19 35 58 / 0.18);
+  /* ── Shape ─────────────────────────────────────────────────────────────── */
+  --radius-control: 10px;
+  --radius-card: 24px;
+  --radius-full: 999px;
 
   --spacing: 0.25rem;
 }
@@ -106,8 +110,8 @@
    ========================================================================== */
 
 :root {
-  /* Set per section to the product that owns it. Read by the 4px marks. */
-  --mark: var(--color-teal);
+  /* The product a section belongs to. Read by the 4px marks. */
+  --mark: var(--color-olive);
   color-scheme: light;
 }
 
@@ -117,111 +121,119 @@ html {
 }
 
 body {
-  background-color: var(--color-paper);
-  color: var(--color-navy);
+  background-color: var(--color-cream);
+  color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: var(--text-body);
-  line-height: 1.6;
-  letter-spacing: -0.01em;
-  /* This site puts reference data in the open, and figures that change width
-     between rows read as careless. */
+  line-height: 1.62;
+  letter-spacing: -0.009em;
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background-color: var(--color-teal);
-  color: var(--color-paper);
+  background-color: var(--color-chartreuse);
+  color: var(--color-ink);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-teal);
-  outline-offset: 2px;
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
-.on-dark :focus-visible {
-  outline-color: var(--color-paper);
+/* On olive, ink would vanish: it is 1.47:1 against it. */
+.on-olive :focus-visible {
+  outline-color: var(--color-chartreuse);
+}
+
+/* ==========================================================================
+   Display type
+   ========================================================================== */
+
+.display {
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
+
+/**
+ * The brand gesture: one meaningful word in a display headline set in italic
+ * with a hand-drawn chartreuse underline beneath it.
+ *
+ * Drawn as an SVG stroke rather than a border, because a straight 3px rule
+ * under a 112px serif reads as an underline on a link. The path is deliberately
+ * uneven.
+ *
+ * Used once per page at most. The brief calls it a selective gesture, and it
+ * stops being one the moment a second heading has it.
+ */
+.accent {
+  position: relative;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.accent > svg {
+  position: absolute;
+  inset-inline: -0.06em;
+  inset-block-end: -0.1em;
+  inline-size: calc(100% + 0.12em);
+  block-size: 0.2em;
+  color: var(--color-chartreuse);
+  /* Behind the glyphs, so a descender crosses the stroke the way it would have
+     crossed a pen line. */
+  z-index: -1;
 }
 
 /* ==========================================================================
    Primitives
-
-   Only the things a utility cannot say. Everything else is Tailwind against the
-   tokens above.
    ========================================================================== */
 
-/* The product mark. 4px of colour that says which product a thing belongs to,
-   and the only place Brass is allowed to appear at any size. */
+/* The product mark. Olive for Continuo, terracotta for Gradlly AMS and the
+   Passport, and the only place either is used as a block of colour. */
 .mark {
   display: block;
   inline-size: 4px;
+  border-radius: var(--radius-full);
   background-color: var(--mark);
 }
 
-/* A bento tile: glass over the wash, with a hairline that lifts on hover.
-   The border is paper rather than mist, because against a translucent fill a
-   grey hairline reads as grime. */
-.tile {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-bento);
-  border: 1px solid rgb(255 255 255 / 0.7);
-  background-color: rgb(255 255 255 / 0.62);
-  box-shadow: var(--shadow-tile);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
-  transition:
-    box-shadow 180ms ease-out,
-    border-color 180ms ease-out;
-}
-
-.tile:hover,
-.tile:focus-within {
-  border-color: rgb(255 255 255 / 0.95);
-  box-shadow: var(--shadow-glass);
-}
-
-/* The dark tile, for the one tile per grid that carries the conclusion. */
-.tile-dark {
-  border-color: rgb(255 255 255 / 0.1);
-  background-color: rgb(19 35 58 / 0.92);
-  color: var(--color-paper);
-}
-
-.tile-dark:hover,
-.tile-dark:focus-within {
-  border-color: rgb(255 255 255 / 0.22);
-}
-
-/* Body measure. Long enough to read, short enough not to lose the line. */
 .measure {
-  max-width: 68ch;
-}
-
-/* Display measure, in characters rather than pixels, so a headline breaks into
-   two or three lines instead of running the full 1320px container. */
-.measure-display {
-  max-width: 18ch;
+  max-width: 62ch;
 }
 
 .measure-lead {
-  max-width: 46ch;
+  max-width: 44ch;
+}
+
+/* Display measure in characters, so an oversized headline breaks into lines
+   rather than running the full container. */
+.measure-display {
+  max-width: 15ch;
 }
 
 /* ==========================================================================
    Motion
 
-   One orchestrated moment per page, on load. Nothing on scroll. Nothing
-   animates a property that triggers layout, so cumulative layout shift is
-   structurally zero rather than measured low.
+   One orchestrated moment on load, nothing on scroll. Transform and opacity
+   only, so nothing here can move the layout.
    ========================================================================== */
 
 @media (prefers-reduced-motion: no-preference) {
   .enter {
     opacity: 0;
-    translate: 0 10px;
-    animation: enter-up 380ms cubic-bezier(0.16, 0.8, 0.3, 1) both;
+    translate: 0 14px;
+    animation: enter-up 620ms cubic-bezier(0.16, 0.8, 0.26, 1) both;
     animation-delay: var(--enter-delay, 0ms);
+  }
+
+  /* The accent underline draws after the headline has arrived, left to right,
+     the way it would have been drawn. */
+  .accent > svg path {
+    stroke-dasharray: 240;
+    stroke-dashoffset: 240;
+    animation: accent-draw 680ms cubic-bezier(0.3, 0.8, 0.3, 1) both;
+    animation-delay: var(--accent-delay, 760ms);
   }
 }
 
@@ -229,6 +241,12 @@ body {
   to {
     opacity: 1;
     translate: 0 0;
+  }
+}
+
+@keyframes accent-draw {
+  to {
+    stroke-dashoffset: 0;
   }
 }
 
@@ -248,6 +266,10 @@ body {
     opacity: 1;
     translate: none;
   }
+
+  .accent > svg path {
+    stroke-dashoffset: 0;
+  }
 }
 
 /* ==========================================================================
@@ -260,9 +282,9 @@ body {
   inset-block-start: -4rem;
   z-index: 100;
   padding: 0.75rem 1.25rem;
-  border-radius: var(--radius-md);
-  background-color: var(--color-teal);
-  color: var(--color-paper);
+  border-radius: var(--radius-control);
+  background-color: var(--color-terracotta);
+  color: var(--color-linen);
   font-size: var(--text-body-sm);
   font-weight: 600;
   transition: inset-block-start 140ms ease-out;

@@ -91,12 +91,12 @@ export function Header() {
       <div id="nav-sentinel" aria-hidden className="absolute top-0 h-12 w-px" />
 
       <header
-        className={`sticky top-0 z-50 bg-paper/95 backdrop-blur-sm transition-colors duration-200 ${
-          scrolled ? "border-b border-mist" : "border-b border-transparent"
+        className={`sticky top-0 z-50 bg-cream/95 backdrop-blur-sm transition-colors duration-200 ${
+          scrolled ? "border-b border-hairline" : "border-b border-transparent"
         }`}
       >
         <div className="mx-auto flex h-17 max-w-[1320px] items-center justify-between gap-6 px-5 md:px-8 lg:px-12">
-          <a href="/" className="text-navy" aria-label="Gradlly, overview">
+          <a href="/" className="text-ink" aria-label="Gradlly, overview">
             <Wordmark />
           </a>
 
@@ -109,16 +109,16 @@ export function Header() {
                     <a
                       href={href}
                       aria-current={current ? "page" : undefined}
-                      className={`relative block px-3 py-5 text-body-sm transition-colors duration-[140ms] ease-out hover:text-navy ${
+                      className={`relative block px-3 py-5 text-body-sm transition-colors duration-[140ms] ease-out hover:text-ink ${
                         current
-                          ? "font-semibold text-navy"
-                          : "font-medium text-graphite"
+                          ? "font-semibold text-ink"
+                          : "font-medium text-ink-soft"
                       }`}
                     >
                       {label}
                       {current ? (
                         <span
-                          className="absolute inset-x-3 bottom-3 block h-0.5 bg-teal"
+                          className="absolute inset-x-3 bottom-3 block h-0.5 bg-terracotta"
                           aria-hidden
                         />
                       ) : null}
@@ -132,13 +132,13 @@ export function Header() {
           <div className="flex items-center gap-4">
             <a
               href="/#sign-in"
-              className="hidden text-body-sm font-medium text-navy transition-colors duration-[140ms] ease-out hover:text-teal sm:inline"
+              className="hidden text-body-sm font-medium text-ink transition-colors duration-[140ms] ease-out hover:text-terracotta sm:inline"
             >
               Sign in
             </a>
             <a
               href="/book-a-demo"
-              className="hidden rounded-md bg-teal px-5 py-2.5 text-body-sm font-semibold text-paper transition-colors duration-[140ms] ease-out hover:bg-[#0c4a4d] sm:inline-block"
+              className="hidden rounded-control bg-terracotta px-5 py-2.5 text-body-sm font-semibold text-linen transition-colors duration-[140ms] ease-out hover:bg-coral sm:inline-block"
             >
               Book a demo
             </a>
@@ -149,7 +149,7 @@ export function Header() {
               onClick={() => (open ? close() : setOpen(true))}
               aria-expanded={open}
               aria-controls="site-menu"
-              className="flex h-10 items-center gap-2 rounded-md border border-mist px-3.5 text-body-sm font-medium text-navy transition-colors duration-[140ms] ease-out hover:border-navy xl:hidden"
+              className="flex h-10 items-center gap-2 rounded-control border border-hairline px-3.5 text-body-sm font-medium text-ink transition-colors duration-[140ms] ease-out hover:border-ink xl:hidden"
             >
               {open ? "Close" : "Menu"}
             </button>
@@ -164,7 +164,7 @@ export function Header() {
           id="site-menu"
           ref={panelRef}
           inert={!open}
-          className={`absolute inset-x-0 top-full border-y border-mist bg-paper xl:hidden ${
+          className={`absolute inset-x-0 top-full border-y border-hairline bg-linen xl:hidden ${
             open
               ? "visible opacity-100 duration-[180ms]"
               : "invisible -translate-y-1 opacity-0 duration-[140ms]"
@@ -173,11 +173,14 @@ export function Header() {
           <ul className="list-none px-5 md:px-8">
             {[...SECTIONS, { href: "/gradlly-ams", label: "Gradlly AMS" }].map(
               ({ href, label }) => (
-                <li key={href} className="border-b border-mist last:border-b-0">
+                <li
+                  key={href}
+                  className="border-b border-hairline last:border-b-0"
+                >
                   <a
                     href={href}
                     onClick={close}
-                    className="block py-4 text-heading-sm font-medium text-navy"
+                    className="block py-4 text-subhead font-medium text-ink"
                   >
                     {label}
                   </a>

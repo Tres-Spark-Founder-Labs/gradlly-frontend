@@ -1,49 +1,48 @@
 /**
- * Product mockups.
+ * Product visuals.
  *
  * ── WHAT THESE DELIBERATELY DO NOT CONTAIN ──────────────────────────────────
  *
- * No figures, no names, no dates, no percentages. The mockups this replaced
- * carried £142,400, 94% and £8,000 inside simulated dashboards, which reads as
- * a screenshot of real data and is the fabricated proof that was stripped from
- * this site on purpose.
+ * No figures, no names, no dates, no percentages. Where a value would sit there
+ * is a neutral block.
  *
- * So these show the *shape* of the product and nothing a reader could mistake
- * for a measurement: a record with its confirmation rows, a cohort with
- * progress drawn as a bar rather than stated as a number, a Passport with its
- * entries. Where a value would sit, there is a neutral block.
+ * That is the point rather than an omission. The visuals these replaced carried
+ * £142,400, 94% and £8,000 inside simulated dashboards, which reads as a
+ * screenshot of real data, and that was the fabricated proof this site had
+ * stripped out of it. The brief for this restyle says the same thing from the
+ * other direction: do not create imagery that implies features or data the
+ * project does not have.
  *
- * Drawn in markup rather than shipped as an image: they stay sharp at any
- * density, they cost nothing to download, and they can be corrected in a line
- * when the real interface changes.
+ * So these show the shape of Gradlly's actual features and nothing a reader
+ * could mistake for a measurement. Drawn in markup rather than shipped as
+ * images: sharp at any density, nothing to download, correctable in a line when
+ * the real interface changes.
  */
 
-/** The chrome every mockup sits in. Glass, so the wash behind it shows through. */
-function Frame({ label, mark = "teal", children, className = "" }) {
-  const dot = mark === "brass" ? "bg-brass" : "bg-teal";
+/** The frame. Linen on cream, a hairline, 24px, and the one place a shadow is
+    allowed: an overlapping product visual, which the brief permits. */
+function Frame({ label, mark = "olive", children, className = "" }) {
+  const dot = mark === "terracotta" ? "bg-terracotta" : "bg-olive";
 
   return (
-    <div
-      className={`overflow-hidden rounded-xl border border-paper/60 bg-paper/70 shadow-glass backdrop-blur-xl ${className}`}
+    <figure
+      className={`overflow-hidden rounded-card border border-hairline bg-linen ${className}`}
     >
-      <div className="flex items-center gap-2.5 border-b border-mist/70 px-4 py-3">
+      <figcaption className="flex items-center gap-2.5 border-b border-hairline px-6 py-4">
         <span className={`h-1.5 w-1.5 rounded-full ${dot}`} aria-hidden />
-        <span className="font-mono text-ref text-steel">{label}</span>
-      </div>
-      <div className="p-4">{children}</div>
-    </div>
+        <span className="text-caption text-ink-muted">{label}</span>
+      </figcaption>
+      <div className="px-6 py-5">{children}</div>
+    </figure>
   );
 }
 
 /** A neutral block where a value would be. Never a number. */
-function Blank({ w = "w-16" }) {
-  return <span className={`block h-2 rounded-full bg-mist ${w}`} aria-hidden />;
+function Blank({ w = "w-14" }) {
+  return <span className={`block h-2 rounded-full bg-sand ${w}`} aria-hidden />;
 }
 
-/**
- * Continuo: a worker's record, with each skill carrying its confirmation.
- * This is the one mockup that shows the product's actual proposition.
- */
+/** Continuo: a worker's record, each skill carrying its confirmation. */
 export function RecordMock({ className = "" }) {
   const rows = [
     { skill: "Moving and handling", by: "Confirmed by assessor" },
@@ -57,18 +56,20 @@ export function RecordMock({ className = "" }) {
         {rows.map(({ skill, by }) => (
           <li
             key={skill}
-            className="flex items-center gap-3 border-b border-mist/60 py-3 last:border-b-0"
+            className="flex items-center gap-4 border-b border-hairline py-4 last:border-b-0"
           >
             <span
-              className="mark h-7"
-              style={{ "--mark": "var(--color-teal)" }}
+              className="mark h-8"
+              style={{ "--mark": "var(--color-olive)" }}
               aria-hidden
             />
             <span className="flex-1">
-              <span className="block text-body-sm font-medium text-navy">
+              <span className="block text-body-sm font-medium text-ink">
                 {skill}
               </span>
-              <span className="mt-0.5 block text-caption text-steel">{by}</span>
+              <span className="mt-0.5 block text-caption text-ink-muted">
+                {by}
+              </span>
             </span>
             <Blank w="w-10" />
           </li>
@@ -83,22 +84,22 @@ export function CohortMock({ className = "" }) {
   const widths = ["w-[72%]", "w-[45%]", "w-[88%]", "w-[31%]"];
 
   return (
-    <Frame label="Cohort progress" mark="brass" className={className}>
-      <ul className="list-none space-y-3.5">
+    <Frame label="Cohort progress" mark="terracotta" className={className}>
+      <ul className="list-none space-y-4">
         {widths.map((width, index) => (
-          <li key={width} className="flex items-center gap-3">
+          <li key={width} className="flex items-center gap-4">
             <span
-              className="h-6 w-6 shrink-0 rounded-full bg-brass-wash"
+              className="h-7 w-7 shrink-0 rounded-full bg-sand"
               aria-hidden
             />
             <span className="flex-1">
-              <Blank w={index % 2 === 0 ? "w-24" : "w-20"} />
+              <Blank w={index % 2 === 0 ? "w-24" : "w-16"} />
               <span
-                className="mt-2 block h-1.5 overflow-hidden rounded-full bg-mist/70"
+                className="mt-2.5 block h-1.5 overflow-hidden rounded-full bg-sand"
                 aria-hidden
               >
                 <span
-                  className={`block h-full rounded-full bg-brass ${width}`}
+                  className={`block h-full rounded-full bg-terracotta ${width}`}
                 />
               </span>
             </span>
@@ -118,23 +119,27 @@ export function PassportMock({ className = "" }) {
   ];
 
   return (
-    <Frame label="Apprenticeship Passport" mark="brass" className={className}>
+    <Frame
+      label="Apprenticeship Passport"
+      mark="terracotta"
+      className={className}
+    >
       <ul className="list-none">
         {entries.map((entry) => (
           <li
             key={entry}
-            className="border-b border-mist/60 py-3 last:border-b-0"
+            className="border-b border-hairline py-4 last:border-b-0"
           >
-            <span className="block text-body-sm font-medium text-navy">
+            <span className="block text-body-sm font-medium text-ink">
               {entry}
             </span>
-            <span className="mt-1.5 flex items-center gap-2">
+            <span className="mt-1.5 flex items-center gap-2.5">
               <span
                 className="mark h-3"
-                style={{ "--mark": "var(--color-brass)" }}
+                style={{ "--mark": "var(--color-terracotta)" }}
                 aria-hidden
               />
-              <span className="text-caption text-steel">
+              <span className="text-caption text-ink-muted">
                 Confirmed, with the date attached
               </span>
             </span>
@@ -142,24 +147,5 @@ export function PassportMock({ className = "" }) {
         ))}
       </ul>
     </Frame>
-  );
-}
-
-/**
- * The atmospheric wash the glass has something to refract.
- *
- * Two soft radial fields in the product colours at low opacity, heavily
- * blurred, sitting behind content and never over it. Decorative, so it is
- * aria-hidden and carries no information.
- */
-export function Wash({ className = "" }) {
-  return (
-    <div
-      aria-hidden
-      className={`pointer-events-none absolute inset-0 -z-10 overflow-hidden ${className}`}
-    >
-      <div className="absolute -left-24 top-[-10%] h-[28rem] w-[28rem] rounded-full bg-teal/15 blur-[90px]" />
-      <div className="absolute -right-20 top-[20%] h-[24rem] w-[24rem] rounded-full bg-brass/15 blur-[90px]" />
-    </div>
   );
 }

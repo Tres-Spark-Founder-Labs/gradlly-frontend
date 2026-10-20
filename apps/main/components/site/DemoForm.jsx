@@ -82,10 +82,8 @@ export function DemoForm() {
   if (state === "sent") {
     return (
       <div className="border-l-4 border-teal pl-6">
-        <h2 className="font-semibold text-heading-lg text-navy">
-          Request sent.
-        </h2>
-        <p className="measure mt-4 text-body text-graphite">
+        <h2 className="font-semibold text-title text-ink">Request sent.</h2>
+        <p className="measure mt-4 text-body text-ink-soft">
           We will reply to the address you gave.
         </p>
       </div>
@@ -99,9 +97,9 @@ export function DemoForm() {
           ref={summaryRef}
           tabIndex={-1}
           role="alert"
-          className="mb-8 border-l-4 border-navy bg-paper p-5"
+          className="mb-8 border-l-4 border-ink bg-linen p-5"
         >
-          <p className="font-semibold text-heading-sm text-navy">
+          <p className="font-semibold text-subhead text-ink">
             Check these before sending
           </p>
           <ul className="mt-3 list-none space-y-1.5">
@@ -109,7 +107,7 @@ export function DemoForm() {
               <li key={field}>
                 <a
                   href={`#${formId}-${field}`}
-                  className="text-body-sm text-navy underline decoration-2 underline-offset-4"
+                  className="text-body-sm text-ink underline decoration-2 underline-offset-4"
                 >
                   {text}
                 </a>
@@ -124,7 +122,7 @@ export function DemoForm() {
           <div key={name}>
             <label
               htmlFor={`${formId}-${name}`}
-              className="block text-ref text-graphite"
+              className="block text-caption text-ink-soft"
             >
               {label}
             </label>
@@ -137,14 +135,14 @@ export function DemoForm() {
               aria-describedby={
                 errors[name] ? `${formId}-${name}-error` : undefined
               }
-              className={`mt-2 w-full border-b-2 bg-transparent pb-2 text-lead text-navy transition-colors duration-100 ease-out focus:border-navy focus:outline-none ${
-                errors[name] ? "border-navy" : "border-mist"
+              className={`mt-2 w-full border-b-2 bg-transparent pb-2 text-lead text-ink transition-colors duration-100 ease-out focus:border-ink focus:outline-none ${
+                errors[name] ? "border-ink" : "border-hairline"
               }`}
             />
             {errors[name] ? (
               <p
                 id={`${formId}-${name}-error`}
-                className="mt-2 text-ref text-navy"
+                className="mt-2 text-caption text-ink"
               >
                 {errors[name]}
               </p>
@@ -153,7 +151,7 @@ export function DemoForm() {
         ))}
 
         <fieldset>
-          <legend className="text-ref text-graphite">
+          <legend className="text-caption text-ink-soft">
             I&rsquo;m interested in
           </legend>
           <div className="mt-3">
@@ -161,21 +159,21 @@ export function DemoForm() {
               <label
                 key={value}
                 htmlFor={`${formId}-interest-${value}`}
-                className="flex items-start gap-3 border-t border-mist py-3.5 text-body-sm text-navy last:border-b"
+                className="flex items-start gap-3 border-t border-hairline py-3.5 text-body-sm text-ink last:border-b"
               >
                 <input
                   id={`${formId}-interest-${value}`}
                   type="radio"
                   name="interest"
                   value={value}
-                  className="mt-1 accent-[var(--color-teal)]"
+                  className="mt-1 accent-[var(--color-terracotta)]"
                 />
                 {label}
               </label>
             ))}
           </div>
           {errors.interest ? (
-            <p className="mt-2 text-ref text-navy">{errors.interest}</p>
+            <p className="mt-2 text-caption text-ink">{errors.interest}</p>
           ) : null}
         </fieldset>
       </div>
@@ -203,18 +201,18 @@ export function DemoForm() {
       <button
         type="submit"
         disabled={state === "sending"}
-        className="mt-10 w-full bg-navy px-6 py-4 text-body-sm font-semibold text-paper transition-colors duration-[140ms] ease-out hover:bg-abyss disabled:opacity-60 sm:w-auto"
+        className="mt-10 w-full bg-terracotta px-6 py-4 text-body-sm font-semibold text-linen transition-colors duration-[140ms] ease-out hover:bg-coral disabled:opacity-60 sm:w-auto"
       >
         {state === "sending" ? "Sending" : "Request a demo"}
       </button>
 
       {message ? (
-        <p role="alert" className="mt-4 text-body-sm text-navy">
+        <p role="alert" className="mt-4 text-body-sm text-ink">
           {message}
         </p>
       ) : null}
 
-      <p className="mt-6 text-ref text-graphite">
+      <p className="mt-6 text-caption text-ink-soft">
         We use your details only to reply to this request.{" "}
         <a
           href="/privacy"

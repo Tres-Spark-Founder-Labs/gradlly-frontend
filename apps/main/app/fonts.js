@@ -1,47 +1,35 @@
-import { IBM_Plex_Mono, Inter_Tight } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 
 /**
- * Two faces, with a hard rule about which one is allowed where.
+ * The Kindsight pairing: an editorial serif for display, a neutral grotesque
+ * for everything functional.
  *
- * ── INTER TIGHT, FOR EVERYTHING ─────────────────────────────────────────────
+ * Times Now and Founders Grotesk are the reference's own faces and are both
+ * commercially licensed, so the brief's stated fallbacks are used: Playfair
+ * Display for the serif, Inter for the sans. Both self-hosted, both free to
+ * swap for the licensed faces in one line here when they are bought.
  *
- * Display, headings, body, navigation, buttons, inputs. Character comes from
- * scale, tracking and composition rather than from a second voice.
+ * Playfair is set at 400 throughout. The reference runs its display type light,
+ * and the weight is what makes an oversized headline read as editorial rather
+ * than as advertising; Playfair's 400 is its lightest and is the right end of
+ * its range for this.
  *
- * Inter Tight rather than Inter: it is drawn tight, so the compressed
- * engineered feel comes from the typeface instead of from negative tracking
- * fighting a face that does not want it. Nothing is set at 700, because at
- * display size that reads as shouting and this audience is not persuaded by
- * volume.
- *
- * The two previous attempts both used a high-contrast editorial serif for
- * display. It gave a compliance product a literary voice, and it is the
- * pairing most generated marketing pages reach for.
- *
- * ── IBM PLEX MONO, FOR REFERENCE DATA ONLY ──────────────────────────────────
- *
- * UKPRNs, dates, counts, statuses, page numbers. If the string is not something
- * you could look up, it is not set in this face. The rule is strict on purpose:
- * a monospace applied to small labels for texture is the commonest piece of
- * borrowed chrome in this category, and this product genuinely has reference
- * data to set.
- *
- * Both provisional pending designer confirmation. Self-hosted: next/font
- * fetches at build and serves from this origin, so nothing reaches Google at
- * runtime.
+ * The serif never carries dense copy, tables, labels or form controls. That is
+ * a rule from the brief and it is also what keeps the page readable at 15px.
  */
 
-export const interTight = Inter_Tight({
+export const playfair = Playfair_Display({
   subsets: ["latin"],
+  weight: ["400", "500"],
+  style: ["normal", "italic"],
   display: "swap",
-  variable: "--font-inter-tight",
+  variable: "--font-playfair",
   adjustFontFallback: true,
 });
 
-export const plexMono = IBM_Plex_Mono({
+export const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500"],
   display: "swap",
-  variable: "--font-plex-mono",
+  variable: "--font-inter",
   adjustFontFallback: true,
 });
