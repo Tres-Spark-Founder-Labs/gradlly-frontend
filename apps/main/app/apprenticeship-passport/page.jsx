@@ -1,9 +1,5 @@
-import {
-  Attest,
-  Band,
-  BandHead,
-  PageHeader,
-} from "@/components/site/PageHeader";
+import { PageHeader } from "@/components/site/PageHeader";
+import { Attestation, Band, BandHead } from "@/components/site/ui";
 import { pageByHref } from "@/config/site.config";
 import { createPageSeo } from "@/utils/metadata";
 
@@ -40,7 +36,7 @@ export default function PassportPage() {
   return (
     <>
       <PageHeader {...page}>
-        <p className="measure text-body text-slate">
+        <p className="measure text-body text-graphite">
           Every apprentice leaves with a verified record of what they achieved.
           It&rsquo;s built automatically as they train, owned by them, and free
           for them.
@@ -58,22 +54,22 @@ export default function PassportPage() {
         <ul className="mt-12 grid list-none gap-x-16 gap-y-10 md:mt-16 md:grid-cols-2">
           {POINTS.map(({ claim, by }) => (
             <li key={claim}>
-              <Attest claim={claim} by={by} mark="brass" />
+              <Attestation claim={claim} by={by} mark="brass" />
             </li>
           ))}
         </ul>
       </Band>
 
-      <Band id="who-owns-it" tone="paper">
+      <Band id="who-owns-it" tone="fog">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,6fr)_minmax(0,6fr)] lg:gap-16">
           <div>
             <div className="h-0.5 w-12 bg-brass" aria-hidden />
-            <h2 className="wide mt-5 max-w-[13ch] text-display text-navy">
+            <h2 className="font-semibold mt-5 max-w-[13ch] text-display text-navy">
               The apprentice owns it.
             </h2>
           </div>
           <div className="self-end">
-            <p className="measure text-body text-slate">
+            <p className="measure text-body text-graphite">
               Included with Gradlly AMS, and free for the apprentice. What they
               achieved does not stay in the provider&rsquo;s system when the
               apprenticeship ends, which is the third of the three problems this
@@ -82,7 +78,7 @@ export default function PassportPage() {
             <p className="mt-6">
               <a
                 href="/#the-problem"
-                className="text-small font-semibold text-navy underline decoration-rule decoration-2 underline-offset-[6px] transition-colors duration-[120ms] ease-out hover:decoration-navy"
+                className="text-body-sm font-semibold text-navy underline decoration-rule decoration-2 underline-offset-[6px] transition-colors duration-[120ms] ease-out hover:decoration-navy"
               >
                 Read the three problems
               </a>
@@ -93,12 +89,12 @@ export default function PassportPage() {
 
       <Band tone="navy">
         <div className="flex flex-wrap items-center justify-between gap-6">
-          <p className="text-lead text-white/80">
+          <p className="text-lead text-paper/75">
             Next: the two flows, step by step.
           </p>
           <a
             href="/how-it-works"
-            className="border border-white/40 px-6 py-3.5 text-small font-semibold text-white transition-colors duration-[140ms] ease-out hover:border-white"
+            className="border border-white/40 px-6 py-3.5 text-body-sm font-semibold text-paper transition-colors duration-[140ms] ease-out hover:border-white"
           >
             05 How it works
           </a>

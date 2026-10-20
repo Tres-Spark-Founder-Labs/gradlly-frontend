@@ -1,9 +1,5 @@
-import {
-  Attest,
-  Band,
-  BandHead,
-  PageHeader,
-} from "@/components/site/PageHeader";
+import { PageHeader } from "@/components/site/PageHeader";
+import { Attestation, Band, BandHead } from "@/components/site/ui";
 import { pageByHref } from "@/config/site.config";
 import { createPageSeo } from "@/utils/metadata";
 
@@ -81,7 +77,7 @@ export default function ContinuoPage() {
   return (
     <>
       <PageHeader {...page}>
-        <p className="measure text-body text-slate">
+        <p className="measure text-body text-graphite">
           Continuo proves what a worker can do, backed by the checks that show
           they&rsquo;re cleared to do it, and keeps that proof true between
           jobs, not just at the moment of hire. The record belongs to the
@@ -97,11 +93,11 @@ export default function ContinuoPage() {
             <div className="h-0.5 w-12 bg-teal" aria-hidden />
             <h2
               id="core-heading"
-              className="wide mt-5 max-w-[14ch] text-display text-navy"
+              className="font-semibold mt-5 max-w-[14ch] text-display text-navy"
             >
               Verified skills, not claimed ones.
             </h2>
-            <p className="measure mt-6 text-body text-slate">
+            <p className="measure mt-6 text-body text-graphite">
               Every skill on a Continuo record is confirmed by the trainer,
               assessor or employer who saw it, with the date and the evidence.
               Employers hire and deploy on what workers can actually do, not on
@@ -113,7 +109,7 @@ export default function ContinuoPage() {
             {CORE.map((point) => (
               <li
                 key={point}
-                className="border-t border-rule py-5 text-body text-navy last:border-b"
+                className="border-t border-mist py-5 text-body text-navy last:border-b"
               >
                 {point}
               </li>
@@ -124,19 +120,21 @@ export default function ContinuoPage() {
 
       {/* Three ruled groups, numbered in lowercase roman so they read as parts
           of one explanation rather than as a ranked list. */}
-      <Band id="what-it-does" tone="paper">
+      <Band id="what-it-does" tone="fog">
         <BandHead id="what-it-does-heading">What the record carries.</BandHead>
 
         <div className="mt-12 grid gap-10 md:mt-16 md:grid-cols-3 md:gap-10">
           {GROUPS.map(({ number, title, points }) => (
             <div key={title}>
               <p className="text-ref text-teal">{number}</p>
-              <h3 className="wide-md mt-2 text-subhead text-navy">{title}</h3>
+              <h3 className="font-semibold mt-2 text-heading-sm text-navy">
+                {title}
+              </h3>
               <ul className="mt-5 list-none">
                 {points.map((point) => (
                   <li
                     key={point}
-                    className="border-t border-rule py-3.5 text-small text-slate"
+                    className="border-t border-mist py-3.5 text-body-sm text-graphite"
                   >
                     {point}
                   </li>
@@ -155,9 +153,9 @@ export default function ContinuoPage() {
         <ul className="mt-12 grid list-none gap-x-10 gap-y-8 md:mt-16 md:grid-cols-2 xl:grid-cols-4">
           {WAYS.map(({ name, detail }) => (
             <li key={name}>
-              <Attest claim={name} mark="teal">
+              <Attestation claim={name} mark="teal">
                 {detail}
-              </Attest>
+              </Attestation>
             </li>
           ))}
         </ul>
@@ -165,12 +163,12 @@ export default function ContinuoPage() {
 
       <Band tone="navy">
         <div className="flex flex-wrap items-center justify-between gap-6">
-          <p className="text-lead text-white/80">
+          <p className="text-lead text-paper/75">
             Next: how the apprenticeship side works.
           </p>
           <a
             href="/gradlly-ams"
-            className="border border-white/40 px-6 py-3.5 text-small font-semibold text-white transition-colors duration-[140ms] ease-out hover:border-white"
+            className="border border-white/40 px-6 py-3.5 text-body-sm font-semibold text-paper transition-colors duration-[140ms] ease-out hover:border-white"
           >
             03 Gradlly AMS
           </a>

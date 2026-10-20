@@ -1,29 +1,39 @@
+import { PageHeader } from "@/components/site/PageHeader";
 import {
-  Attest,
+  Attestation,
   Band,
   BandHead,
-  PageHeader,
-} from "@/components/site/PageHeader";
+  Button,
+  DarkCta,
+  SpecList,
+  TextLink,
+} from "@/components/site/ui";
 import { pageByHref } from "@/config/site.config";
 
 const page = pageByHref("/");
 
-/** content-v1.md §2, the two product cards, as two stacked records. */
+/** content-v1.md §2, the two product cards. */
 const PRODUCTS = [
   {
     number: "02",
     href: "/continuo",
     name: "Continuo",
     summary: "Verified skills for the workforce",
-    audience: "For employers and agencies",
+    audience: "Employers and agencies in regulated work",
     mark: "teal",
     points: [
-      ["Verified skills.", "Confirmed by whoever assessed or observed them"],
-      [
-        "Identity, right to work and DBS.",
-        "Verified at source, live between jobs",
-      ],
-      ["Competence sign-off.", "Confirmed by the manager each quarter"],
+      {
+        claim: "Verified skills",
+        by: "Confirmed by whoever assessed or observed them",
+      },
+      {
+        claim: "Identity, right to work and DBS",
+        by: "Verified at source, live between jobs",
+      },
+      {
+        claim: "Competence sign-off",
+        by: "Confirmed by the manager each quarter",
+      },
     ],
   },
   {
@@ -31,21 +41,21 @@ const PRODUCTS = [
     href: "/gradlly-ams",
     name: "Gradlly AMS",
     summary: "With the Apprenticeship Passport",
-    audience: "For training providers",
+    audience: "Training providers and employers",
     mark: "brass",
     points: [
-      [
-        "Enrolment to end-point assessment.",
-        "One place for delivery and funding compliance",
-      ],
-      [
-        "Evidence built as delivery happens.",
-        "Audit-ready without rebuilding by hand",
-      ],
-      [
-        "A verified Passport for every apprentice.",
-        "KSBs, hours and EPA result they keep",
-      ],
+      {
+        claim: "Enrolment to end-point assessment",
+        by: "One place for delivery and funding compliance",
+      },
+      {
+        claim: "Evidence built as delivery happens",
+        by: "Audit-ready without rebuilding by hand",
+      },
+      {
+        claim: "A verified Passport for every apprentice",
+        by: "KSBs, hours and EPA result they keep",
+      },
     ],
   },
 ];
@@ -69,14 +79,57 @@ const PROBLEMS = [
   },
 ];
 
-const MARK_BG = { teal: "bg-teal", brass: "bg-brass" };
 const MARK_INK = { teal: "text-teal", brass: "text-brass-ink" };
 
 export default function OverviewPage() {
   return (
     <>
-      <PageHeader {...page}>
-        <p className="measure text-body text-slate">
+      {/*
+        The right column of the header. Not decoration: it is the two products
+        named, marked and linked, which is the one thing a first-time reader
+        needs before anything else on the site makes sense. It also stops the
+        header being a single sentence floating in two thirds of empty width.
+      */}
+      <PageHeader
+        {...page}
+        aside={
+          <div className="rounded-md border border-mist">
+            <p className="border-b border-mist px-6 py-4 font-mono text-ref text-steel">
+              Two products
+            </p>
+            {PRODUCTS.map(({ number, href, name, summary, mark }) => (
+              <a
+                key={name}
+                href={href}
+                className="flex items-start gap-4 border-b border-mist px-6 py-5 transition-colors duration-[140ms] ease-out last:border-b-0 hover:bg-fog"
+              >
+                <span
+                  className="mark mt-1 h-10"
+                  style={{
+                    "--mark":
+                      mark === "teal"
+                        ? "var(--color-teal)"
+                        : "var(--color-brass)",
+                  }}
+                  aria-hidden
+                />
+                <span className="flex-1">
+                  <span className="block text-heading-sm font-semibold text-navy">
+                    {name}
+                  </span>
+                  <span className="mt-1 block text-body-sm text-graphite">
+                    {summary}
+                  </span>
+                </span>
+                <span className="mt-1 font-mono text-ref text-steel">
+                  {number}
+                </span>
+              </a>
+            ))}
+          </div>
+        }
+      >
+        <p className="measure text-body text-graphite">
           Gradlly builds two products for the UK workforce.{" "}
           <strong className="font-semibold text-navy">Continuo</strong> gives
           every worker verified skills and checks, and keeps them verified at
@@ -87,75 +140,66 @@ export default function OverviewPage() {
         </p>
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <a
-            href="/book-a-demo"
-            className="bg-navy px-6 py-3.5 text-center text-small font-semibold text-white transition-colors duration-[140ms] ease-out hover:bg-navy-deep"
-          >
-            Book a demo
-          </a>
-          <a
-            href="/how-it-works"
-            className="border border-navy px-6 py-3.5 text-center text-small font-semibold text-navy transition-colors duration-[140ms] ease-out hover:bg-navy hover:text-white"
-          >
+          <Button href="/book-a-demo">Book a demo</Button>
+          <Button href="/how-it-works" variant="outline">
             See how it works
-          </a>
+          </Button>
         </div>
       </PageHeader>
 
       {/*
-        Two products as two stacked records, each with its own number and its
-        own page. Not two coloured panels side by side: that was the mockup's
-        hero and it makes the two products look like a pricing comparison,
-        which is the one thing content-v1.md says they are not.
+        Two products as two records, each with its reference number and its own
+        page. Not two coloured panels side by side: that reads as a pricing
+        comparison, which content-v1.md is explicit they are not.
       */}
       <Band id="products">
         <BandHead
           id="products-heading"
-          note="Two products. Each works on its own."
+          note="Two products. Each works on its own, and they work together when apprentices move into work."
         >
           Two products, and the line between them.
         </BandHead>
 
         <div className="mt-12 md:mt-16">
           {PRODUCTS.map(
-            (
-              { number, href, name, summary, audience, mark, points },
-              index,
-            ) => (
+            ({ number, href, name, summary, audience, mark, points }) => (
               <article
                 key={name}
-                className={`grid gap-8 border-t border-rule py-10 md:py-14 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 ${
-                  index === PRODUCTS.length - 1 ? "border-b" : ""
-                }`}
+                className="grid gap-8 border-t border-mist py-10 last:border-b md:py-14 lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)] lg:gap-16"
               >
                 <div>
-                  <p className="flex items-center gap-3 text-ref text-slate">
+                  <p className="flex items-center gap-2.5 text-caption text-steel">
                     <span
-                      className={`block h-3 w-1 ${MARK_BG[mark]}`}
+                      className="mark h-3"
+                      style={{
+                        "--mark":
+                          mark === "teal"
+                            ? "var(--color-teal)"
+                            : "var(--color-brass)",
+                      }}
                       aria-hidden
                     />
-                    <span>
-                      {number} <span className="text-rule">/</span> {audience}
-                    </span>
+                    <span className="font-mono text-ref">{number}</span>{" "}
+                    <span className="text-mist">/</span> {audience}
                   </p>
-                  <h3 className="wide mt-4 text-display text-navy">{name}</h3>
-                  <p className="mt-3 text-lead text-slate">{summary}</p>
+                  <h3 className="mt-4 text-heading-lg font-semibold text-navy">
+                    {name}
+                  </h3>
+                  <p className="mt-2 text-lead text-graphite">{summary}</p>
                   <p className="mt-6">
                     <a
                       href={href}
-                      className={`text-small font-semibold ${MARK_INK[mark]} underline decoration-2 underline-offset-[6px] transition-colors duration-[120ms] ease-out hover:text-navy`}
+                      className={`text-body-sm font-semibold ${MARK_INK[mark]} underline decoration-1 underline-offset-[3px] transition-colors duration-[140ms] ease-out hover:text-navy`}
                     >
-                      Read page {number}
+                      Read {name}
                     </a>
                   </p>
                 </div>
 
-                <ul className="list-none space-y-7">
-                  {points.map(([claim, detail]) => (
+                <ul className="list-none space-y-8">
+                  {points.map(({ claim, by }) => (
                     <li key={claim}>
-                      <Attest claim={claim} mark={mark}>
-                        {detail}
-                      </Attest>
+                      <Attestation claim={claim} by={by} mark={mark} />
                     </li>
                   ))}
                 </ul>
@@ -163,53 +207,35 @@ export default function OverviewPage() {
             ),
           )}
         </div>
-
-        {/* content-v1.md's "Link between the cards", given its own line rather
-            than squeezed into the gutter between two panels. */}
-        <p className="mt-10 flex flex-wrap items-center gap-x-3 gap-y-2 text-small text-slate">
-          <span className="block h-1 w-6 bg-teal" aria-hidden />
-          <span className="block h-1 w-6 bg-brass" aria-hidden />
-          Works together when apprentices move into work
-        </p>
       </Band>
 
-      {/* content-v1.md §3. */}
-      <Band id="the-problem" tone="paper">
+      <Band id="the-problem" tone="fog">
         <BandHead id="the-problem-heading">
           Proof gets rebuilt at every step. It shouldn&rsquo;t.
         </BandHead>
 
-        <ul className="mt-12 grid list-none gap-10 md:mt-16 md:grid-cols-3 md:gap-10">
-          {PROBLEMS.map(({ claim, detail }) => (
-            <li key={claim}>
-              <Attest claim={claim}>{detail}</Attest>
-            </li>
-          ))}
-        </ul>
+        <div className="mt-12 md:mt-16">
+          <SpecList items={PROBLEMS} />
+        </div>
+
+        <p className="mt-10">
+          <TextLink href="/how-it-works">
+            See how Gradlly answers each of the three
+          </TextLink>
+        </p>
       </Band>
 
-      <Band tone="navy">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-end lg:gap-16">
-          <div>
-            <h2 className="wide max-w-[16ch] text-display text-white">
-              See it with your own programme.
-            </h2>
-            <p className="measure mt-5 text-body text-white/75">
-              Whether you hire into regulated roles or run apprenticeships,
-              we&rsquo;ll walk you through the parts of Gradlly that matter to
-              you.
-            </p>
-          </div>
-          <div>
-            <a
-              href="/book-a-demo"
-              className="inline-block bg-white px-6 py-3.5 text-small font-semibold text-navy transition-colors duration-[140ms] ease-out hover:bg-paper"
-            >
-              Book a demo
-            </a>
-          </div>
-        </div>
-      </Band>
+      <DarkCta
+        heading="See it with your own programme."
+        action={
+          <Button href="/book-a-demo" variant="inverse">
+            Book a demo
+          </Button>
+        }
+      >
+        Whether you hire into regulated roles or run apprenticeships,
+        we&rsquo;ll walk you through the parts of Gradlly that matter to you.
+      </DarkCta>
     </>
   );
 }

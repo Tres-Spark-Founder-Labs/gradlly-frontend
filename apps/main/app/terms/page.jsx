@@ -1,4 +1,5 @@
-import { Band, PageHeader } from "@/components/site/PageHeader";
+import { PageHeader } from "@/components/site/PageHeader";
+import { Band } from "@/components/site/ui";
 import { createPageSeo } from "@/utils/metadata";
 
 export const metadata = createPageSeo({ title: "Terms", path: "/terms" });
@@ -20,14 +21,14 @@ export default function TermsPage() {
         lead="Not written yet."
       />
       <Band>
-        <p className="measure text-body text-slate">
+        <p className="measure text-body text-graphite">
           This page is published so the link to it works. It will carry
           Gradlly&rsquo;s terms content before launch.
         </p>
         <p className="mt-8">
           <a
             href="/"
-            className="text-small font-semibold text-navy underline decoration-rule decoration-2 underline-offset-[6px] transition-colors duration-[120ms] ease-out hover:decoration-navy"
+            className="text-body-sm font-semibold text-navy underline decoration-rule decoration-2 underline-offset-[6px] transition-colors duration-[120ms] ease-out hover:decoration-navy"
           >
             Back to the overview
           </a>

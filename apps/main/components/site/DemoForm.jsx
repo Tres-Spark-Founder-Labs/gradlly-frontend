@@ -82,8 +82,10 @@ export function DemoForm() {
   if (state === "sent") {
     return (
       <div className="border-l-4 border-teal pl-6">
-        <h2 className="wide-md text-section text-navy">Request sent.</h2>
-        <p className="measure mt-4 text-body text-slate">
+        <h2 className="font-semibold text-heading-lg text-navy">
+          Request sent.
+        </h2>
+        <p className="measure mt-4 text-body text-graphite">
           We will reply to the address you gave.
         </p>
       </div>
@@ -99,7 +101,7 @@ export function DemoForm() {
           role="alert"
           className="mb-8 border-l-4 border-navy bg-paper p-5"
         >
-          <p className="wide-md text-subhead text-navy">
+          <p className="font-semibold text-heading-sm text-navy">
             Check these before sending
           </p>
           <ul className="mt-3 list-none space-y-1.5">
@@ -107,7 +109,7 @@ export function DemoForm() {
               <li key={field}>
                 <a
                   href={`#${formId}-${field}`}
-                  className="text-small text-navy underline decoration-2 underline-offset-4"
+                  className="text-body-sm text-navy underline decoration-2 underline-offset-4"
                 >
                   {text}
                 </a>
@@ -122,7 +124,7 @@ export function DemoForm() {
           <div key={name}>
             <label
               htmlFor={`${formId}-${name}`}
-              className="block text-ref text-slate"
+              className="block text-ref text-graphite"
             >
               {label}
             </label>
@@ -136,7 +138,7 @@ export function DemoForm() {
                 errors[name] ? `${formId}-${name}-error` : undefined
               }
               className={`mt-2 w-full border-b-2 bg-transparent pb-2 text-lead text-navy transition-colors duration-100 ease-out focus:border-navy focus:outline-none ${
-                errors[name] ? "border-navy" : "border-rule"
+                errors[name] ? "border-navy" : "border-mist"
               }`}
             />
             {errors[name] ? (
@@ -151,7 +153,7 @@ export function DemoForm() {
         ))}
 
         <fieldset>
-          <legend className="text-ref text-slate">
+          <legend className="text-ref text-graphite">
             I&rsquo;m interested in
           </legend>
           <div className="mt-3">
@@ -159,7 +161,7 @@ export function DemoForm() {
               <label
                 key={value}
                 htmlFor={`${formId}-interest-${value}`}
-                className="flex items-start gap-3 border-t border-rule py-3.5 text-small text-navy last:border-b"
+                className="flex items-start gap-3 border-t border-mist py-3.5 text-body-sm text-navy last:border-b"
               >
                 <input
                   id={`${formId}-interest-${value}`}
@@ -201,18 +203,18 @@ export function DemoForm() {
       <button
         type="submit"
         disabled={state === "sending"}
-        className="mt-10 w-full bg-navy px-6 py-4 text-small font-semibold text-white transition-colors duration-[140ms] ease-out hover:bg-navy-deep disabled:opacity-60 sm:w-auto"
+        className="mt-10 w-full bg-navy px-6 py-4 text-body-sm font-semibold text-paper transition-colors duration-[140ms] ease-out hover:bg-abyss disabled:opacity-60 sm:w-auto"
       >
         {state === "sending" ? "Sending" : "Request a demo"}
       </button>
 
       {message ? (
-        <p role="alert" className="mt-4 text-small text-navy">
+        <p role="alert" className="mt-4 text-body-sm text-navy">
           {message}
         </p>
       ) : null}
 
-      <p className="mt-6 text-ref text-slate">
+      <p className="mt-6 text-ref text-graphite">
         We use your details only to reply to this request.{" "}
         <a
           href="/privacy"

@@ -5,7 +5,7 @@ import { Header } from "@/components/site/Header";
 import { SITE } from "@/config/site.config";
 import { createPageSeo, organizationJsonLd } from "@/utils/metadata";
 
-import { archivo } from "./fonts";
+import { interTight, plexMono } from "./fonts";
 
 export const metadata = createPageSeo();
 
@@ -22,7 +22,10 @@ export const viewport = {
  */
 export default function RootLayout({ children }) {
   return (
-    <html lang={SITE.lang} className={archivo.variable}>
+    <html
+      lang={SITE.lang}
+      className={`${interTight.variable} ${plexMono.variable}`}
+    >
       <body>
         <a href="#main-content" className="skip-link">
           Skip to content

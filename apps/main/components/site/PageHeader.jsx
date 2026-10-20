@@ -1,26 +1,24 @@
 const MARK = {
-  navy: "var(--color-navy)",
   teal: "var(--color-teal)",
   brass: "var(--color-brass)",
-};
-
-const MARK_CLASS = {
-  navy: "bg-navy",
-  teal: "bg-teal",
-  brass: "bg-brass",
+  navy: "var(--color-navy)",
 };
 
 /**
  * The top of every page.
  *
- * Built like the head of a record rather than a hero: the page's number, its
- * name, a rule, and then the title. The rule draws across on load and is the
- * page's one orchestrated moment, because ruling a line is what you do before
- * you write on a form.
+ * ── THE COMPOSITION, AND WHY IT CHANGED ─────────────────────────────────────
  *
- * `mark` is the product that owns the page and is the only thing on it that
- * decides colour. On the overview page that is navy, because the overview
- * belongs to neither product.
+ * The first version put the heading in a left column and the lead alone in a
+ * right one. At 1440 that left most of the width empty with a single sentence
+ * floating in it, which reads as an unfinished wireframe rather than as a
+ * designed page. This audience is comfortable with density and reads a page
+ * the way a specification is read; a mostly-empty screen says there is nothing
+ * to say.
+ *
+ * So the claim and its lead stack on the left, and the right column carries
+ * something of substance: an `aside` the page supplies. Where a page has no
+ * aside the heading widens to take the space instead of leaving a hole.
  */
 export function PageHeader({
   number,
@@ -28,108 +26,65 @@ export function PageHeader({
   title,
   lead,
   mark = "navy",
+  aside,
   children,
 }) {
   return (
-    <header
-      className="border-b border-rule px-5 pb-14 pt-12 md:px-8 md:pb-20 md:pt-16 lg:px-12"
-      style={{ "--mark": MARK[mark] }}
-    >
+    <header className="border-b border-mist px-5 pb-14 pt-10 md:px-8 md:pb-18 md:pt-14 lg:px-12">
       <div className="mx-auto max-w-[1320px]">
         <p
-          className="enter flex items-center gap-3 text-ref text-slate"
+          className="enter flex items-center gap-2.5 text-caption text-steel"
           style={{ "--enter-delay": "0ms" }}
         >
-          <span className={`block h-3 w-1 ${MARK_CLASS[mark]}`} aria-hidden />
+          <span
+            className="mark h-3"
+            style={{ "--mark": MARK[mark] }}
+            aria-hidden
+          />
           <span>
-            {number} <span className="text-rule">/</span> {label}
+            <span className="font-mono text-ref">{number}</span>{" "}
+            <span className="text-mist">/</span> {label}
           </span>
         </p>
 
         <div
-          className="rule-draw mt-5 h-px bg-rule"
-          style={{ "--enter-delay": "80ms" }}
-          aria-hidden
-        />
-
-        <h1
-          className="enter wide mt-8 max-w-[18ch] text-hero text-navy"
-          style={{ "--enter-delay": "180ms" }}
+          className={
+            aside
+              ? "mt-7 grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16"
+              : "mt-7"
+          }
         >
-          {title}
-        </h1>
+          <div>
+            <h1
+              className={`enter text-display font-semibold text-navy ${aside ? "max-w-[16ch]" : "max-w-[22ch]"}`}
+              style={{ "--enter-delay": "90ms" }}
+            >
+              {title}
+            </h1>
 
-        {lead ? (
-          <p
-            className="enter measure-lead mt-6 text-lead text-slate"
-            style={{ "--enter-delay": "280ms" }}
-          >
-            {lead}
-          </p>
-        ) : null}
+            {lead ? (
+              <p
+                className="enter measure mt-6 text-lead text-graphite"
+                style={{ "--enter-delay": "180ms" }}
+              >
+                {lead}
+              </p>
+            ) : null}
 
-        {children ? (
-          <div className="enter mt-10" style={{ "--enter-delay": "360ms" }}>
-            {children}
+            {children ? (
+              <div className="enter mt-9" style={{ "--enter-delay": "270ms" }}>
+                {children}
+              </div>
+            ) : null}
           </div>
-        ) : null}
+
+          {aside ? (
+            <div className="enter lg:pt-2" style={{ "--enter-delay": "320ms" }}>
+              {aside}
+            </div>
+          ) : null}
+        </div>
       </div>
     </header>
-  );
-}
-
-/**
- * A claim with the confirmation under it.
- *
- * The site's recurring idea, and the reason the design exists: this product's
- * whole proposition is not that something is true but that somebody confirmed
- * it, so every promise on the site carries who stands behind it in the same
- * shape. The 4px mark down the left is the product's colour.
- */
-export function Attest({ claim, by, mark = "navy", children }) {
-  return (
-    <div className="attest" style={{ "--mark": MARK[mark] }}>
-      <p className="wide-md text-subhead text-navy">{claim}</p>
-      {children ? (
-        <div className="mt-2 text-small text-slate">{children}</div>
-      ) : null}
-      {by ? (
-        <p className="attest-rule mt-4 pt-3 text-ref text-slate">{by}</p>
-      ) : null}
-    </div>
-  );
-}
-
-/** A plain section on a white page. */
-export function Band({ id, children, className = "", tone = "white" }) {
-  const background =
-    tone === "paper"
-      ? "bg-paper"
-      : tone === "navy"
-        ? "on-dark bg-navy"
-        : "bg-white";
-
-  return (
-    <section
-      id={id}
-      className={`${background} px-5 py-16 md:px-8 md:py-24 lg:px-12 ${className}`}
-    >
-      <div className="mx-auto max-w-[1320px]">{children}</div>
-    </section>
-  );
-}
-
-/** A section heading, with the rule above it that the whole design hangs on. */
-export function BandHead({ id, children, note }) {
-  return (
-    <>
-      <div className="h-0.5 w-12 bg-navy" aria-hidden />
-      <h2 id={id} className="wide-md mt-5 max-w-[22ch] text-section text-navy">
-        {children}
-      </h2>
-      {note ? (
-        <p className="measure mt-4 text-body text-slate">{note}</p>
-      ) : null}
-    </>
   );
 }

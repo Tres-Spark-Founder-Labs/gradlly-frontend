@@ -1,4 +1,5 @@
-import { Band, PageHeader } from "@/components/site/PageHeader";
+import { PageHeader } from "@/components/site/PageHeader";
+import { Band } from "@/components/site/ui";
 import { pageByHref } from "@/config/site.config";
 import { createPageSeo } from "@/utils/metadata";
 
@@ -60,7 +61,7 @@ export default function WhoItsForPage() {
   return (
     <>
       <PageHeader {...page}>
-        <p className="measure text-body text-slate">
+        <p className="measure text-body text-graphite">
           Four audiences and two products. The colour against each row is the
           product it belongs to, which is the same colour that marks it
           everywhere else on this site.
@@ -72,9 +73,9 @@ export default function WhoItsForPage() {
           {AUDIENCES.map(({ number, who, detail, products }) => (
             <li
               key={who}
-              className="grid gap-4 border-t border-rule py-8 last:border-b md:grid-cols-[auto_minmax(0,4fr)_minmax(0,6fr)] md:gap-10 md:py-10"
+              className="grid gap-4 border-t border-mist py-8 last:border-b md:grid-cols-[auto_minmax(0,4fr)_minmax(0,6fr)] md:gap-10 md:py-10"
             >
-              <p className="text-ref text-slate">{number}</p>
+              <p className="text-ref text-graphite">{number}</p>
 
               <div className="flex gap-4">
                 <span className="flex shrink-0 gap-1" aria-hidden>
@@ -82,11 +83,13 @@ export default function WhoItsForPage() {
                     <span key={name} className={`block w-1 ${BAR[mark]}`} />
                   ))}
                 </span>
-                <h2 className="wide-md text-subhead text-navy">{who}</h2>
+                <h2 className="font-semibold text-heading-sm text-navy">
+                  {who}
+                </h2>
               </div>
 
               <div>
-                <p className="text-body text-slate">{detail}</p>
+                <p className="text-body text-graphite">{detail}</p>
                 <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1">
                   {products.map(({ name, href, mark }) => (
                     <a
@@ -106,12 +109,12 @@ export default function WhoItsForPage() {
 
       <Band tone="navy">
         <div className="flex flex-wrap items-center justify-between gap-6">
-          <p className="text-lead text-white/80">
+          <p className="text-lead text-paper/75">
             Next: see it with your own programme.
           </p>
           <a
             href="/book-a-demo"
-            className="bg-white px-6 py-3.5 text-small font-semibold text-navy transition-colors duration-[140ms] ease-out hover:bg-paper"
+            className="bg-white px-6 py-3.5 text-body-sm font-semibold text-navy transition-colors duration-[140ms] ease-out hover:bg-paper"
           >
             07 Book a demo
           </a>

@@ -1,35 +1,47 @@
-import { Archivo } from "next/font/google";
+import { IBM_Plex_Mono, Inter_Tight } from "next/font/google";
 
 /**
- * One family, doing all of it.
+ * Two faces, with a hard rule about which one is allowed where.
  *
- * ── WHY NOT A SERIF ─────────────────────────────────────────────────────────
+ * ── INTER TIGHT, FOR EVERYTHING ─────────────────────────────────────────────
  *
- * The previous attempt paired a high-contrast editorial serif with a humanist
- * sans, which is the pairing the mockup uses and the pairing most generated
- * marketing pages use. It gave the page a literary voice, and this product is
- * not literary: it is a register of who confirmed what, on what date, with what
- * evidence. Site cards, DBS certificates and ILR returns are set in grotesques,
- * not in Didones.
+ * Display, headings, body, navigation, buttons, inputs. Character comes from
+ * scale, tracking and composition rather than from a second voice.
  *
- * Archivo is a grotesque with a width axis. Headlines run at 600 to 700 weight
- * with the width pushed out, which reads as signage and official stationery
- * rather than as a magazine. Body runs at normal width and 400. One family with
- * two axes carries the whole hierarchy, so nothing on the page is a second
- * voice.
+ * Inter Tight rather than Inter: it is drawn tight, so the compressed
+ * engineered feel comes from the typeface instead of from negative tracking
+ * fighting a face that does not want it. Nothing is set at 700, because at
+ * display size that reads as shouting and this audience is not persuaded by
+ * volume.
  *
- * Tabular figures throughout, because this design puts reference data in the
- * open and numbers that shift width between rows read as careless.
+ * The two previous attempts both used a high-contrast editorial serif for
+ * display. It gave a compliance product a literary voice, and it is the
+ * pairing most generated marketing pages reach for.
  *
- * Provisional pending designer confirmation.
+ * ── IBM PLEX MONO, FOR REFERENCE DATA ONLY ──────────────────────────────────
+ *
+ * UKPRNs, dates, counts, statuses, page numbers. If the string is not something
+ * you could look up, it is not set in this face. The rule is strict on purpose:
+ * a monospace applied to small labels for texture is the commonest piece of
+ * borrowed chrome in this category, and this product genuinely has reference
+ * data to set.
+ *
+ * Both provisional pending designer confirmation. Self-hosted: next/font
+ * fetches at build and serves from this origin, so nothing reaches Google at
+ * runtime.
  */
-export const archivo = Archivo({
+
+export const interTight = Inter_Tight({
   subsets: ["latin"],
-  // No weight array: axes can only be requested on the variable font, and
-  // asking for named weights pins it to static instances. The variable font
-  // covers 100 to 900, so every weight this design uses comes from one file.
-  axes: ["wdth"],
   display: "swap",
-  variable: "--font-archivo",
+  variable: "--font-inter-tight",
+  adjustFontFallback: true,
+});
+
+export const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  display: "swap",
+  variable: "--font-plex-mono",
   adjustFontFallback: true,
 });

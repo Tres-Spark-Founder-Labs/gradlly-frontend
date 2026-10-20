@@ -1,4 +1,5 @@
-import { Band, PageHeader } from "@/components/site/PageHeader";
+import { PageHeader } from "@/components/site/PageHeader";
+import { Band } from "@/components/site/ui";
 import { pageByHref } from "@/config/site.config";
 import { createPageSeo } from "@/utils/metadata";
 
@@ -76,20 +77,22 @@ function Flow({ title, steps, mark, label }) {
     <div>
       <p className={`text-ref ${ink}`}>{label}</p>
       <h2
-        className={`wide mt-2 border-t-2 pt-5 text-section text-navy ${rule}`}
+        className={`font-semibold mt-2 border-t-2 pt-5 text-heading-lg text-navy ${rule}`}
       >
         {title}
       </h2>
       <ol className="mt-2 list-none">
         {steps.map(({ step, detail }, index) => (
-          <li key={step} className="border-b border-rule py-6">
+          <li key={step} className="border-b border-mist py-6">
             <div className="flex items-baseline gap-5">
               <span className={`text-ref ${ink}`} aria-hidden>
                 {String(index + 1).padStart(2, "0")}
               </span>
               <div>
-                <p className="wide-md text-subhead text-navy">{step}</p>
-                <p className="mt-2 text-small text-slate">{detail}</p>
+                <p className="font-semibold text-heading-sm text-navy">
+                  {step}
+                </p>
+                <p className="mt-2 text-body-sm text-graphite">{detail}</p>
               </div>
             </div>
           </li>
@@ -103,7 +106,7 @@ export default function HowItWorksPage() {
   return (
     <>
       <PageHeader {...page}>
-        <p className="measure text-body text-slate">
+        <p className="measure text-body text-graphite">
           Continuo verifies what a worker can do and keeps it true. Gradlly AMS
           runs an apprenticeship and hands the apprentice a Passport at the end
           of it. Neither needs the other.
@@ -129,7 +132,7 @@ export default function HowItWorksPage() {
 
       {/* The one place the two colours meet, because the claim is the handoff
           between them. */}
-      <Band id="better-together" tone="paper">
+      <Band id="better-together" tone="fog">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
           <div>
             <p className="flex items-center gap-2" aria-hidden>
@@ -138,12 +141,12 @@ export default function HowItWorksPage() {
             </p>
             <h2
               id="better-together-heading"
-              className="wide mt-5 max-w-[12ch] text-display text-navy"
+              className="font-semibold mt-5 max-w-[12ch] text-display text-navy"
             >
               Better together.
             </h2>
           </div>
-          <p className="measure self-end text-body text-slate">
+          <p className="measure self-end text-body text-graphite">
             When an apprentice finishes, they can carry their Passport&rsquo;s
             verified achievements into Continuo, with their consent. Their first
             employer onboards from proof on day one.
@@ -153,10 +156,10 @@ export default function HowItWorksPage() {
 
       <Band tone="navy">
         <div className="flex flex-wrap items-center justify-between gap-6">
-          <p className="text-lead text-white/80">Next: who each part is for.</p>
+          <p className="text-lead text-paper/75">Next: who each part is for.</p>
           <a
             href="/who-its-for"
-            className="border border-white/40 px-6 py-3.5 text-small font-semibold text-white transition-colors duration-[140ms] ease-out hover:border-white"
+            className="border border-white/40 px-6 py-3.5 text-body-sm font-semibold text-paper transition-colors duration-[140ms] ease-out hover:border-white"
           >
             06 Who it&rsquo;s for
           </a>

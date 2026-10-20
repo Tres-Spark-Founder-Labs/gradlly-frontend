@@ -1,134 +1,54 @@
-import {
-  Attest,
-  Band,
-  BandHead,
-  PageHeader,
-} from "@/components/site/PageHeader";
-import { pageByHref } from "@/config/site.config";
-import { createPageSeo } from "@/utils/metadata";
+"use client";
+import { useState } from "react";
 
-const page = pageByHref("/gradlly-ams");
+import CTA from "@/components/Home/CTA";
+import FlowPortal from "@/components/Home/FlowPortal";
+import Footer from "@/components/Home/Footer";
+import Hero from "@/components/Home/Hero";
+import HowItWorks from "@/components/Home/HowItWorks";
+import Marquee from "@/components/Home/Marquee";
+import Nav from "@/components/Home/Nav";
+import Portals from "@/components/Home/Portals";
+import Problem from "@/components/Home/Problem";
+import Why from "@/components/Home/Why";
 
-export const metadata = createPageSeo({
-  title: "Gradlly AMS",
-  description:
-    "Apprenticeship management from enrolment to end-point assessment. Every review, hour and outcome recorded as it happens.",
-  path: "/gradlly-ams",
-});
-
-/** content-v1.md §5, verbatim. */
-const HANDLES = [
-  "Enrolment and onboarding",
-  "Off-the-job training records",
-  "Progress reviews signed off by learner and employer",
-  "Gateway Readiness Score for every apprentice approaching assessment",
-  "ILR and funding compliance in one place",
-  "Levy transfer: employers with unspent levy matched with SMEs that need funded apprenticeships",
-];
-
-const PORTALS = [
-  {
-    number: "i",
-    name: "Provider portal",
-    detail:
-      "Delivery, funding compliance and ILR, with readiness scores across every cohort.",
-  },
-  {
-    number: "ii",
-    name: "Employer portal",
-    detail: "Levy spend, apprentice progress and review sign-off in one view.",
-  },
-  {
-    number: "iii",
-    name: "Apprentice portal",
-    detail:
-      "An ePortfolio for logging hours, building KSB evidence and tracking progress to assessment.",
-  },
-  {
-    number: "iv",
-    name: "Gradlly Forge",
-    detail:
-      "The SME marketplace. Levy donors and SMEs matched, and transfers managed from pledge to funded start.",
-  },
-];
-
+/**
+ * Gradlly AMS: the original design, kept.
+ *
+ * This is the page that was approved. It is not rebuilt, not restyled and not
+ * brought onto the marketing tokens, because it is a standard rather than a
+ * draft. It carries its own navigation and footer for the same reason.
+ *
+ * The only change is subtraction. Four sections are gone because their entire
+ * content was proof nobody has yet: Stats (four market figures), Results (six
+ * measured outcomes under the heading "Early Results"), Testimonials (six
+ * attributed quotes from people who do not exist, one a director at an NHS
+ * Trust) and Pricing (three prices in no approved copy).
+ *
+ * Mockups went with them: it drew simulated dashboards whose numbers
+ * (£142,400, 94%, £8,000) read as a screenshot of real data. Portals lost its
+ * mockup column as a result, which is a visible loss and is recorded as one.
+ * The KPI tiles inside Problem, Portals and FlowPortal are gone too, and the
+ * layouts closed up rather than keeping an empty slot.
+ *
+ * Every removal is listed with file and line in
+ * docs/marketing/DESIGN-SPEC.md section 9.
+ */
 export default function GradllyAmsPage() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
-    <>
-      <PageHeader {...page}>
-        <p className="measure text-body text-slate">
-          Apprenticeship management from enrolment to end-point assessment.
-          Every review, hour and outcome is recorded as it happens, so you go
-          into audit with the evidence already in order.
-        </p>
-      </PageHeader>
-
-      <Band id="what-it-handles">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
-          <div>
-            <div className="h-0.5 w-12 bg-brass" aria-hidden />
-            <h2
-              id="what-it-handles-heading"
-              className="wide mt-5 max-w-[14ch] text-display text-navy"
-            >
-              What it handles.
-            </h2>
-            <p className="measure mt-6 text-body text-slate">
-              One place for delivery and funding compliance, so the evidence is
-              built as the apprenticeship happens rather than rebuilt before an
-              audit.
-            </p>
-          </div>
-
-          <ol className="list-none">
-            {HANDLES.map((item, index) => (
-              <li
-                key={item}
-                className="flex items-baseline gap-5 border-t border-rule py-5 last:border-b"
-              >
-                <span className="text-ref text-brass-ink" aria-hidden>
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span className="text-body text-navy">{item}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </Band>
-
-      <Band id="portals" tone="paper">
-        <BandHead
-          id="portals-heading"
-          note="Each one is a place somebody signs in to do their part of the same apprenticeship."
-        >
-          Four portals.
-        </BandHead>
-
-        <ul className="mt-12 grid list-none gap-x-10 gap-y-8 md:mt-16 md:grid-cols-2 xl:grid-cols-4">
-          {PORTALS.map(({ number, name, detail }) => (
-            <li key={name}>
-              <p className="mb-2 text-ref text-brass-ink">{number}</p>
-              <Attest claim={name} mark="brass">
-                {detail}
-              </Attest>
-            </li>
-          ))}
-        </ul>
-      </Band>
-
-      <Band tone="navy">
-        <div className="flex flex-wrap items-center justify-between gap-6">
-          <p className="text-lead text-white/80">
-            Next: what the apprentice walks away with.
-          </p>
-          <a
-            href="/apprenticeship-passport"
-            className="border border-white/40 px-6 py-3.5 text-small font-semibold text-white transition-colors duration-[140ms] ease-out hover:border-white"
-          >
-            04 Apprenticeship Passport
-          </a>
-        </div>
-      </Band>
-    </>
+    <div className="overflow-x-hidden bg-stone-50 text-stone-900">
+      <Nav menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+      <Hero />
+      <Marquee />
+      <Problem />
+      <Portals />
+      <HowItWorks />
+      <FlowPortal />
+      <Why />
+      <CTA />
+      <Footer />
+    </div>
   );
 }

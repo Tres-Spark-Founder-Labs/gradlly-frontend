@@ -1,5 +1,6 @@
 import { DemoForm } from "@/components/site/DemoForm";
-import { Band, PageHeader } from "@/components/site/PageHeader";
+import { PageHeader } from "@/components/site/PageHeader";
+import { Band } from "@/components/site/ui";
 import { pageByHref } from "@/config/site.config";
 import { createPageSeo } from "@/utils/metadata";
 
@@ -16,7 +17,7 @@ export default function BookADemoPage() {
   return (
     <>
       <PageHeader {...page}>
-        <p className="measure text-body text-slate">
+        <p className="measure text-body text-graphite">
           Whether you hire into regulated roles or run apprenticeships,
           we&rsquo;ll walk you through the parts of Gradlly that matter to you.
         </p>
@@ -28,7 +29,7 @@ export default function BookADemoPage() {
 
           <div className="order-first lg:order-none">
             <div className="h-0.5 w-12 bg-navy" aria-hidden />
-            <h2 className="wide-md mt-5 max-w-[18ch] text-section text-navy">
+            <h2 className="font-semibold mt-5 max-w-[18ch] text-heading-lg text-navy">
               What a demo covers.
             </h2>
             <ul className="mt-8 list-none">
@@ -48,15 +49,17 @@ export default function BookADemoPage() {
               ].map(([name, detail]) => (
                 <li
                   key={name}
-                  className="border-t border-rule py-5 last:border-b"
+                  className="border-t border-mist py-5 last:border-b"
                 >
-                  <p className="wide-md text-subhead text-navy">{name}</p>
-                  <p className="mt-1.5 text-small text-slate">{detail}</p>
+                  <p className="font-semibold text-heading-sm text-navy">
+                    {name}
+                  </p>
+                  <p className="mt-1.5 text-body-sm text-graphite">{detail}</p>
                 </li>
               ))}
             </ul>
 
-            <p className="mt-8 text-small text-slate">
+            <p className="mt-8 text-body-sm text-graphite">
               Or email us at{" "}
               <span
                 className="font-semibold text-navy"

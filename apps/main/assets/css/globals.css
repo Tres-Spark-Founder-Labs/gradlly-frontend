@@ -1,96 +1,88 @@
 /* ==========================================================================
    Gradlly marketing site
-   Tailwind v4. Scoped to apps/main and shared with nothing.
 
-   ── THE DIRECTION ────────────────────────────────────────────────────────────
+   Implements docs/marketing/STYLE-REFERENCE.md. Read that first: it carries the
+   reasoning, the audience, the contrast measurements and the do's and don'ts.
+   This file is only the tokens and the handful of primitives Tailwind cannot
+   express as utilities.
 
-   A dossier, not a brochure. This product is a register of who confirmed what,
-   on what date, with what evidence, and the page is built to look like
-   something you could look a record up in.
-
-   What that means concretely, and what it changed from the first attempt:
-
-   1. The ground is inverted. White carries the content; navy carries the shell.
-      The first attempt made warm paper the dominant surface, which is the
-      mockup's look and the look of most generated marketing pages.
-   2. No serif anywhere. One grotesque with a width axis does the whole
-      hierarchy. See app/fonts.js.
-   3. Colour is status, not surface. Teal and brass appear as 4px marks and
-      rules against white, never as large fills. The first attempt put the two
-      products on big saturated plates, which is the mockup's hero.
-   4. Nothing is rounded. A record has corners.
-   5. The pages are numbered, because there are seven of them and the number is
-      real information about where you are in the set.
+   Scoped to apps/main. There are no shared packages in this repository, so
+   nothing here reaches a portal and nothing a portal defines reaches here.
    ========================================================================== */
 
 @import "tailwindcss";
 
 @theme {
-  /* ── Brand ───────────────────────────────────────────────────────────────
-     The palette is fixed. Teal is Continuo, brass is Gradlly AMS and the
-     Apprenticeship Passport, and neither is ever spent on decoration. */
+  /* ── Surfaces and ink ──────────────────────────────────────────────────── */
+  --color-paper: #ffffff;
+  --color-fog: #f3f4f1;
   --color-navy: #13233a;
-  --color-navy-deep: #0b1526;
+  --color-abyss: #0b1526;
+  --color-graphite: #4b5566;
+  --color-steel: #767f8f;
+  --color-mist: #d6d9d4;
+
+  /* ── One accent, and two product marks ─────────────────────────────────────
+     Teal is the only colour that appears on an interactive surface: primary
+     buttons, active indicators, and the Continuo mark. Brass identifies Gradlly
+     AMS and the Passport and never becomes a fill or a button. An accent that
+     is scattered stops meaning anything. */
   --color-teal: #0f5b5f;
+  --color-teal-wash: #e3eeec;
   --color-brass: #8c6420;
-  --color-paper: #f3f4f1;
-  --color-white: #ffffff;
-  --color-slate: #4b5566;
+  --color-brass-wash: #f3ebdc;
 
-  --color-teal-tint: #e3eeec;
-  --color-brass-tint: #f3ebdc;
-  --color-rule: #d6d9d4;
-  --color-rule-dark: #2a3a55;
-
-  /* Brass is 4.47:1 on either tint and fails AA for body text. This is the
-     same brass darkened 6%: 4.92:1 on both tints, 5.28 on paper. Used only
-     below 24px on a tint. #89621F also clears at 4.63 and was rejected,
-     because 0.13 of headroom survives no antialiasing and no rounding
-     difference between engines. */
+  /* Brass is 4.47:1 on either wash, which fails AA for body text. This is the
+     same brass darkened 6%: 4.92:1 on both. Used only below 24px on a wash.
+     #89621F also clears at 4.63 and was rejected, because 0.13 of headroom
+     survives no antialiasing and no rounding difference between engines. */
   --color-brass-ink: #845e1e;
 
-  /* ── Type ────────────────────────────────────────────────────────────────
-     One family. Width and weight carry the hierarchy. */
-  --font-sans: var(--font-archivo), system-ui, -apple-system, sans-serif;
+  /* ── Type ──────────────────────────────────────────────────────────────── */
+  --font-sans: var(--font-inter-tight), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 
-  /* Display is set tight and wide: signage, not a masthead. */
-  --text-hero: clamp(2.75rem, 1.5rem + 5.2vw, 5.5rem);
-  --text-hero--line-height: 0.96;
-  --text-hero--letter-spacing: -0.035em;
-
-  --text-display: clamp(2.25rem, 1.6rem + 2.7vw, 3.75rem);
+  --text-display: clamp(3rem, 1.9rem + 4.6vw, 4.75rem);
   --text-display--line-height: 1;
-  --text-display--letter-spacing: -0.03em;
+  --text-display--letter-spacing: -0.035em;
 
-  --text-section: clamp(1.75rem, 1.45rem + 1.25vw, 2.5rem);
-  --text-section--line-height: 1.08;
-  --text-section--letter-spacing: -0.025em;
+  --text-heading-lg: clamp(2.125rem, 1.75rem + 1.6vw, 3rem);
+  --text-heading-lg--line-height: 1.08;
+  --text-heading-lg--letter-spacing: -0.03em;
 
-  --text-subhead: clamp(1.1875rem, 1.12rem + 0.3vw, 1.375rem);
-  --text-subhead--line-height: 1.25;
-  --text-subhead--letter-spacing: -0.015em;
+  --text-heading: clamp(1.625rem, 1.45rem + 0.75vw, 2.125rem);
+  --text-heading--line-height: 1.14;
+  --text-heading--letter-spacing: -0.025em;
 
-  --text-lead: clamp(1.125rem, 1.03rem + 0.4vw, 1.375rem);
+  --text-heading-sm: 1.3125rem;
+  --text-heading-sm--line-height: 1.25;
+  --text-heading-sm--letter-spacing: -0.02em;
+
+  --text-lead: clamp(1.125rem, 1.05rem + 0.3vw, 1.3125rem);
   --text-lead--line-height: 1.5;
-  --text-lead--letter-spacing: -0.01em;
+  --text-lead--letter-spacing: -0.015em;
 
-  --text-body: clamp(1rem, 0.98rem + 0.1vw, 1.0625rem);
-  --text-body--line-height: 1.62;
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+  --text-body--letter-spacing: -0.01em;
 
-  --text-small: 0.9375rem;
-  --text-small--line-height: 1.58;
+  --text-body-sm: 0.9375rem;
+  --text-body-sm--line-height: 1.55;
+  --text-body-sm--letter-spacing: -0.01em;
 
-  /* Reference data. Not a label style: this size carries page numbers, counts
-     and the "confirmed by" lines, which are content. */
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.45;
+  --text-caption--letter-spacing: -0.005em;
+
   --text-ref: 0.8125rem;
-  --text-ref--line-height: 1.45;
+  --text-ref--line-height: 1.4;
+
+  /* ── Shape ─────────────────────────────────────────────────────────────────
+     One radius per component group. Never 8px or 10px as a compromise. */
+  --radius-sm: 6px;
+  --radius-md: 12px;
 
   --spacing: 0.25rem;
-
-  /* ── Nothing is rounded ──────────────────────────────────────────────────
-     Except a status pill, which is round because it is a pill. */
-  --radius-none: 0;
-  --radius-pill: 999px;
 }
 
 /* ==========================================================================
@@ -98,86 +90,86 @@
    ========================================================================== */
 
 :root {
-  --mark: var(--color-navy);
+  /* Set per section to the product that owns it. Read by the 4px marks. */
+  --mark: var(--color-teal);
   color-scheme: light;
 }
 
 html {
-  scroll-padding-top: 5.5rem;
+  scroll-padding-top: 6rem;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background-color: var(--color-white);
+  background-color: var(--color-paper);
   color: var(--color-navy);
   font-family: var(--font-sans);
   font-size: var(--text-body);
-  line-height: 1.62;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  /* This site puts reference data in the open, and figures that change width
+     between rows read as careless. */
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background-color: var(--color-navy);
-  color: var(--color-white);
+  background-color: var(--color-teal);
+  color: var(--color-paper);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-navy);
-  outline-offset: 3px;
+  outline: 2px solid var(--color-teal);
+  outline-offset: 2px;
 }
 
 .on-dark :focus-visible {
-  outline-color: var(--color-white);
+  outline-color: var(--color-paper);
 }
 
 /* ==========================================================================
-   The attestation block
+   Primitives
 
-   The page's one recurring idea. A claim, a hairline, and who stands behind
-   it. Every section that makes a promise carries the confirmation underneath
-   it in the same shape, because that is the product: not that something is
-   true, but that somebody confirmed it.
-
-   The left mark is the product's colour, which is the only place colour
-   appears at any size.
+   Only the things a utility cannot say. Everything else is Tailwind against the
+   tokens above.
    ========================================================================== */
 
-.attest {
-  border-left: 4px solid var(--mark);
-  padding-left: 1.25rem;
+/* The product mark. 4px of colour that says which product a thing belongs to,
+   and the only place Brass is allowed to appear at any size. */
+.mark {
+  display: block;
+  inline-size: 4px;
+  background-color: var(--mark);
 }
 
-.attest-rule {
-  border-top: 1px solid var(--color-rule);
+/* Body measure. Long enough to read, short enough not to lose the line. */
+.measure {
+  max-width: 68ch;
 }
 
-.on-dark .attest-rule {
-  border-top-color: var(--color-rule-dark);
+/* Display measure, in characters rather than pixels, so a headline breaks into
+   two or three lines instead of running the full 1320px container. */
+.measure-display {
+  max-width: 18ch;
+}
+
+.measure-lead {
+  max-width: 46ch;
 }
 
 /* ==========================================================================
    Motion
 
-   One orchestrated moment per page, on load, and nothing on scroll. Transform
-   and opacity only; every element holds its final box from first paint, so
-   none of this can move the layout.
+   One orchestrated moment per page, on load. Nothing on scroll. Nothing
+   animates a property that triggers layout, so cumulative layout shift is
+   structurally zero rather than measured low.
    ========================================================================== */
 
 @media (prefers-reduced-motion: no-preference) {
   .enter {
     opacity: 0;
-    translate: 0 12px;
-    animation: enter-up 440ms cubic-bezier(0.16, 0.8, 0.3, 1) both;
-    animation-delay: var(--enter-delay, 0ms);
-  }
-
-  /* The rule under a page title draws across rather than fading in: it is the
-     line being ruled, which is what the rest of the page then hangs from. */
-  .rule-draw {
-    transform-origin: left center;
-    scale: 0 1;
-    animation: rule-draw 520ms cubic-bezier(0.16, 0.8, 0.3, 1) both;
+    translate: 0 10px;
+    animation: enter-up 380ms cubic-bezier(0.16, 0.8, 0.3, 1) both;
     animation-delay: var(--enter-delay, 0ms);
   }
 }
@@ -189,14 +181,8 @@ body {
   }
 }
 
-@keyframes rule-draw {
-  to {
-    scale: 1 1;
-  }
-}
-
-/* Not a blanket `animation: none`, which leaves anything animating from a
-   hidden start state invisible. Everything is forced to its end state. */
+/* Forced to end states rather than `animation: none`, which would leave
+   anything animating from a hidden start state invisible. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -211,14 +197,10 @@ body {
     opacity: 1;
     translate: none;
   }
-
-  .rule-draw {
-    scale: 1 1;
-  }
 }
 
 /* ==========================================================================
-   Utilities
+   Skip link
    ========================================================================== */
 
 .skip-link {
@@ -227,33 +209,14 @@ body {
   inset-block-start: -4rem;
   z-index: 100;
   padding: 0.75rem 1.25rem;
-  background-color: var(--color-white);
-  color: var(--color-navy);
+  border-radius: var(--radius-md);
+  background-color: var(--color-teal);
+  color: var(--color-paper);
+  font-size: var(--text-body-sm);
   font-weight: 600;
-  outline: 2px solid var(--color-navy);
   transition: inset-block-start 140ms ease-out;
 }
 
 .skip-link:focus {
   inset-block-start: 1rem;
-}
-
-.measure {
-  max-width: 64ch;
-}
-
-.measure-lead {
-  max-width: 48ch;
-}
-
-/* Display type: the width axis pushed out, which is what makes this read as
-   stationery rather than as a magazine. */
-.wide {
-  font-stretch: 112%;
-  font-weight: 700;
-}
-
-.wide-md {
-  font-stretch: 106%;
-  font-weight: 600;
 }
