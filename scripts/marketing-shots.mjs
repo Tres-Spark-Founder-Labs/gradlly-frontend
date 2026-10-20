@@ -31,7 +31,10 @@ for (const width of WIDTHS) {
     deviceScaleFactor: 2,
     // The page's one entrance animation runs on load. Screenshots are taken
     // with it already finished, so what is reviewed is the resting state.
-    reducedMotion: "reduce",
+    // Not "reduce": that would disable the scroll-driven spine, which is the
+    // thing most worth looking at. The entrance animation is waited out below
+    // instead, so what is captured is the resting state either way.
+    reducedMotion: "no-preference",
   });
   const page = await context.newPage();
 
@@ -48,6 +51,18 @@ for (const width of WIDTHS) {
   // Fonts decide the layout. Shooting before they land photographs the
   // fallback stack.
   await page.evaluate(() => document.fonts.ready);
+
+  // Walk the page so every scroll-driven segment reaches its end state, then
+  // return to the top for the capture.
+  await page.evaluate(async () => {
+    const step = Math.round(globalThis.innerHeight * 0.6);
+    for (let y = 0; y < document.body.scrollHeight; y += step) {
+      globalThis.scrollTo(0, y);
+      await new Promise((resolve) => globalThis.setTimeout(resolve, 90));
+    }
+    globalThis.scrollTo(0, 0);
+    await new Promise((resolve) => globalThis.setTimeout(resolve, 400));
+  });
 
   const file = path.join(outDir, `${name}-${width}.png`);
   await page.screenshot({ path: file, fullPage: true });
