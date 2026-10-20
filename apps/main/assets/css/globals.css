@@ -190,19 +190,21 @@ body {
    geometry rather than a border trick, drawn once left to right when both
    plates are in view. It does not reverse on scroll up: it is a statement,
    not a meter. */
-.join-path {
-  stroke-dasharray: var(--join-length, 240);
-  stroke-dashoffset: 0;
+.join {
+  /* Drawn is the default, so an engine that cannot transform an SVG still
+     shows a complete connector rather than nothing. */
+  transform-origin: var(--join-origin, left center);
+  scale: 1 1;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .join-path[data-draw="pending"] {
-    stroke-dashoffset: var(--join-length, 240);
+  .join[data-draw="pending"] {
+    scale: var(--join-pending, 0 1);
   }
 
-  .join-path[data-draw="drawn"] {
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 520ms cubic-bezier(0.3, 0.8, 0.3, 1);
+  .join[data-draw="drawn"] {
+    scale: 1 1;
+    transition: scale 520ms cubic-bezier(0.3, 0.8, 0.3, 1);
   }
 }
 
@@ -264,8 +266,8 @@ body {
     scale: 1 1;
   }
 
-  .join-path {
-    stroke-dashoffset: 0;
+  .join {
+    scale: 1 1;
   }
 }
 

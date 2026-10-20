@@ -1,9 +1,13 @@
-import { SITE } from "@/config/site.config";
+import { Hero } from "@/components/landing/Hero";
+import { Nav } from "@/components/landing/Nav";
 
 export default function HomePage() {
   return (
-    <main id="main-content">
-      <h1>{SITE.tagline}</h1>
-    </main>
+    <>
+      <Nav />
+      <main id="main-content">
+        <Hero />
+      </main>
+    </>
   );
 }

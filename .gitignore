@@ -181,3 +181,6 @@ CLAUDE.md
 
 # Local env backups (e.g. .env.railway-before-local): never tracked.
 .env.*-before-local
+
+# Screenshots from scripts/marketing-shots.mjs, a local review tool.
+.shots/
