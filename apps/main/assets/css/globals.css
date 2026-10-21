@@ -370,6 +370,136 @@ body {
 }
 
 /* ==========================================================================
+   Ambient motion
+
+   The drifting fields behind sections, and the artwork's own animation. All of
+   it is slow, none of it loops in a way a reader can catch repeating, and every
+   one of these animates transform or opacity only, so none can move the layout.
+
+   Suppressed entirely under prefers-reduced-motion by the block above, which
+   sets animation-duration on everything. The grain is not motion and stays.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  .drift {
+    animation: drift-a 26s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  .drift-b {
+    animation-name: drift-b;
+    animation-duration: 34s;
+  }
+
+  .drift-c {
+    animation-name: drift-c;
+    animation-duration: 42s;
+  }
+
+  /* Artwork. Each piece moves at its own tempo so two of them on screen never
+     beat together. */
+  .spin {
+    /* transform-box defaults to view-box in SVG, so "center" resolves to the
+       centre of the viewBox rather than of the element. On a circle sitting in
+       a translated group that turns a spin into an orbit, which is what it was
+       doing. fill-box makes the origin the element.
+
+       A plain circle rotating is invisible; the point is the dashed rings,
+       whose dashes travel round. */
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: spin linear infinite;
+  }
+
+  .lift {
+    animation: lift 7s ease-in-out infinite alternate;
+  }
+
+  .weave {
+    stroke-dasharray: 420;
+    stroke-dashoffset: 420;
+    animation: weave-draw 2.4s cubic-bezier(0.16, 0.8, 0.26, 1) both;
+  }
+
+  .pulse {
+    animation: pulse 5.5s ease-in-out infinite alternate;
+  }
+
+  .rise {
+    transform-origin: 50% 100%;
+    animation: rise 900ms cubic-bezier(0.16, 0.8, 0.26, 1) both;
+  }
+}
+
+@keyframes drift-a {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(5rem, 3rem, 0) scale(1.12);
+  }
+}
+
+@keyframes drift-b {
+  from {
+    transform: translate3d(0, 0, 0) scale(1.08);
+  }
+  to {
+    transform: translate3d(-4rem, 4.5rem, 0) scale(0.94);
+  }
+}
+
+@keyframes drift-c {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(3rem, -3.5rem, 0);
+  }
+}
+
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes lift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes weave-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 0.95;
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: scaleY(0.2);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
    Skip link
    ========================================================================== */
 

@@ -1,3 +1,10 @@
+import {
+  ArcField,
+  AudienceField,
+  GridFill,
+  PlateStack,
+  WeaveField,
+} from "@/components/site/Art";
 import { DemoForm } from "@/components/site/DemoForm";
 import {
   EvidenceCompare,
@@ -8,12 +15,10 @@ import {
 } from "@/components/site/Diagrams";
 import { Col, Disclose, Grid, Ref } from "@/components/site/Grid";
 import { ListDetail } from "@/components/site/ListDetail";
-import {
-  PassportMock,
-  StatesMock,
-  TableToolbarMock,
-} from "@/components/site/Mocks";
+import { PassportMock, StatesMock } from "@/components/site/Mocks";
+import { Screenshot } from "@/components/site/Screenshot";
 import { SectionNav } from "@/components/site/SectionNav";
+import { Field } from "@/components/site/Texture";
 import {
   Accent,
   Attestation,
@@ -86,6 +91,7 @@ export default function HomePage() {
              The record confirms itself. See VerifyDemo for why this and not a
              headline beside a static screenshot. ─────────────────────────── */}
       <header className="relative overflow-hidden px-6 pb-16 pt-14 md:px-10 md:pb-24 md:pt-20 lg:px-12">
+        <Field tone="mixed" density="strong" />
         <div className="mx-auto max-w-[1200px]">
           <Grid className="items-center">
             <Col span="col-span-4 md:col-span-6 lg:col-span-6">
@@ -196,6 +202,9 @@ export default function HomePage() {
             <h2 className="display mt-6 max-w-[11ch] text-section text-ink">
               Two products and a Passport.
             </h2>
+            {/* A record confirmed once, then again in each role, opening
+                outward from the first line. */}
+            <ArcField className="mt-10 hidden lg:block" />
           </Col>
           <Col span="col-span-4 md:col-span-6 lg:col-span-7 lg:col-start-6">
             <table className="table-stack w-full border-collapse text-left">
@@ -401,17 +410,24 @@ export default function HomePage() {
             </div>
           </Col>
           <Col span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7">
-            <TableToolbarMock />
-            <p className="mt-4 text-caption text-ink-muted">
-              Search, filters, sort, view settings and the export action sit
-              together above the data they control.
-            </p>
+            {/* The real thing, now that there are screenshots of it: search,
+                status tabs, filters and the export actions sitting together
+                above the data they control. The drawn version it replaces was
+                a stand-in for exactly this. */}
+            <Screenshot
+              name="apprentice-table"
+              alt="The employer portal's apprentice list: cohort tiles for active, on track, at risk and end-point assessment this quarter, above a toolbar with status tabs, filters, a search field, CSV and PDF export, and an enrol action."
+              width={1810}
+              height={330}
+              caption="Employer portal, apprentice list."
+            />
+            <GridFill className="mt-8" />
           </Col>
         </Grid>
       </Band>
 
       {/* ── 06 Sharing a record. One clause in the copy, four behaviours. ── */}
-      <Band id="sharing" tone="linen">
+      <Band id="sharing" tone="linen" className="relative overflow-hidden">
         <Grid className="items-end">
           <Col span="col-span-4 md:col-span-6 lg:col-span-5">
             <Ref number="06" tone="olive">
@@ -461,11 +477,32 @@ export default function HomePage() {
         <div className="mt-14">
           <PortalMap />
         </div>
+
+        <div className="mt-14 grid gap-8 lg:grid-cols-2 lg:gap-14">
+          <Screenshot
+            name="apprentice-progress"
+            alt="The apprentice portal's progress tiles: off-the-job progress, next review, days to end-point assessment, pace status, approved hours and open reviews."
+            width={1560}
+            height={345}
+            caption="Apprentice portal, progress."
+          />
+          <div className="self-center">
+            <h3 className="display text-subhead text-ink">
+              What the apprentice sees
+            </h3>
+            <p className="measure mt-3 text-body-sm text-ink-soft">
+              Off-the-job progress against the statutory target, the next
+              review, days to end-point assessment, and whether their pace is on
+              track. The same hours the provider reports and the employer signs
+              off, read from the same record.
+            </p>
+          </div>
+        </div>
       </Band>
 
       {/* ── 08 Levy transfer, which the copy gives one line and which is the
              whole of Gradlly Forge. ───────────────────────────────────────── */}
-      <Band id="levy" tone="sand">
+      <Band id="levy" tone="sand" className="relative overflow-hidden">
         <Grid className="items-end">
           <Col span="col-span-4 md:col-span-6 lg:col-span-5">
             <Ref number="08" tone="terracotta">
@@ -485,6 +522,16 @@ export default function HomePage() {
         </Grid>
         <div className="mt-14">
           <LevyFlow />
+        </div>
+
+        <div className="mt-14">
+          <Screenshot
+            name="levy-health"
+            alt="The employer portal's levy health panel: a health score, warnings that utilisation is low and that funds are expiring, a note that the balance was entered manually rather than synced from the ESFA, and an export action."
+            width={1550}
+            height={390}
+            caption="Employer portal, levy health. The panel says plainly when a balance was entered by hand rather than synced from the ESFA, because an employer acting on a stale figure is the failure this screen exists to prevent."
+          />
         </div>
       </Band>
 
@@ -522,7 +569,29 @@ export default function HomePage() {
               </TextLink>
             </p>
           </div>
-          <PassportMock className="self-start" />
+          <div className="self-start">
+            <PassportMock />
+            {/* A record built a layer at a time during delivery, then handed
+                over whole. */}
+            <PlateStack className="mt-5" />
+          </div>
+        </div>
+
+        <div className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-14">
+          <Screenshot
+            name="ksb-coverage"
+            alt="The KSB coverage heatmap: knowledge, skill and behaviour codes from an apprenticeship standard, each showing how many pieces of evidence are mapped to it and whether coverage is none, low or adequate."
+            width={1560}
+            height={600}
+            caption="Apprentice portal, KSB coverage. Every knowledge, skill and behaviour in the standard, with the evidence mapped to it."
+          />
+          <Screenshot
+            name="epa-pack"
+            alt="The end-point assessment evidence pack: accepted evidence items, KSB coverage summary, review history, off-the-job summary, commitment statement and reflective statements, each with its readiness, and an export action."
+            width={1560}
+            height={530}
+            caption="Apprentice portal, end-point assessment pack. It states which sections are not ready rather than exporting a pack that looks complete."
+          />
         </div>
       </Band>
 
@@ -581,11 +650,16 @@ export default function HomePage() {
               Better together
             </h3>
           </div>
-          <p className="measure self-end text-body text-ink-soft">
-            When an apprentice finishes, they can carry their Passport&rsquo;s
-            verified achievements into Continuo, with their consent. Their first
-            employer onboards from proof on day one.
-          </p>
+          <div className="self-end">
+            <p className="measure text-body text-ink-soft">
+              When an apprentice finishes, they can carry their Passport&rsquo;s
+              verified achievements into Continuo, with their consent. Their
+              first employer onboards from proof on day one.
+            </p>
+            {/* Two sets of lines that run on their own and cross once, which is
+                exactly what the copy says about the two products. */}
+            <WeaveField className="mt-8" />
+          </div>
         </div>
       </Band>
 
@@ -615,9 +689,14 @@ export default function HomePage() {
 
       {/* ── 09 Who it's for, §8 ──────────────────────────────────────────── */}
       <Band id="who-its-for" tone="sand">
-        <BandHead id="who-its-for-heading">
+        <BandHead
+          id="who-its-for-heading"
+          note="Four audiences reading the same record from different sides."
+        >
           Built for each side of the journey.
         </BandHead>
+
+        <AudienceField className="mt-12 max-w-[520px]" />
 
         <ul className="mt-16 grid list-none gap-14 md:grid-cols-2 md:gap-x-20">
           {audiences.map(({ who, detail, products: owned }) => (

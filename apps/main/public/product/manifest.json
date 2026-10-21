@@ -1,0 +1,37 @@
+[
+  {
+    "name": "apprentice-progress",
+    "alt": "The apprentice portal's progress tiles: off-the-job progress, next review, days to end-point assessment, pace status, approved hours and open reviews.",
+    "width": 1560,
+    "height": 345,
+    "ratio": "4.522"
+  },
+  {
+    "name": "ksb-coverage",
+    "alt": "The KSB coverage heatmap: knowledge, skill and behaviour codes from an apprenticeship standard, each showing how many pieces of evidence are mapped to it and whether coverage is none, low or adequate.",
+    "width": 1560,
+    "height": 600,
+    "ratio": "2.600"
+  },
+  {
+    "name": "epa-pack",
+    "alt": "The end-point assessment evidence pack: accepted evidence items, KSB coverage summary, review history, off-the-job summary, commitment statement and reflective statements, each with its readiness, and an export action.",
+    "width": 1560,
+    "height": 530,
+    "ratio": "2.943"
+  },
+  {
+    "name": "levy-health",
+    "alt": "The employer portal's levy health panel: a health score, warnings that utilisation is low and that funds are expiring, a note that the balance was entered manually rather than synced from the ESFA, and an export action.",
+    "width": 1550,
+    "height": 390,
+    "ratio": "3.974"
+  },
+  {
+    "name": "apprentice-table",
+    "alt": "The employer portal's apprentice list: cohort tiles for active, on track, at risk and end-point assessment this quarter, above a toolbar with status tabs, filters, a search field, CSV and PDF export, and an enrol action.",
+    "width": 1810,
+    "height": 330,
+    "ratio": "5.485"
+  }
+]

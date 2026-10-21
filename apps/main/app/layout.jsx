@@ -2,6 +2,7 @@ import "@/assets/css/globals.css";
 
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
+import { Grain } from "@/components/site/Texture";
 import { SITE } from "@/config/site.config";
 import { createPageSeo, organizationJsonLd } from "@/utils/metadata";
 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>
+        <Grain />
         <Header />
         <main id="main-content">{children}</main>
         <Footer />
