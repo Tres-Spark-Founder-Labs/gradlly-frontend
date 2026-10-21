@@ -180,7 +180,18 @@ export function HeroStack() {
         <PacePlate />
       </div>
 
-      <div className="mt-5 w-full xl:absolute xl:-bottom-[72px] xl:left-[78%] xl:mt-0 xl:w-[40%]">
+      {/* 116px, not the 72px that would mirror the pace plate's 96px top
+          offset. The wrapper's own box is only as tall as the record card —
+          the plates sit outside it — so align-items: center on the hero's
+          row centres the record against the taller copy column using the
+          record's height alone, blind to what overhangs it. That already put
+          the top of this cluster close to flush with the copy column's top;
+          it left a 124px gap below the bottom plate that no amount of
+          eyeballing the two offsets as a pair would explain. 116px was
+          measured off the rendered page to land this plate's bottom within a
+          pixel of the CTA row's, which is the one thing on the left column
+          low enough to be worth matching. */}
+      <div className="mt-5 w-full xl:absolute xl:-bottom-[116px] xl:left-[78%] xl:mt-0 xl:w-[40%]">
         <ReadyPlate />
       </div>
     </div>

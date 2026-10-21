@@ -79,6 +79,88 @@ export function RecordMock({ className = "" }) {
   );
 }
 
+/**
+ * Continuo: one line of a record, for the §04 category detail.
+ *
+ * ── WHAT IS REAL AND WHAT IS A PLACEHOLDER ──────────────────────────────────
+ *
+ * The title, the "Confirmed" status and who confirmed it all come straight off
+ * the selected category — item.name and item.by are the same strings the list
+ * and the detail panel already show, not new copy. "Confirmed" is the section's
+ * own word: its intro paragraph is "the confirmation behind it is the thing
+ * you are reading," and every row in content/landing.js's recordItems already
+ * says who did the confirming.
+ *
+ * The date and the evidence are not in that data, and nothing here invents one.
+ * The date is a neutral block, the same convention VerifyDemo uses in the hero
+ * for the same reason: a date would be invented data. The evidence line is an
+ * icon and the word "on file," never a filename, a count or anything that
+ * reads as a specific document — the product's own copy establishes that
+ * evidence exists ("with the date and the evidence," in the Skills category's
+ * own detail text), not what it is.
+ */
+export function RecordLineMock({ item }) {
+  const markVar =
+    item.mark === "terracotta"
+      ? "var(--color-terracotta)"
+      : "var(--color-olive)";
+  const statusText =
+    item.mark === "terracotta" ? "text-terracotta-ink" : "text-olive";
+
+  return (
+    <Frame label="Continuo record" mark={item.mark}>
+      <div className="flex items-start gap-4">
+        <span
+          className="mark mt-1 h-11"
+          style={{ "--mark": markVar }}
+          aria-hidden
+        />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
+            <span className="text-body-sm font-medium text-ink">
+              {item.name}
+            </span>
+            <span
+              className={`rounded-full border border-hairline px-2.5 py-0.5 text-caption ${statusText}`}
+            >
+              Confirmed
+            </span>
+          </div>
+          <p className="mt-1.5 text-caption text-ink-muted">{item.by}</p>
+
+          <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-hairline pt-4">
+            {/* Where a date would sit. See the note above: not a real one. */}
+            <span className="flex items-center gap-2">
+              <span className="text-caption text-ink-muted">Date</span>
+              <Blank w="w-14" />
+            </span>
+            <span className="flex items-center gap-1.5 text-caption text-ink-muted">
+              <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden>
+                <path
+                  d="M3 1.5h4.5L9.5 3.5V10.5H3z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.1"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M4.3 6.4l1.1 1.1L8 5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Evidence on file
+            </span>
+          </div>
+        </div>
+      </div>
+    </Frame>
+  );
+}
+
 /** Gradlly AMS: a cohort, with progress drawn rather than stated. */
 export function CohortMock({ className = "" }) {
   const widths = ["w-[72%]", "w-[45%]", "w-[88%]", "w-[31%]"];

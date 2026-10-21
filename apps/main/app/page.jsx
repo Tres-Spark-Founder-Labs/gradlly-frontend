@@ -336,10 +336,21 @@ export default function HomePage() {
           Continuo. Verified skills for the workforce.
         </BandHead>
 
-        {/* The claim the product rests on, on the page's one olive surface. */}
-        <div className="on-olive mt-16 rounded-card bg-olive px-7 py-12 text-linen md:px-14 md:py-16">
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-20">
-            <div>
+        {/* The claim the product rests on, on the page's one olive surface.
+
+            An editorial split: one message on the left, its four supporting
+            points on the right, both centred against each other so the panel
+            reads as a spread rather than as a box with a heading in the corner.
+            Roughly 40/60 rather than the 45/55 it was, because the points carry
+            more words than the message and the measure should follow the
+            content, not the other way round.
+
+            Stacked and left aligned below the large breakpoint, with the panel
+            padding down to 24px: at 390 the old 28px inset left the text in a
+            column barely wider than its own measure. */}
+        <div className="on-olive mt-16 rounded-card bg-olive px-6 py-12 text-linen md:px-14 md:py-16">
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,6fr)] lg:items-center lg:gap-24">
+            <Reveal>
               <h3 className="display max-w-[12ch] text-section text-linen">
                 Verified skills, not claimed ones.
               </h3>
@@ -349,32 +360,65 @@ export default function HomePage() {
                 Employers hire and deploy on what workers can actually do, not
                 on what a CV says.
               </p>
-            </div>
-            <SpecList items={continuoCore} dark />
+            </Reveal>
+            <Reveal>
+              <SpecList items={continuoCore} dark />
+            </Reveal>
           </div>
         </div>
 
-        <div className="mt-20 grid gap-14 md:grid-cols-3 md:gap-10">
-          {continuoGroups.map(({ title, points }) => (
-            <div key={title}>
-              <span
-                className="mark mb-6 h-3.5"
-                style={{ "--mark": "var(--color-olive)" }}
-                aria-hidden
-              />
-              <h3 className="display text-subhead text-ink">{title}</h3>
-              <ul className="mt-5 list-none">
-                {points.map((point) => (
-                  <li
-                    key={point}
-                    className="border-t border-hairline py-4 text-body-sm text-ink-soft"
-                  >
-                    {point}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        {/* Three equal columns of hairline-ruled text was the most basic thing
+            on the page: same width, same weight, same rhythm, nothing arriving.
+
+            Now a bento over a field of drifting colour. Six columns, three
+            cells of two sizes: a wide cell, a tall narrow one beside it, and a
+            second wide cell under the first. The sizes are not arbitrary —
+            "Verified checks" and "Continuous, not one-off" carry the longer
+            lines and take the wide cells; the evidence engine's three points
+            are short and read well in a tall column.
+
+            The wrapper isolates so the field stays behind the cards rather
+            than escaping behind the band. See .glass in globals.css for why
+            the blur needs something to blur and what happens without it.
+
+            Two animations, nested: the grid staggers the cards in, and each
+            card's list staggers its own points. That is the text arriving,
+            which is what was missing. */}
+        <div className="relative isolate mt-20 overflow-hidden rounded-card">
+          <Field tone="mixed" density="strong" />
+
+          <Reveal className="grid gap-5 lg:grid-cols-6" stagger={120}>
+            {continuoGroups.map(({ title, points }, index) => (
+              <div
+                key={title}
+                className={`glass p-7 md:p-9 ${
+                  index === 1 ? "lg:col-span-2 lg:row-span-2" : "lg:col-span-4"
+                }`}
+              >
+                <span
+                  className="mark mb-6 h-3.5"
+                  style={{ "--mark": "var(--color-olive)" }}
+                  aria-hidden
+                />
+                <h3 className="display text-subhead text-ink">{title}</h3>
+                <Reveal
+                  as="ul"
+                  className="mt-5 list-none"
+                  stagger={70}
+                  distance={12}
+                >
+                  {points.map((point) => (
+                    <li
+                      key={point}
+                      className="border-t border-hairline py-4 text-body-sm text-ink-soft"
+                    >
+                      {point}
+                    </li>
+                  ))}
+                </Reveal>
+              </div>
+            ))}
+          </Reveal>
         </div>
 
         <div className="mt-20">
@@ -395,8 +439,19 @@ export default function HomePage() {
       {/* ── 04 What a record carries. List and detail, over the approved
              §4 content. ──────────────────────────────────────────────────── */}
       <Band id="the-record" tone="linen" labelledBy="the-record-heading">
-        <StickyPair
-          aside={
+        {/* A flat three-column composition rather than StickyPair's nested
+            aside+content: intro 4/12, selector 3/12, detail 5/12, which is
+            what distinguishes this section from 02 and 05. ListDetail owns the
+            3fr/5fr split of its own 8-column host, so the figures here are
+            4 and 8, and 3:5 is set inside that component. At md both columns
+            are full width, which stacks them — intro first, then the selector
+            and detail ListDetail already lays out side by side on its own.
+            Below md, ListDetail collapses to the single-open accordion. */}
+        <Grid className="lg:items-start">
+          <Col
+            span="col-span-4 md:col-span-6 lg:col-span-4"
+            className="lg:sticky lg:top-28"
+          >
             <Reveal>
               <Ref number="04" tone="olive">
                 The record
@@ -416,24 +471,26 @@ export default function HomePage() {
                 time-limited or revocable.
               </p>
             </Reveal>
-          }
-        >
-          <Reveal>
-            <ListDetail items={recordItems} label="what a record carries" />
-          </Reveal>
+          </Col>
+          <Col span="col-span-4 md:col-span-6 lg:col-span-8 lg:col-start-5">
+            <Reveal>
+              <ListDetail items={recordItems} label="what a record carries" />
+            </Reveal>
+          </Col>
+        </Grid>
 
-          {/* Sharing was its own section. It answers the same question as the
-              list above it, which is what a record is and who gets to see it,
-              and two sections made that look like two subjects. */}
-          <Reveal className="mt-16">
-            <h3 className="display text-subhead text-ink">
-              What the worker shares
-            </h3>
-            <div className="mt-6">
-              <ShareDiagram />
-            </div>
-          </Reveal>
-        </StickyPair>
+        {/* Sharing was its own section before it was folded in here. It
+            answers the same question as the list above it, which is what a
+            record is and who gets to see it, so it stays below the pair
+            rather than crowding into one of the three columns. */}
+        <Reveal className="mt-16">
+          <h3 className="display text-subhead text-ink">
+            What the worker shares
+          </h3>
+          <div className="mt-6">
+            <ShareDiagram />
+          </div>
+        </Reveal>
       </Band>
 
       {/* ── 05 Compliance evidence, with the table and its toolbar. ───────── */}

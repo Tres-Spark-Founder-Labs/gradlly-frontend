@@ -205,6 +205,41 @@ body {
   isolation: isolate;
 }
 
+/* ==========================================================================
+   Glass
+
+   Used by one group of cards and nowhere else: the three Continuo pillars,
+   which sit over a field of drifting colour so there is something behind them
+   worth blurring. Glass over a flat surface is just a tinted box with a
+   performance cost.
+
+   The wrapper that holds them isolates, because the field paints at z-index -1
+   and would otherwise escape behind the band's own background.
+
+   backdrop-filter is not universal and the fallback is not "no background":
+   an unsupported browser gets the solid linen surface, because translucent
+   text panels over a moving field are unreadable without the blur.
+   ========================================================================== */
+
+.glass {
+  border-radius: var(--radius-card);
+  background-color: color-mix(in oklab, var(--color-linen) 46%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-linen) 78%, transparent);
+  box-shadow: 0 1px 1px 0
+    color-mix(in oklab, var(--color-linen) 90%, transparent) inset;
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .glass {
+    background-color: var(--color-linen);
+    border-color: var(--color-hairline);
+  }
+}
+
 .plate {
   border-radius: var(--radius-card);
   background-color: var(--color-linen);
