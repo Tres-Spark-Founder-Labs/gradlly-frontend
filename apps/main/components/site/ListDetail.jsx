@@ -141,7 +141,9 @@ export function ListDetail({ items, label }) {
 
       {selected ? (
         <div
-          className="rule-top self-start"
+          key={selected.id}
+          className="rule-top enter self-start"
+          style={{ "--enter-delay": "0ms" }}
           aria-live="polite"
           aria-atomic="true"
         >

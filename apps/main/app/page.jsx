@@ -2,9 +2,7 @@ import { DemoForm } from "@/components/site/DemoForm";
 import { Col, Disclose, Grid, Ref } from "@/components/site/Grid";
 import { ListDetail } from "@/components/site/ListDetail";
 import {
-  CohortMock,
   PassportMock,
-  RecordMock,
   StatesMock,
   TableToolbarMock,
 } from "@/components/site/Mocks";
@@ -19,6 +17,7 @@ import {
   SpecList,
   TextLink,
 } from "@/components/site/ui";
+import { VerifyDemo } from "@/components/site/VerifyDemo";
 import { CONTENT } from "@/content/landing";
 
 /**
@@ -73,43 +72,63 @@ const MARK_VAR = {
 export default function HomePage() {
   return (
     <>
-      {/* ── Hero, §2 ─────────────────────────────────────────────────────── */}
-      <header className="px-6 pb-20 pt-16 md:px-10 md:pb-28 md:pt-24 lg:px-12">
+      {/* ── Hero, §2 ─────────────────────────────────────────────────────────
+             The record confirms itself. See VerifyDemo for why this and not a
+             headline beside a static screenshot. ─────────────────────────── */}
+      <header className="relative overflow-hidden px-6 pb-16 pt-14 md:px-10 md:pb-24 md:pt-20 lg:px-12">
         <div className="mx-auto max-w-[1200px]">
-          <p
-            className="enter flex items-center gap-3 text-caption text-ink-muted"
-            style={{ "--enter-delay": "0ms" }}
-          >
-            <span
-              className="mark h-3.5"
-              style={{ "--mark": "var(--color-olive)" }}
-              aria-hidden
-            />
-            Verified skills and apprenticeships, for UK regulated work
-          </p>
-
-          {/* The one accent on the page: "trusted" italic, under a drawn
-              chartreuse stroke. The word is chosen because the whole
-              proposition turns on it. */}
-          <h1
-            className="enter display mt-10 max-w-[13ch] text-display text-ink"
-            style={{ "--enter-delay": "120ms" }}
-          >
-            From trained to <Accent>trusted</Accent>.
-          </h1>
-
-          <div className="mt-14 grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:items-start lg:gap-20">
-            <div>
+          <Grid className="items-center">
+            <Col span="col-span-4 md:col-span-6 lg:col-span-6">
               <p
-                className="enter measure-lead text-lead text-ink-soft"
-                style={{ "--enter-delay": "240ms" }}
+                className="enter flex items-center gap-3 text-caption text-ink-muted"
+                style={{ "--enter-delay": "0ms" }}
+              >
+                <span
+                  className="mark h-3.5"
+                  style={{ "--mark": "var(--color-olive)" }}
+                  aria-hidden
+                />
+                Verified skills and apprenticeships, for UK regulated work
+              </p>
+
+              <h1
+                className="enter display mt-8 max-w-[11ch] text-display text-ink"
+                style={{ "--enter-delay": "120ms" }}
+              >
+                From trained to <Accent>trusted</Accent>.
+              </h1>
+
+              <p
+                className="enter measure-lead mt-9 text-lead text-ink-soft"
+                style={{ "--enter-delay": "260ms" }}
               >
                 Skills you can prove. Workers you can trust.
               </p>
-              <p
-                className="enter measure mt-6 text-body text-ink-soft"
-                style={{ "--enter-delay": "300ms" }}
+
+              <div
+                className="enter mt-9 flex flex-col gap-3 sm:flex-row"
+                style={{ "--enter-delay": "340ms" }}
               >
+                <Button href="/#book-a-demo">Book a demo</Button>
+                <Button href="/#how-it-works" variant="outline">
+                  See how it works
+                </Button>
+              </div>
+            </Col>
+
+            <Col span="col-span-4 md:col-span-6 lg:col-span-6">
+              <div className="enter" style={{ "--enter-delay": "420ms" }}>
+                <VerifyDemo />
+              </div>
+            </Col>
+          </Grid>
+
+          {/* The body copy and the two products, below the fold rather than
+              crowding the demonstration. A reader who has watched a line
+              confirm itself already knows what the paragraph is going to say. */}
+          <Grid className="mt-20 rule-top-hair">
+            <Col span="col-span-4 md:col-span-6 lg:col-span-5">
+              <p className="measure text-body text-ink-soft">
                 Gradlly builds two products for the UK workforce.{" "}
                 <strong className="font-semibold text-ink">Continuo</strong>{" "}
                 gives every worker verified skills and checks, and keeps them
@@ -118,61 +137,33 @@ export default function HomePage() {
                 runs apprenticeships, with a verified Passport for every
                 apprentice. Use either on its own, or both together.
               </p>
-
-              <div
-                className="enter mt-10 flex flex-col gap-3 sm:flex-row"
-                style={{ "--enter-delay": "360ms" }}
-              >
-                <Button href="/#book-a-demo">Book a demo</Button>
-                <Button href="/#how-it-works" variant="outline">
-                  See how it works
-                </Button>
-              </div>
-            </div>
-
-            {/* The product visual, offset against the heading. No figures in
-                it, by design: see Mocks.jsx. */}
-            <div
-              className="enter grid gap-5 sm:grid-cols-2 lg:grid-cols-5"
-              style={{ "--enter-delay": "440ms" }}
-            >
-              <RecordMock className="sm:col-span-2 lg:col-span-5" />
-              <CohortMock className="lg:col-span-3" />
-              <PassportMock className="lg:col-span-2" />
-            </div>
-          </div>
-
-          <div
-            className="enter mt-20 border-t border-hairline pt-10"
-            style={{ "--enter-delay": "520ms" }}
-          >
-            <p className="text-caption text-ink-muted">
-              Two products. Each works on its own.
-            </p>
-            <ul className="mt-6 grid list-none gap-10 md:grid-cols-2 md:gap-16">
-              {products.map(({ href, name, summary, audience, mark }) => (
-                <li key={name} className="flex gap-5">
-                  <span
-                    className="mark h-auto self-stretch"
-                    style={{ "--mark": MARK_VAR[mark] }}
-                    aria-hidden
-                  />
-                  <div>
-                    <h2 className="display text-subhead text-ink">{name}</h2>
-                    <p className="mt-1.5 text-body-sm text-ink-soft">
-                      {summary}
-                    </p>
-                    <p className="mt-1 text-caption text-ink-muted">
-                      {audience}
-                    </p>
-                    <p className="mt-4">
-                      <TextLink href={href}>Read {name}</TextLink>
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+            </Col>
+            <Col span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7">
+              <ul className="grid list-none gap-8 sm:grid-cols-2">
+                {products.map(({ href, name, summary, audience, mark }) => (
+                  <li key={name} className="flex gap-4">
+                    <span
+                      className="mark h-auto self-stretch"
+                      style={{ "--mark": MARK_VAR[mark] }}
+                      aria-hidden
+                    />
+                    <div>
+                      <h2 className="display text-subhead text-ink">{name}</h2>
+                      <p className="mt-1.5 text-body-sm text-ink-soft">
+                        {summary}
+                      </p>
+                      <p className="mt-1 text-caption text-ink-muted">
+                        {audience}
+                      </p>
+                      <p className="mt-3">
+                        <TextLink href={href}>Read {name}</TextLink>
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </Col>
+          </Grid>
         </div>
       </header>
 
