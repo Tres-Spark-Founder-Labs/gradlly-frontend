@@ -3,38 +3,43 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * A section, and its text, arriving as it is reached.
+ * A section, and its text, flowing in as it's reached and flowing back out as
+ * it's left — in either scroll direction.
  *
- * ── WHY THIS EXISTS AFTER I ARGUED AGAINST IT ───────────────────────────────
+ * ── WHY THIS NOW RE-ANIMATES, AFTER I ARGUED FOR "PLAYS ONCE" ───────────────
  *
- * A fade-and-slide on every section is the generic default, and I left it out
- * three times on that basis. It was asked for three times, so it is in, and the
- * job now is to make it the good version of the pattern rather than the lazy
- * one.
+ * The one-shot version of this component disconnected its observer after the
+ * first arrival specifically so that scrolling back up wouldn't retrigger a
+ * light show. That was a reasoned default, not a law, and the explicit brief
+ * now is the opposite of it: obvious motion, flowing in and flowing out,
+ * repeatable. So the observer is never disconnected except on unmount, and
+ * every crossing — down past a section or back up through it — toggles the
+ * state and replays the transition.
  *
- * What makes it the good version:
+ * What's kept from the original version, because none of it was in tension
+ * with the new brief:
  *
- *   It plays once. An element that re-animates every time it re-enters the
- *   viewport turns scrolling back up into a light show.
+ *   Children stagger rather than the whole block moving as one, so a heading
+ *   still arrives before the paragraph under it (and leaves before it too,
+ *   on the way out — see the shared transition-delay in globals.css).
  *
- *   It staggers children rather than moving the whole block, so a heading
- *   arrives before the paragraph under it and the order of reading is the order
- *   of arrival.
+ *   It cannot move the layout. Opacity and translate only.
  *
- *   It cannot move the layout. Opacity and transform only, and the element
- *   holds its final box from first paint, so nothing here touches CLS.
+ *   It never hides content from a reader who gets no JavaScript, or who has
+ *   asked for less motion. The visible "idle" state is still the default and
+ *   the only thing that can hide an element is the observer's own first
+ *   callback, which never fires at all under prefers-reduced-motion.
  *
- *   It never hides content from a reader who gets no JavaScript. The visible
- *   state is the default and the hidden state is only applied once the observer
- *   is attached, which is the opposite of how this is usually built and the
- *   reason a failed hydration here leaves a readable page rather than a blank
- *   one.
+ * Driven by a CSS transition now rather than a one-shot keyframe animation,
+ * which is what makes the reverse direction free: a transition animates
+ * whichever way a property's value changes, so the same two rules (shown,
+ * hidden) cover flowing in and flowing out without a second set of keyframes.
  */
 export function Reveal({
   children,
   as: Tag = "div",
-  stagger = 90,
-  distance = 18,
+  stagger = 110,
+  distance = 28,
   className = "",
 }) {
   const ref = useRef(null);
@@ -46,26 +51,22 @@ export function Reveal({
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    // Armed, not hidden, until the observer exists. See the note above.
-    const arm = requestAnimationFrame(() => setState("armed"));
-
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) return;
-        setState("shown");
-        observer.disconnect();
+        // Every crossing, not just the first — this is the whole of the
+        // change from the one-shot version. IntersectionObserver callbacks
+        // are always async, so this setState is never the synchronous kind
+        // that would need deferring into a rAF first.
+        setState(entry.isIntersecting ? "shown" : "hidden");
       },
-      // A third of the way up from the bottom: the block starts arriving as it
-      // comes into reading position rather than the moment its first pixel
-      // crosses the edge.
+      // A third of the way up from the bottom: a block starts arriving as it
+      // reaches reading position, and — on the way back up — has already
+      // left reading position before it starts leaving the viewport.
       { rootMargin: "0px 0px -18% 0px", threshold: 0.05 },
     );
 
     observer.observe(element);
-    return () => {
-      cancelAnimationFrame(arm);
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, []);
 
   return (

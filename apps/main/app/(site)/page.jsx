@@ -8,7 +8,11 @@ import {
 } from "@/components/site/Diagrams";
 import { Col, Disclose, Grid, Ref, StickyPair } from "@/components/site/Grid";
 import { ListDetail } from "@/components/site/ListDetail";
-import { PassportMock, TableToolbarMock } from "@/components/site/Mocks";
+import {
+  PassportMock,
+  RecordLineMock,
+  TableToolbarMock,
+} from "@/components/site/Mocks";
 import { Reveal } from "@/components/site/Reveal";
 import { SectionNav } from "@/components/site/SectionNav";
 import {
@@ -333,6 +337,17 @@ export default function HomePage() {
             </Reveal>
           </div>
         </div>
+
+        {/* What that looks like on an actual record. The claim above is
+            abstract ("verified skills, not claimed ones"); this is the same
+            Skills line the-record section shows in its own detail panel,
+            reused rather than redrawn, so a reader sees one concrete example
+            before the three pillars below generalise from it. */}
+        <Reveal className="mt-14 flex justify-center">
+          <div className="w-full max-w-[460px]">
+            <RecordLineMock item={recordItems[0]} />
+          </div>
+        </Reveal>
 
         {/* Three pillars, each with its three points. The first rebuild drew
             these as a bento of glass cards over a drifting field; both retired

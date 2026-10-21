@@ -19,18 +19,63 @@
  * the real interface changes.
  */
 
-/** The frame every product visual shares: white, bordered, a shadow lifting
-    it off the page. The one shared surface treatment of this rebuild. */
-function Frame({ label, mark = "olive", children, className = "" }) {
+/**
+ * The frame every product visual shares: white, bordered, a shadow lifting it
+ * off the page. The one shared surface treatment of this rebuild.
+ *
+ * `crumb` and `badge` are optional and add the same header the hero's
+ * VerifyDemo card carries — "Continuo › One worker, one record" with a
+ * "Verified" pill at the right — so a reader who has already seen the hero
+ * recognises the convention when it shows up again in Compliance or the
+ * Passport, instead of meeting a plainer header each time. Left off where a
+ * mock doesn't have a real second-level name to put after the crumb.
+ */
+function Frame({
+  label,
+  crumb,
+  badge,
+  mark = "olive",
+  children,
+  className = "",
+}) {
   const dot = mark === "terracotta" ? "bg-terracotta" : "bg-olive";
+  const badgeTone =
+    mark === "terracotta" ? "text-terracotta-ink" : "text-olive";
 
   return (
     <figure
       className={`shadow-card overflow-hidden rounded-card border border-hairline bg-linen ${className}`}
     >
-      <figcaption className="flex items-center gap-2.5 border-b border-hairline px-6 py-4">
-        <span className={`h-1.5 w-1.5 rounded-full ${dot}`} aria-hidden />
-        <span className="text-caption text-ink-muted">{label}</span>
+      <figcaption className="flex items-center justify-between gap-4 border-b border-hairline px-6 py-4">
+        {crumb ? (
+          <p className="flex items-baseline gap-2 text-caption text-ink-muted">
+            <span>{crumb}</span>
+            <span aria-hidden>›</span>
+            <span className="font-medium text-ink">{label}</span>
+          </p>
+        ) : (
+          <span className="flex items-center gap-2.5">
+            <span className={`h-1.5 w-1.5 rounded-full ${dot}`} aria-hidden />
+            <span className="text-caption text-ink-muted">{label}</span>
+          </span>
+        )}
+        {badge ? (
+          <span
+            className={`flex shrink-0 items-center gap-1.5 rounded-full bg-sand/60 px-2.5 py-1 text-caption font-medium ${badgeTone}`}
+          >
+            <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden>
+              <path
+                d="M1.5 5.2 L3.8 7.5 L8.5 2.3"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            {badge}
+          </span>
+        ) : null}
       </figcaption>
       <div className="px-6 py-5">{children}</div>
     </figure>
@@ -108,7 +153,7 @@ export function RecordLineMock({ item }) {
     item.mark === "terracotta" ? "text-terracotta-ink" : "text-olive";
 
   return (
-    <Frame label="Continuo record" mark={item.mark}>
+    <Frame crumb="Continuo" label="Record" mark={item.mark}>
       <div className="flex items-start gap-4">
         <span
           className="mark mt-1 h-11"
@@ -202,7 +247,9 @@ export function PassportMock({ className = "" }) {
 
   return (
     <Frame
+      crumb="Gradlly AMS"
       label="Apprenticeship Passport"
+      badge="Verified"
       mark="terracotta"
       className={className}
     >
@@ -248,7 +295,7 @@ export function TableToolbarMock({ className = "" }) {
   const statuses = ["olive", "olive", "terracotta", "olive"];
 
   return (
-    <Frame label="Compliance evidence" className={className}>
+    <Frame crumb="Continuo" label="Compliance evidence" className={className}>
       {/* The toolbar. Search, filter, sort and the action, in that order,
           because that is the order the work happens in. */}
       <div className="flex flex-wrap items-center gap-2 pb-4">
