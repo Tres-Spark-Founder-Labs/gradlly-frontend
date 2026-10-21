@@ -11,6 +11,8 @@
  *   Whitespace does most of the work: no extra dividers, no decoration.
  */
 
+import { Reveal } from "./Reveal";
+
 const MARK = {
   olive: "var(--color-olive)",
   terracotta: "var(--color-terracotta)",
@@ -79,7 +81,7 @@ export function BandHead({
           : ""
       }
     >
-      <div>
+      <Reveal>
         {eyebrow ? (
           <p
             className={`flex items-center gap-3 text-caption ${dark ? "text-linen/60" : "text-ink-muted"}`}
@@ -100,13 +102,15 @@ export function BandHead({
         >
           {children}
         </h2>
-      </div>
+      </Reveal>
       {note ? (
-        <p
-          className={`measure text-lead ${dark ? "text-linen/75" : "text-ink-soft"}`}
-        >
-          {note}
-        </p>
+        <Reveal stagger={0}>
+          <p
+            className={`measure text-lead ${dark ? "text-linen/75" : "text-ink-soft"}`}
+          >
+            {note}
+          </p>
+        </Reveal>
       ) : null}
     </div>
   );

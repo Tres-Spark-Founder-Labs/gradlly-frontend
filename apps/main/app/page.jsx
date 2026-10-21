@@ -1,10 +1,3 @@
-import {
-  ArcField,
-  AudienceField,
-  GridFill,
-  PlateStack,
-  WeaveField,
-} from "@/components/site/Art";
 import { DemoForm } from "@/components/site/DemoForm";
 import {
   EvidenceCompare,
@@ -13,9 +6,10 @@ import {
   PortalMap,
   ShareDiagram,
 } from "@/components/site/Diagrams";
-import { Col, Disclose, Grid, Ref } from "@/components/site/Grid";
+import { Col, Disclose, Grid, Ref, StickyPair } from "@/components/site/Grid";
 import { ListDetail } from "@/components/site/ListDetail";
 import { PassportMock, StatesMock } from "@/components/site/Mocks";
+import { Reveal } from "@/components/site/Reveal";
 import { Screenshot } from "@/components/site/Screenshot";
 import { SectionNav } from "@/components/site/SectionNav";
 import { Field } from "@/components/site/Texture";
@@ -202,9 +196,14 @@ export default function HomePage() {
             <h2 className="display mt-6 max-w-[11ch] text-section text-ink">
               Two products and a Passport.
             </h2>
-            {/* A record confirmed once, then again in each role, opening
-                outward from the first line. */}
-            <ArcField className="mt-10 hidden lg:block" />
+            <Screenshot
+              name="apprentice-nav"
+              alt="The apprentice portal's navigation, grouped under My learning, Reporting and Account: dashboard, my journey, off-the-job log, portfolio, commitment statement, end-point assessment pack, messages, documents, profile and settings."
+              width={252}
+              height={580}
+              caption="Apprentice portal, navigation."
+              className="mt-10 hidden max-w-[240px] lg:block"
+            />
           </Col>
           <Col span="col-span-4 md:col-span-6 lg:col-span-7 lg:col-start-6">
             <table className="table-stack w-full border-collapse text-left">
@@ -276,21 +275,33 @@ export default function HomePage() {
 
       {/* ── 02 The problem, §3 ───────────────────────────────────────────── */}
       <Band id="the-problem" tone="sand">
-        <BandHead
-          id="the-problem-heading"
-          note="Continuo and Gradlly AMS answer one of these each, and the third between them."
+        <StickyPair
+          aside={
+            <Reveal>
+              <Ref number="02">The problem</Ref>
+              <h2
+                id="the-problem-heading"
+                className="display mt-6 max-w-[12ch] text-section text-ink"
+              >
+                Proof gets rebuilt at every step. It shouldn&rsquo;t.
+              </h2>
+              <p className="measure mt-6 text-body text-ink-soft">
+                Continuo and Gradlly AMS answer one of these each, and the third
+                between them.
+              </p>
+            </Reveal>
+          }
         >
-          Proof gets rebuilt at every step. It shouldn&rsquo;t.
-        </BandHead>
-        <div className="mt-16">
-          <SpecList items={problems} />
-        </div>
+          <Reveal>
+            <SpecList items={problems} />
+          </Reveal>
 
-        {/* The second problem, drawn. "Not buried in folders" is a claim every
-            compliance product makes and nobody illustrates. */}
-        <div className="mt-16">
-          <EvidenceCompare />
-        </div>
+          {/* The second problem, drawn. "Not buried in folders" is a claim
+              every compliance product makes and nobody illustrates. */}
+          <Reveal className="mt-14">
+            <EvidenceCompare />
+          </Reveal>
+        </StickyPair>
       </Band>
 
       {/* ── Continuo, §4 ─────────────────────────────────────────────────── */}
@@ -362,26 +373,27 @@ export default function HomePage() {
       {/* ── 04 What a record carries. List and detail, over the approved
              §4 content. ──────────────────────────────────────────────────── */}
       <Band id="the-record" tone="linen">
-        <Grid className="items-end">
-          <Col span="col-span-4 md:col-span-6 lg:col-span-5">
-            <Ref number="04" tone="olive">
-              What a record carries
-            </Ref>
-            <h2 className="display mt-6 max-w-[12ch] text-section text-ink">
-              Every line, and who stands behind it.
-            </h2>
-          </Col>
-          <Col span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7">
-            <p className="measure text-lead text-ink-soft">
-              A Continuo record is not one document. Filter it, open a line, and
-              the confirmation behind it is the thing you are reading.
-            </p>
-          </Col>
-        </Grid>
-
-        <div className="mt-16">
+        <StickyPair
+          aside={
+            <Reveal>
+              <Ref number="04" tone="olive">
+                What a record carries
+              </Ref>
+              <h2
+                id="the-record-heading"
+                className="display mt-6 max-w-[12ch] text-section text-ink"
+              >
+                Every line, and who stands behind it.
+              </h2>
+              <p className="measure mt-6 text-body text-ink-soft">
+                A Continuo record is not one document. Filter it, open a line,
+                and the confirmation behind it is the thing you are reading.
+              </p>
+            </Reveal>
+          }
+        >
           <ListDetail items={recordItems} label="what a record carries" />
-        </div>
+        </StickyPair>
       </Band>
 
       {/* ── 05 Compliance evidence, with the table and its toolbar. ───────── */}
@@ -421,7 +433,14 @@ export default function HomePage() {
               height={330}
               caption="Employer portal, apprentice list."
             />
-            <GridFill className="mt-8" />
+            <Screenshot
+              name="levy-analysis"
+              alt="Two analysis panels in the employer portal: annual levy utilisation with the proportion used, and a twelve month spend forecast, each with a PNG export."
+              width={1550}
+              height={180}
+              caption="Employer portal, analysis."
+              className="mt-8"
+            />
           </Col>
         </Grid>
       </Band>
@@ -445,9 +464,9 @@ export default function HomePage() {
             </p>
           </Col>
         </Grid>
-        <div className="mt-14">
+        <Reveal className="mt-14">
           <ShareDiagram />
-        </div>
+        </Reveal>
       </Band>
 
       {/* ── 07 The four portals. ─────────────────────────────────────────── */}
@@ -474,9 +493,9 @@ export default function HomePage() {
             </p>
           </Col>
         </Grid>
-        <div className="mt-14">
+        <Reveal className="mt-14">
           <PortalMap />
-        </div>
+        </Reveal>
 
         <div className="mt-14 grid gap-8 lg:grid-cols-2 lg:gap-14">
           <Screenshot
@@ -520,9 +539,9 @@ export default function HomePage() {
             </p>
           </Col>
         </Grid>
-        <div className="mt-14">
+        <Reveal className="mt-14">
           <LevyFlow />
-        </div>
+        </Reveal>
 
         <div className="mt-14">
           <Screenshot
@@ -571,9 +590,14 @@ export default function HomePage() {
           </div>
           <div className="self-start">
             <PassportMock />
-            {/* A record built a layer at a time during delivery, then handed
-                over whole. */}
-            <PlateStack className="mt-5" />
+            <Screenshot
+              name="portfolio-intro"
+              alt="The apprentice portal's portfolio header: an evidence library mapped to the knowledge, skills and behaviours in the apprenticeship standard."
+              width={1560}
+              height={176}
+              caption="Apprentice portal, portfolio."
+              className="mt-5"
+            />
           </div>
         </div>
 
@@ -656,9 +680,14 @@ export default function HomePage() {
               verified achievements into Continuo, with their consent. Their
               first employer onboards from proof on day one.
             </p>
-            {/* Two sets of lines that run on their own and cross once, which is
-                exactly what the copy says about the two products. */}
-            <WeaveField className="mt-8" />
+            <Screenshot
+              name="epa-export"
+              alt="The export control for an end-point assessment pack: one action that compiles everything listed above it."
+              width={1540}
+              height={96}
+              caption="Apprentice portal, pack export. The last thing that happens in an apprenticeship, and the first thing a Continuo record can be built from."
+              className="mt-8"
+            />
           </div>
         </div>
       </Band>
@@ -696,7 +725,14 @@ export default function HomePage() {
           Built for each side of the journey.
         </BandHead>
 
-        <AudienceField className="mt-12 max-w-[520px]" />
+        <Screenshot
+          name="levy-expiry"
+          alt="An alert at the top of the employer portal: funds expire on a given date, three days remaining, with an action to transfer or allocate them before they lapse."
+          width={1550}
+          height={86}
+          caption="Employer portal, expiry alert. What a levy-paying employer is trying not to let happen."
+          className="mt-12"
+        />
 
         <ul className="mt-16 grid list-none gap-14 md:grid-cols-2 md:gap-x-20">
           {audiences.map(({ who, detail, products: owned }) => (

@@ -370,6 +370,71 @@ body {
 }
 
 /* ==========================================================================
+   Reveal
+
+   A block and its children arriving as the block is reached. The staggering is
+   done with nth-child rather than per-element delays in markup, so a section
+   does not have to carry animation bookkeeping in its JSX.
+
+   The "idle" state is the visible one, and is what renders with no JavaScript,
+   which is why the hidden state belongs to "armed" rather than being the
+   default. A failed hydration leaves a readable page rather than a blank one.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal[data-reveal="armed"] > * {
+    opacity: 0;
+    translate: 0 var(--reveal-distance, 18px);
+  }
+
+  .reveal[data-reveal="shown"] > * {
+    animation: reveal-in 680ms cubic-bezier(0.16, 0.8, 0.26, 1) both;
+  }
+
+  /* Seven is enough for every block on this page, and an eighth child arrives
+     with the seventh rather than being left hidden. */
+  .reveal[data-reveal="shown"] > *:nth-child(1) {
+    animation-delay: 0ms;
+  }
+  .reveal[data-reveal="shown"] > *:nth-child(2) {
+    animation-delay: calc(var(--reveal-stagger) * 1);
+  }
+  .reveal[data-reveal="shown"] > *:nth-child(3) {
+    animation-delay: calc(var(--reveal-stagger) * 2);
+  }
+  .reveal[data-reveal="shown"] > *:nth-child(4) {
+    animation-delay: calc(var(--reveal-stagger) * 3);
+  }
+  .reveal[data-reveal="shown"] > *:nth-child(5) {
+    animation-delay: calc(var(--reveal-stagger) * 4);
+  }
+  .reveal[data-reveal="shown"] > *:nth-child(6) {
+    animation-delay: calc(var(--reveal-stagger) * 5);
+  }
+  .reveal[data-reveal="shown"] > *:nth-child(n + 7) {
+    animation-delay: calc(var(--reveal-stagger) * 6);
+  }
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--reveal-distance, 18px);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal > * {
+    opacity: 1;
+    translate: none;
+  }
+}
+
+/* ==========================================================================
    Ambient motion
 
    The drifting fields behind sections, and the artwork's own animation. All of

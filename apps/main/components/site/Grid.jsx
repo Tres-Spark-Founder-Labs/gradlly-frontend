@@ -77,3 +77,40 @@ export function Disclose({ summary, children, defaultOpen = false }) {
     </details>
   );
 }
+
+/**
+ * A heading that stays while its content scrolls past.
+ *
+ * ── THE PROBLEM THIS FIXES ──────────────────────────────────────────────────
+ *
+ * Several sections had a short heading in a left column and a long list in the
+ * same column beneath it, which left the right half of a 1440 screen empty for
+ * the whole length of the list. The page read as a narrow column of text with a
+ * wide margin, which is not what a twelve column grid is for.
+ *
+ * So the heading moves into its own column and sticks. The content scrolls past
+ * it, the reader keeps the heading in view while reading a list that may be ten
+ * rows long, and the width gets used.
+ *
+ * Sticky only from the large breakpoint. Below it the two stack, because a
+ * sticky heading on a phone eats a third of the viewport for the whole section.
+ */
+export function StickyPair({ aside, children, asideSpan, contentSpan }) {
+  return (
+    <Grid className="items-start">
+      <Col
+        span={asideSpan ?? "col-span-4 md:col-span-6 lg:col-span-4"}
+        className="lg:sticky lg:top-28"
+      >
+        {aside}
+      </Col>
+      <Col
+        span={
+          contentSpan ?? "col-span-4 md:col-span-6 lg:col-span-7 lg:col-start-6"
+        }
+      >
+        {children}
+      </Col>
+    </Grid>
+  );
+}

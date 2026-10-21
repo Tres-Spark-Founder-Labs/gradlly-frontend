@@ -33,5 +33,35 @@
     "width": 1810,
     "height": 330,
     "ratio": "5.485"
+  },
+  {
+    "name": "apprentice-nav",
+    "alt": "The apprentice portal's navigation, grouped under My learning, Reporting and Account: dashboard, my journey, off-the-job log, portfolio, commitment statement, end-point assessment pack, messages, documents, profile and settings.",
+    "width": 252,
+    "height": 580
+  },
+  {
+    "name": "levy-expiry",
+    "alt": "An alert at the top of the employer portal: funds expire on a given date, three days remaining, with an action to transfer or allocate them before they lapse.",
+    "width": 1550,
+    "height": 86
+  },
+  {
+    "name": "levy-analysis",
+    "alt": "Two analysis panels in the employer portal: annual levy utilisation with the proportion used, and a twelve month spend forecast, each with a PNG export.",
+    "width": 1550,
+    "height": 180
+  },
+  {
+    "name": "portfolio-intro",
+    "alt": "The apprentice portal's portfolio header: an evidence library mapped to the knowledge, skills and behaviours in the apprenticeship standard.",
+    "width": 1560,
+    "height": 176
+  },
+  {
+    "name": "epa-export",
+    "alt": "The export control for an end-point assessment pack: one action that compiles everything listed above it.",
+    "width": 1540,
+    "height": 96
   }
 ]
