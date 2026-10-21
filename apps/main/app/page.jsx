@@ -8,9 +8,8 @@ import {
 } from "@/components/site/Diagrams";
 import { Col, Disclose, Grid, Ref, StickyPair } from "@/components/site/Grid";
 import { ListDetail } from "@/components/site/ListDetail";
-import { PassportMock, StatesMock } from "@/components/site/Mocks";
+import { PassportMock } from "@/components/site/Mocks";
 import { Reveal } from "@/components/site/Reveal";
-import { Screenshot } from "@/components/site/Screenshot";
 import { SectionNav } from "@/components/site/SectionNav";
 import { Field } from "@/components/site/Texture";
 import {
@@ -45,16 +44,13 @@ const SECTIONS = [
   { id: "positioning", number: "01", label: "What Gradlly builds" },
   { id: "the-problem", number: "02", label: "The problem" },
   { id: "continuo", number: "03", label: "Continuo" },
-  { id: "the-record", number: "04", label: "What a record carries" },
+  { id: "the-record", number: "04", label: "The record" },
   { id: "compliance", number: "05", label: "Compliance evidence" },
-  { id: "sharing", number: "06", label: "Sharing a record" },
-  { id: "portals", number: "07", label: "The four portals" },
-  { id: "levy", number: "08", label: "Levy transfer" },
-  { id: "passport", number: "09", label: "Apprenticeship Passport" },
-  { id: "how-it-works", number: "10", label: "How it works" },
-  { id: "states", number: "11", label: "Every state, designed" },
-  { id: "who-its-for", number: "12", label: "Who it's for" },
-  { id: "book-a-demo", number: "13", label: "Book a demo" },
+  { id: "portals", number: "06", label: "The four portals" },
+  { id: "passport", number: "07", label: "Apprenticeship Passport" },
+  { id: "how-it-works", number: "08", label: "How it works" },
+  { id: "who-its-for", number: "09", label: "Who it's for" },
+  { id: "book-a-demo", number: "10", label: "Book a demo" },
 ];
 
 const {
@@ -196,14 +192,6 @@ export default function HomePage() {
             <h2 className="display mt-6 max-w-[11ch] text-section text-ink">
               Two products and a Passport.
             </h2>
-            <Screenshot
-              name="apprentice-nav"
-              alt="The apprentice portal's navigation, grouped under My learning, Reporting and Account: dashboard, my journey, off-the-job log, portfolio, commitment statement, end-point assessment pack, messages, documents, profile and settings."
-              width={252}
-              height={580}
-              caption="Apprentice portal, navigation."
-              className="mt-10 hidden max-w-[240px] lg:block"
-            />
           </Col>
           <Col span="col-span-4 md:col-span-6 lg:col-span-7 lg:col-start-6">
             <table className="table-stack w-full border-collapse text-left">
@@ -377,7 +365,7 @@ export default function HomePage() {
           aside={
             <Reveal>
               <Ref number="04" tone="olive">
-                What a record carries
+                The record
               </Ref>
               <h2
                 id="the-record-heading"
@@ -389,10 +377,28 @@ export default function HomePage() {
                 A Continuo record is not one document. Filter it, open a line,
                 and the confirmation behind it is the thing you are reading.
               </p>
+              <p className="measure mt-5 text-body text-ink-soft">
+                The worker decides what a hirer sees: full or partial,
+                time-limited or revocable.
+              </p>
             </Reveal>
           }
         >
-          <ListDetail items={recordItems} label="what a record carries" />
+          <Reveal>
+            <ListDetail items={recordItems} label="what a record carries" />
+          </Reveal>
+
+          {/* Sharing was its own section. It answers the same question as the
+              list above it, which is what a record is and who gets to see it,
+              and two sections made that look like two subjects. */}
+          <Reveal className="mt-16">
+            <h3 className="display text-subhead text-ink">
+              What the worker shares
+            </h3>
+            <div className="mt-6">
+              <ShareDiagram />
+            </div>
+          </Reveal>
         </StickyPair>
       </Band>
 
@@ -426,54 +432,15 @@ export default function HomePage() {
                 status tabs, filters and the export actions sitting together
                 above the data they control. The drawn version it replaces was
                 a stand-in for exactly this. */}
-            <Screenshot
-              name="apprentice-table"
-              alt="The employer portal's apprentice list: cohort tiles for active, on track, at risk and end-point assessment this quarter, above a toolbar with status tabs, filters, a search field, CSV and PDF export, and an enrol action."
-              width={1810}
-              height={330}
-              caption="Employer portal, apprentice list."
-            />
-            <Screenshot
-              name="levy-analysis"
-              alt="Two analysis panels in the employer portal: annual levy utilisation with the proportion used, and a twelve month spend forecast, each with a PNG export."
-              width={1550}
-              height={180}
-              caption="Employer portal, analysis."
-              className="mt-8"
-            />
           </Col>
         </Grid>
-      </Band>
-
-      {/* ── 06 Sharing a record. One clause in the copy, four behaviours. ── */}
-      <Band id="sharing" tone="linen" className="relative overflow-hidden">
-        <Grid className="items-end">
-          <Col span="col-span-4 md:col-span-6 lg:col-span-5">
-            <Ref number="06" tone="olive">
-              Sharing a record
-            </Ref>
-            <h2 className="display mt-6 max-w-[13ch] text-section text-ink">
-              The worker decides what a hirer sees.
-            </h2>
-          </Col>
-          <Col span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7">
-            <p className="measure text-lead text-ink-soft">
-              Shared by the worker with one link: full or partial, time-limited
-              or revocable. Four behaviours in one clause, so here they are as a
-              control you can work.
-            </p>
-          </Col>
-        </Grid>
-        <Reveal className="mt-14">
-          <ShareDiagram />
-        </Reveal>
       </Band>
 
       {/* ── 07 The four portals. ─────────────────────────────────────────── */}
       <Band id="portals">
         <Grid className="items-end">
           <Col span="col-span-4 md:col-span-6 lg:col-span-5">
-            <Ref number="07" tone="terracotta">
+            <Ref number="06" tone="terracotta">
               The four portals
             </Ref>
             <h2 className="display mt-6 max-w-[13ch] text-section text-ink">
@@ -497,61 +464,21 @@ export default function HomePage() {
           <PortalMap />
         </Reveal>
 
-        <div className="mt-14 grid gap-8 lg:grid-cols-2 lg:gap-14">
-          <Screenshot
-            name="apprentice-progress"
-            alt="The apprentice portal's progress tiles: off-the-job progress, next review, days to end-point assessment, pace status, approved hours and open reviews."
-            width={1560}
-            height={345}
-            caption="Apprentice portal, progress."
-          />
-          <div className="self-center">
-            <h3 className="display text-subhead text-ink">
-              What the apprentice sees
-            </h3>
-            <p className="measure mt-3 text-body-sm text-ink-soft">
-              Off-the-job progress against the statutory target, the next
-              review, days to end-point assessment, and whether their pace is on
-              track. The same hours the provider reports and the employer signs
-              off, read from the same record.
-            </p>
+        {/* Levy transfer was its own section. It is what the fourth portal
+            does, so a separate one described a part as though it were a peer. */}
+        <Reveal className="mt-20">
+          <h3 className="display max-w-[16ch] text-section text-ink">
+            What the Forge does.
+          </h3>
+          <p className="measure mt-5 text-body text-ink-soft">
+            Employers with unspent levy matched with SMEs that need funded
+            apprenticeships, and the transfer managed from pledge to funded
+            start.
+          </p>
+          <div className="mt-10">
+            <LevyFlow />
           </div>
-        </div>
-      </Band>
-
-      {/* ── 08 Levy transfer, which the copy gives one line and which is the
-             whole of Gradlly Forge. ───────────────────────────────────────── */}
-      <Band id="levy" tone="sand" className="relative overflow-hidden">
-        <Grid className="items-end">
-          <Col span="col-span-4 md:col-span-6 lg:col-span-5">
-            <Ref number="08" tone="terracotta">
-              Levy transfer
-            </Ref>
-            <h2 className="display mt-6 max-w-[14ch] text-section text-ink">
-              Unspent levy, matched to an SME that needs it.
-            </h2>
-          </Col>
-          <Col span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7">
-            <p className="measure text-lead text-ink-soft">
-              Employers with unspent levy matched with SMEs that need funded
-              apprenticeships, and the transfer managed from pledge to funded
-              start.
-            </p>
-          </Col>
-        </Grid>
-        <Reveal className="mt-14">
-          <LevyFlow />
         </Reveal>
-
-        <div className="mt-14">
-          <Screenshot
-            name="levy-health"
-            alt="The employer portal's levy health panel: a health score, warnings that utilisation is low and that funds are expiring, a note that the balance was entered manually rather than synced from the ESFA, and an export action."
-            width={1550}
-            height={390}
-            caption="Employer portal, levy health. The panel says plainly when a balance was entered by hand rather than synced from the ESFA, because an employer acting on a stale figure is the failure this screen exists to prevent."
-          />
-        </div>
       </Band>
 
       {/* ── 09 Passport, §6 ──────────────────────────────────────────────── */}
@@ -590,33 +517,10 @@ export default function HomePage() {
           </div>
           <div className="self-start">
             <PassportMock />
-            <Screenshot
-              name="portfolio-intro"
-              alt="The apprentice portal's portfolio header: an evidence library mapped to the knowledge, skills and behaviours in the apprenticeship standard."
-              width={1560}
-              height={176}
-              caption="Apprentice portal, portfolio."
-              className="mt-5"
-            />
           </div>
         </div>
 
-        <div className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-14">
-          <Screenshot
-            name="ksb-coverage"
-            alt="The KSB coverage heatmap: knowledge, skill and behaviour codes from an apprenticeship standard, each showing how many pieces of evidence are mapped to it and whether coverage is none, low or adequate."
-            width={1560}
-            height={600}
-            caption="Apprentice portal, KSB coverage. Every knowledge, skill and behaviour in the standard, with the evidence mapped to it."
-          />
-          <Screenshot
-            name="epa-pack"
-            alt="The end-point assessment evidence pack: accepted evidence items, KSB coverage summary, review history, off-the-job summary, commitment statement and reflective statements, each with its readiness, and an export action."
-            width={1560}
-            height={530}
-            caption="Apprentice portal, end-point assessment pack. It states which sections are not ready rather than exporting a pack that looks complete."
-          />
-        </div>
+        <div className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-14"></div>
       </Band>
 
       {/* ── How it works, §7 ─────────────────────────────────────────────── */}
@@ -680,39 +584,7 @@ export default function HomePage() {
               verified achievements into Continuo, with their consent. Their
               first employer onboards from proof on day one.
             </p>
-            <Screenshot
-              name="epa-export"
-              alt="The export control for an end-point assessment pack: one action that compiles everything listed above it."
-              width={1540}
-              height={96}
-              caption="Apprentice portal, pack export. The last thing that happens in an apprenticeship, and the first thing a Continuo record can be built from."
-              className="mt-8"
-            />
           </div>
-        </div>
-      </Band>
-
-      {/* ── 08 Every state, designed. ────────────────────────────────────── */}
-      <Band id="states" tone="linen">
-        <Grid className="items-end">
-          <Col span="col-span-4 md:col-span-6 lg:col-span-5">
-            <Ref number="08">Every state, designed</Ref>
-            <h2 className="display mt-6 max-w-[13ch] text-section text-ink">
-              Including the ones nobody demos.
-            </h2>
-          </Col>
-          <Col span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7">
-            <p className="measure text-body text-ink-soft">
-              A cohort with nobody in it yet. A DAS call that times out. An
-              evidence pack that is ready. Designing only the populated screen
-              is how a product ships something that breaks the first time
-              reality is not ideal, so every screen in Gradlly has its empty,
-              loading, error and confirmed states drawn.
-            </p>
-          </Col>
-        </Grid>
-        <div className="mt-14">
-          <StatesMock />
         </div>
       </Band>
 
@@ -724,15 +596,6 @@ export default function HomePage() {
         >
           Built for each side of the journey.
         </BandHead>
-
-        <Screenshot
-          name="levy-expiry"
-          alt="An alert at the top of the employer portal: funds expire on a given date, three days remaining, with an action to transfer or allocate them before they lapse."
-          width={1550}
-          height={86}
-          caption="Employer portal, expiry alert. What a levy-paying employer is trying not to let happen."
-          className="mt-12"
-        />
 
         <ul className="mt-16 grid list-none gap-14 md:grid-cols-2 md:gap-x-20">
           {audiences.map(({ who, detail, products: owned }) => (
