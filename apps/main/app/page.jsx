@@ -1,4 +1,11 @@
 import { DemoForm } from "@/components/site/DemoForm";
+import {
+  EvidenceCompare,
+  FlowPath,
+  LevyFlow,
+  PortalMap,
+  ShareDiagram,
+} from "@/components/site/Diagrams";
 import { Col, Disclose, Grid, Ref } from "@/components/site/Grid";
 import { ListDetail } from "@/components/site/ListDetail";
 import {
@@ -41,11 +48,14 @@ const SECTIONS = [
   { id: "continuo", number: "03", label: "Continuo" },
   { id: "the-record", number: "04", label: "What a record carries" },
   { id: "compliance", number: "05", label: "Compliance evidence" },
-  { id: "passport", number: "06", label: "Apprenticeship Passport" },
-  { id: "how-it-works", number: "07", label: "How it works" },
-  { id: "states", number: "08", label: "Every state, designed" },
-  { id: "who-its-for", number: "09", label: "Who it's for" },
-  { id: "book-a-demo", number: "10", label: "Book a demo" },
+  { id: "sharing", number: "06", label: "Sharing a record" },
+  { id: "portals", number: "07", label: "The four portals" },
+  { id: "levy", number: "08", label: "Levy transfer" },
+  { id: "passport", number: "09", label: "Apprenticeship Passport" },
+  { id: "how-it-works", number: "10", label: "How it works" },
+  { id: "states", number: "11", label: "Every state, designed" },
+  { id: "who-its-for", number: "12", label: "Who it's for" },
+  { id: "book-a-demo", number: "13", label: "Book a demo" },
 ];
 
 const {
@@ -266,6 +276,12 @@ export default function HomePage() {
         <div className="mt-16">
           <SpecList items={problems} />
         </div>
+
+        {/* The second problem, drawn. "Not buried in folders" is a claim every
+            compliance product makes and nobody illustrates. */}
+        <div className="mt-16">
+          <EvidenceCompare />
+        </div>
       </Band>
 
       {/* ── Continuo, §4 ─────────────────────────────────────────────────── */}
@@ -394,7 +410,85 @@ export default function HomePage() {
         </Grid>
       </Band>
 
-      {/* ── 06 Passport, §6 ──────────────────────────────────────────────── */}
+      {/* ── 06 Sharing a record. One clause in the copy, four behaviours. ── */}
+      <Band id="sharing" tone="linen">
+        <Grid className="items-end">
+          <Col span="col-span-4 md:col-span-6 lg:col-span-5">
+            <Ref number="06" tone="olive">
+              Sharing a record
+            </Ref>
+            <h2 className="display mt-6 max-w-[13ch] text-section text-ink">
+              The worker decides what a hirer sees.
+            </h2>
+          </Col>
+          <Col span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7">
+            <p className="measure text-lead text-ink-soft">
+              Shared by the worker with one link: full or partial, time-limited
+              or revocable. Four behaviours in one clause, so here they are as a
+              control you can work.
+            </p>
+          </Col>
+        </Grid>
+        <div className="mt-14">
+          <ShareDiagram />
+        </div>
+      </Band>
+
+      {/* ── 07 The four portals. ─────────────────────────────────────────── */}
+      <Band id="portals">
+        <Grid className="items-end">
+          <Col span="col-span-4 md:col-span-6 lg:col-span-5">
+            <Ref number="07" tone="terracotta">
+              The four portals
+            </Ref>
+            <h2 className="display mt-6 max-w-[13ch] text-section text-ink">
+              Four doors onto one apprenticeship.
+            </h2>
+          </Col>
+          <Col span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7">
+            <p className="measure text-lead text-ink-soft">
+              Provider, employer, apprentice and the Forge marketplace. Not four
+              products: four ways into the same record, which is why nothing has
+              to be reconciled between them.
+            </p>
+            <p className="mt-6">
+              <TextLink href="/gradlly-ams">
+                See the Gradlly AMS platform
+              </TextLink>
+            </p>
+          </Col>
+        </Grid>
+        <div className="mt-14">
+          <PortalMap />
+        </div>
+      </Band>
+
+      {/* ── 08 Levy transfer, which the copy gives one line and which is the
+             whole of Gradlly Forge. ───────────────────────────────────────── */}
+      <Band id="levy" tone="sand">
+        <Grid className="items-end">
+          <Col span="col-span-4 md:col-span-6 lg:col-span-5">
+            <Ref number="08" tone="terracotta">
+              Levy transfer
+            </Ref>
+            <h2 className="display mt-6 max-w-[14ch] text-section text-ink">
+              Unspent levy, matched to an SME that needs it.
+            </h2>
+          </Col>
+          <Col span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7">
+            <p className="measure text-lead text-ink-soft">
+              Employers with unspent levy matched with SMEs that need funded
+              apprenticeships, and the transfer managed from pledge to funded
+              start.
+            </p>
+          </Col>
+        </Grid>
+        <div className="mt-14">
+          <LevyFlow />
+        </div>
+      </Band>
+
+      {/* ── 09 Passport, §6 ──────────────────────────────────────────────── */}
       <Band id="passport" tone="linen">
         <BandHead
           id="passport-heading"
@@ -452,7 +546,11 @@ export default function HomePage() {
               How Continuo works
             </h3>
             <div className="mt-8">
-              <SpecList items={continuoFlow} numbered mark="olive" />
+              <FlowPath
+                steps={continuoFlow}
+                tone="olive"
+                label="How Continuo works"
+              />
             </div>
           </div>
 
@@ -464,7 +562,11 @@ export default function HomePage() {
             />
             <h3 className="display text-section text-ink">How AMS works</h3>
             <div className="mt-8">
-              <SpecList items={amsFlow} numbered mark="terracotta" />
+              <FlowPath
+                steps={amsFlow}
+                tone="terracotta"
+                label="How Gradlly AMS works"
+              />
             </div>
           </div>
         </div>
