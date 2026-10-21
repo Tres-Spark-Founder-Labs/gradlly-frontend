@@ -149,8 +149,11 @@ export function ShareDiagram() {
   return (
     <div>
       <fieldset>
+        {/* The subheading above this diagram says what it shows. A legend
+            repeating it left the same five words twice, 40px apart, so this
+            one says what the control does instead. */}
         <legend className="text-caption text-ink-muted">
-          What the worker shares
+          Choose what a hirer sees
         </legend>
         <div className="mt-3 flex flex-wrap gap-2" role="radiogroup">
           {SHARE_MODES.map((option) => {

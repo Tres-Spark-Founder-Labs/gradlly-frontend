@@ -98,12 +98,15 @@
   --text-caption--letter-spacing: 0;
 
   /* ── Shape ─────────────────────────────────────────────────────────────────
-     Pulled back for the Swiss pass. A 24px corner on every surface softens the
-     grid until the columns stop reading, and a modernist layout earns its
-     clarity from alignment rather than from rounding. Controls keep 10px
-     because a button is a thing you press; surfaces go flat. */
+     A 4px corner was the Swiss pass, on the argument that rounding softens a
+     grid until the columns stop reading. The reference boards for this project
+     settle it the other way: generous corners on the surfaces, stadium buttons,
+     and the grid carried by alignment, which it still is. 20px is the figure
+     those boards sit at. Controls keep 10px for inputs; buttons go to a full
+     stadium, which is what the boards show. */
   --radius-control: 10px;
-  --radius-card: 4px;
+  --radius-card: 20px;
+  --radius-panel: 28px;
   --radius-full: 999px;
 
   /* ── The grid ──────────────────────────────────────────────────────────────
@@ -157,6 +160,57 @@ body {
 /* On olive, ink would vanish: it is 1.47:1 against it. */
 .on-olive :focus-visible {
   outline-color: var(--color-chartreuse);
+}
+
+/* ==========================================================================
+   The hero panel, and the plates that float over it
+
+   The deep olive field with light cards collaged over it is the composition
+   the reference boards are built around, so it is the one place on this site
+   where a surface sits on top of another surface rather than beside it.
+
+   Shadows are used here and nowhere else. The rule for the rest of the page is
+   thin borders and tonal change, and that rule is right there: a border is
+   enough to separate a card from the page it sits on. It is not enough to
+   separate three light cards from *each other* when they overlap, which is the
+   whole point of a collage, and value alone cannot do it because all three are
+   the same linen. So the plates cast a shadow and nothing else does.
+   ========================================================================== */
+
+.hero-panel {
+  position: relative;
+  border-radius: var(--radius-panel);
+  background-color: var(--color-olive);
+  color: var(--color-linen);
+  /* No overflow clip: the plates deliberately break the top and right edges.
+     The panel's own texture is clipped by .hero-panel-texture instead. */
+}
+
+.hero-panel-texture {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  /* Field paints itself at z-index -1. Without a stacking context here that is
+     behind the olive, and in fact behind the page. */
+  isolation: isolate;
+}
+
+/* The accent stroke sits at z-index -1 so a descender crosses it. Inside the
+   panel that would put it behind the olive, so the copy column becomes its own
+   stacking context and the stroke stays between the panel and the glyphs. */
+.hero-copy {
+  position: relative;
+  isolation: isolate;
+}
+
+.plate {
+  border-radius: var(--radius-card);
+  background-color: var(--color-linen);
+  box-shadow:
+    0 22px 48px -26px rgb(14 15 10 / 0.55),
+    0 3px 10px -5px rgb(14 15 10 / 0.3);
 }
 
 /* ==========================================================================

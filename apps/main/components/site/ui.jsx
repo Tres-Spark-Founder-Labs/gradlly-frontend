@@ -144,7 +144,7 @@ export function Button({
   return (
     <a
       href={href}
-      className={`inline-flex items-center justify-center rounded-control px-7 py-3.5 text-body-sm font-medium transition-colors duration-200 ease-out ${style} ${className}`}
+      className={`inline-flex items-center justify-center rounded-full px-7 py-3.5 text-body-sm font-medium transition-colors duration-200 ease-out ${style} ${className}`}
     >
       {children}
     </a>

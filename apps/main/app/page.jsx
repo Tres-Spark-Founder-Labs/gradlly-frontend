@@ -7,8 +7,9 @@ import {
   ShareDiagram,
 } from "@/components/site/Diagrams";
 import { Col, Disclose, Grid, Ref, StickyPair } from "@/components/site/Grid";
+import { HeroStack } from "@/components/site/HeroStack";
 import { ListDetail } from "@/components/site/ListDetail";
-import { PassportMock } from "@/components/site/Mocks";
+import { PassportMock, TableToolbarMock } from "@/components/site/Mocks";
 import { Reveal } from "@/components/site/Reveal";
 import { SectionNav } from "@/components/site/SectionNav";
 import { Field } from "@/components/site/Texture";
@@ -22,7 +23,6 @@ import {
   SpecList,
   TextLink,
 } from "@/components/site/ui";
-import { VerifyDemo } from "@/components/site/VerifyDemo";
 import { CONTENT } from "@/content/landing";
 
 /**
@@ -78,56 +78,77 @@ export default function HomePage() {
   return (
     <>
       {/* ── Hero, §2 ─────────────────────────────────────────────────────────
-             The record confirms itself. See VerifyDemo for why this and not a
-             headline beside a static screenshot. ─────────────────────────── */}
-      <header className="relative overflow-hidden px-6 pb-16 pt-14 md:px-10 md:pb-24 md:pt-20 lg:px-12">
-        <Field tone="mixed" density="strong" />
+             A deep olive panel with the copy on it and a collage of light
+             plates over it, which is the composition the reference boards are
+             built around. The light hero this replaced put a single card beside
+             a headline on cream: correct, quiet, and the same opening as every
+             other product site. The panel is the one place on the page that
+             raises its voice, and it earns that by being the only one.
+
+             The record still confirms itself inside it. See VerifyDemo for why
+             a demonstration and not a static screenshot, and HeroStack for what
+             the two smaller plates carry and why neither holds a number. ───── */}
+      <header className="relative px-4 pb-16 pt-8 md:px-8 md:pb-24 md:pt-10 lg:px-12">
         <div className="mx-auto max-w-[1200px]">
-          <Grid className="items-center">
-            <Col span="col-span-4 md:col-span-6 lg:col-span-6">
-              <p
-                className="enter flex items-center gap-3 text-caption text-ink-muted"
-                style={{ "--enter-delay": "0ms" }}
-              >
-                <span
-                  className="mark h-3.5"
-                  style={{ "--mark": "var(--color-olive)" }}
-                  aria-hidden
-                />
-                Verified skills and apprenticeships, for UK regulated work
-              </p>
+          <div className="hero-panel on-olive px-6 py-14 md:px-10 md:py-16 lg:px-14 lg:py-20">
+            {/* Warm light in the corners of the panel, clipped to its radius.
+                Terracotta rather than olive: olive on olive is invisible. */}
+            <div className="hero-panel-texture">
+              <Field tone="terracotta" density="soft" />
+            </div>
 
-              <h1
-                className="enter display mt-8 max-w-[11ch] text-display text-ink"
-                style={{ "--enter-delay": "120ms" }}
+            <Grid className="items-center">
+              <Col
+                span="col-span-4 md:col-span-6 xl:col-span-5"
+                className="hero-copy"
               >
-                From trained to <Accent>trusted</Accent>.
-              </h1>
+                <p
+                  className="enter flex items-center gap-3 text-caption text-linen/70"
+                  style={{ "--enter-delay": "0ms" }}
+                >
+                  <span
+                    className="mark h-3.5"
+                    style={{ "--mark": "var(--color-chartreuse)" }}
+                    aria-hidden
+                  />
+                  Verified skills and apprenticeships, for UK regulated work
+                </p>
 
-              <p
-                className="enter measure-lead mt-9 text-lead text-ink-soft"
-                style={{ "--enter-delay": "260ms" }}
+                <h1
+                  className="enter display mt-8 max-w-[11ch] text-display text-chartreuse"
+                  style={{ "--enter-delay": "120ms" }}
+                >
+                  From trained to <Accent>trusted</Accent>.
+                </h1>
+
+                <p
+                  className="enter measure-lead mt-9 text-lead text-linen/75"
+                  style={{ "--enter-delay": "260ms" }}
+                >
+                  Skills you can prove. Workers you can trust.
+                </p>
+
+                <div
+                  className="enter mt-9 flex flex-col gap-3 sm:flex-row"
+                  style={{ "--enter-delay": "340ms" }}
+                >
+                  <Button href="/#book-a-demo">Book a demo</Button>
+                  <Button href="/#how-it-works" variant="outline-olive">
+                    See how it works
+                  </Button>
+                </div>
+              </Col>
+
+              <Col
+                span="col-span-4 md:col-span-6 xl:col-span-6 xl:col-start-7"
+                className="mt-10 xl:mt-0"
               >
-                Skills you can prove. Workers you can trust.
-              </p>
-
-              <div
-                className="enter mt-9 flex flex-col gap-3 sm:flex-row"
-                style={{ "--enter-delay": "340ms" }}
-              >
-                <Button href="/#book-a-demo">Book a demo</Button>
-                <Button href="/#how-it-works" variant="outline">
-                  See how it works
-                </Button>
-              </div>
-            </Col>
-
-            <Col span="col-span-4 md:col-span-6 lg:col-span-6">
-              <div className="enter" style={{ "--enter-delay": "420ms" }}>
-                <VerifyDemo />
-              </div>
-            </Col>
-          </Grid>
+                <div className="enter" style={{ "--enter-delay": "420ms" }}>
+                  <HeroStack />
+                </div>
+              </Col>
+            </Grid>
+          </div>
 
           {/* The body copy and the two products, below the fold rather than
               crowding the demonstration. A reader who has watched a line
@@ -186,17 +207,24 @@ export default function HomePage() {
       {/* ── 01 What Gradlly builds. The positioning table from the approved
              copy, which no version of this site has used until now. ────────── */}
       <Band id="positioning" labelledBy="positioning-heading">
-        <Grid>
-          <Col span="col-span-4 md:col-span-6 lg:col-span-4">
-            <Ref number="01">What Gradlly builds</Ref>
-            <h2
-              id="positioning-heading"
-              className="display mt-6 max-w-[11ch] text-section text-ink"
-            >
-              Two products and a Passport.
-            </h2>
-          </Col>
-          <Col span="col-span-4 md:col-span-6 lg:col-span-7 lg:col-start-6">
+        <StickyPair
+          aside={
+            <Reveal>
+              <Ref number="01">What Gradlly builds</Ref>
+              <h2
+                id="positioning-heading"
+                className="display mt-6 max-w-[11ch] text-section text-ink"
+              >
+                Two products and a Passport.
+              </h2>
+              <p className="measure mt-6 text-body text-ink-soft">
+                Each works on its own, and they work together when apprentices
+                move into work.
+              </p>
+            </Reveal>
+          }
+        >
+          <Reveal>
             <table className="table-stack w-full border-collapse text-left">
               <caption className="sr-only">
                 Gradlly products, what each one is, and who buys it
@@ -260,8 +288,8 @@ export default function HomePage() {
                 ))}
               </tbody>
             </table>
-          </Col>
-        </Grid>
+          </Reveal>
+        </StickyPair>
       </Band>
 
       {/* ── 02 The problem, §3 ───────────────────────────────────────────── */}
@@ -435,11 +463,18 @@ export default function HomePage() {
               ))}
             </div>
           </Col>
-          <Col span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7">
-            {/* The real thing, now that there are screenshots of it: search,
-                status tabs, filters and the export actions sitting together
-                above the data they control. The drawn version it replaces was
-                a stand-in for exactly this. */}
+          {/* Sticky the other way round from StickyPair: here the left column
+              is the long one, because the disclosures open into it, so the
+              toolbar is what should stay in view while they are read. */}
+          <Col
+            span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7"
+            className="lg:sticky lg:top-28"
+          >
+            {/* Search, status tabs, filters and the export actions sitting
+                together above the data they control, which is the whole claim
+                of this section: evidence organised by the obligation it
+                answers, reachable without opening a folder. */}
+            <TableToolbarMock />
           </Col>
         </Grid>
       </Band>

@@ -120,21 +120,13 @@ export function VerifyDemo() {
   }, [play]);
 
   return (
-    <figure className="rounded-card border border-hairline bg-linen">
-      <figcaption className="flex items-center justify-between gap-4 border-b border-hairline px-6 py-4">
-        <span className="text-caption text-ink-muted">
-          One worker, one record
-        </span>
-        {mounted ? (
-          <button
-            type="button"
-            onClick={play}
-            disabled={playing}
-            className="rounded-control border border-hairline px-3 py-1.5 text-caption text-ink transition-colors duration-200 ease-out hover:border-ink disabled:opacity-45"
-          >
-            {playing ? "Confirming" : "Watch it confirm"}
-          </button>
-        ) : null}
+    <figure className="plate">
+      {/* The control used to sit here, at the top right. In the hero it is a
+          collage now, and the plate that overlaps this one crosses exactly that
+          corner: a button under another card is a button nobody can press. It
+          moved to the footer, beside the line it belongs with. */}
+      <figcaption className="border-b border-hairline px-6 py-4 text-caption text-ink-muted">
+        One worker, one record
       </figcaption>
 
       <ul className="list-none px-6">
@@ -158,7 +150,11 @@ export function VerifyDemo() {
               />
 
               <span className="min-w-0 flex-1">
-                <span className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                {/* Stacked at phone width, side by side above it. Left to
+                    wrap, the kind dropped below the claim on the two long rows
+                    and stayed inline on the short one, so three identical rows
+                    rendered in two different shapes. */}
+                <span className="flex flex-col gap-x-4 gap-y-0.5 sm:flex-row sm:items-baseline sm:justify-between">
                   <span className="text-body font-medium text-ink">
                     {claim}
                   </span>
@@ -210,10 +206,28 @@ export function VerifyDemo() {
           : `${confirmed} of ${LINES.length} lines confirmed.`}
       </p>
 
-      <p className="border-t border-hairline px-6 py-4 text-caption text-ink-muted">
-        Nothing on a Continuo record is a claim. Every line carries whoever
-        confirmed it.
-      </p>
+      {/* The footer used to carry "Nothing on a Continuo record is a claim.
+          Every line carries whoever confirmed it." The three rows above say
+          exactly that, each naming who confirmed it, and §3 says it again in
+          the copy. It went so that the card's bottom-right corner is free for
+          the plate that crosses it, and because a card that demonstrates a
+          thing does not also need to assert it. */}
+      <div className="border-t border-hairline px-6 py-4">
+        {mounted ? (
+          <button
+            type="button"
+            onClick={play}
+            disabled={playing}
+            className="rounded-full border border-hairline px-3.5 py-1.5 text-caption text-ink transition-colors duration-200 ease-out hover:border-ink disabled:opacity-45"
+          >
+            {playing ? "Confirming" : "Watch it confirm"}
+          </button>
+        ) : (
+          /* Holds the footer's height before hydration so the collage above it
+             does not reflow when the control appears. */
+          <span aria-hidden className="block h-[30px]" />
+        )}
+      </div>
     </figure>
   );
 }
