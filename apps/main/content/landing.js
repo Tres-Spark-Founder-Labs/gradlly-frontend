@@ -28,6 +28,145 @@ export const CONTENT = Object.freeze({
     },
   ],
 
+  /**
+   * The positioning table, verbatim from content-v1.md's Positioning section.
+   *
+   * It was in the approved copy from the start and no version of this site has
+   * used it, which is an omission rather than an edit: it is the only place the
+   * three things are set out against who buys each one.
+   */
+  positioning: [
+    {
+      product: "Continuo",
+      what: "Verified skills for the workforce: each skill confirmed by whoever assessed or observed it, backed by verified identity, right to work and DBS, and kept current between jobs",
+      who: "Employers and agencies in regulated sectors",
+      mark: "olive",
+      href: "/#continuo",
+    },
+    {
+      product: "Gradlly AMS",
+      what: "Apprenticeship management SaaS with Provider, Employer and Apprentice portals and the Gradlly Forge marketplace",
+      who: "Training providers, levy-paying employers, SMEs",
+      mark: "terracotta",
+      href: "/gradlly-ams",
+    },
+    {
+      product: "Apprenticeship Passport",
+      what: "The apprentice's verified record of KSBs, off-the-job hours and EPA result, built by AMS",
+      who: "Included with AMS; free for apprentices",
+      mark: "terracotta",
+      href: "/#passport",
+    },
+  ],
+
+  /**
+   * What a Continuo record carries, for the list and detail view.
+   *
+   * Every row is drawn from content-v1.md §4: the four core bullets, the three
+   * verified-checks bullets and the continuous sign-off bullets. Nothing here
+   * is a new claim; the detail lines restate the approved copy for the item they
+   * belong to.
+   */
+  recordItems: [
+    {
+      id: "skills",
+      name: "Skills",
+      by: "Confirmed by whoever assessed or observed it",
+      mark: "olive",
+      detail:
+        "Every skill on a Continuo record is confirmed by the trainer, assessor or employer who saw it, with the date and the evidence. Described against recognised occupational standards, so any employer can read them.",
+    },
+    {
+      id: "identity",
+      name: "Identity",
+      by: "Verified at source",
+      mark: "olive",
+      detail:
+        "Captured at source rather than taken on trust, and nothing is added to a record without the worker's consent.",
+    },
+    {
+      id: "right-to-work",
+      name: "Right to work",
+      by: "Verified at source, live between jobs",
+      mark: "olive",
+      detail:
+        "Kept current between jobs rather than checked once at the moment of hire, so an employer deploying a worker is reading a live status.",
+    },
+    {
+      id: "dbs",
+      name: "DBS",
+      by: "Verified at source, live between jobs",
+      mark: "olive",
+      detail:
+        "Held alongside the skills it clears the worker to use, and flagged before it lapses rather than after.",
+    },
+    {
+      id: "qualifications",
+      name: "Qualifications",
+      by: "Captured at source",
+      mark: "olive",
+      detail:
+        "Held on the record so they are not re-evidenced at every job, which is one of the three things this platform exists to stop.",
+    },
+    {
+      id: "site-cards",
+      name: "Site cards",
+      by: "Captured at source",
+      mark: "olive",
+      detail:
+        "The sector-specific cards a worker has to produce on arrival, on the same record as everything else they are cleared for.",
+    },
+    {
+      id: "conduct",
+      name: "Conduct, attendance and performance",
+      by: "Confirmed by each employer",
+      mark: "olive",
+      detail:
+        "Every employer adds conduct, attendance and performance confirmations alongside skills, so the record grows with the worker's career rather than restarting at each job.",
+    },
+    {
+      id: "sign-off",
+      name: "Competence sign-off",
+      by: "Confirmed by the manager each quarter",
+      mark: "olive",
+      detail:
+        "A quarterly skills and competence sign-off, done by a manager in minutes on a phone. A Health Score shows how fresh and complete each record is.",
+    },
+    {
+      id: "passport",
+      name: "Passport achievements",
+      by: "Carried in from Gradlly AMS, with consent",
+      mark: "terracotta",
+      detail:
+        "When an apprentice finishes, they can carry their Passport's verified achievements into Continuo, with their consent. Their first employer onboards from proof on day one.",
+    },
+  ],
+
+  /**
+   * The deeper detail behind each Continuo capability, shown on request.
+   *
+   * Progressive disclosure: the capability is always visible, the detail opens
+   * when a reader asks for it. Every line restates content-v1.md §4 rather than
+   * adding to it.
+   */
+  capabilities: [
+    {
+      summary: "Verified checks",
+      detail:
+        "Identity, right to work, DBS, qualifications and site cards, captured at source. Nothing added without the worker's consent. Every employer adds conduct, attendance and performance confirmations alongside skills.",
+    },
+    {
+      summary: "A compliance evidence engine",
+      detail:
+        "Proof organised by each regulated obligation, not buried in folders. Gaps and upcoming lapses flagged before they become breaches. Evidence packs for any regulator, funder or client audit, on demand.",
+    },
+    {
+      summary: "Continuous, not one-off",
+      detail:
+        "Quarterly skills and competence sign-off, done by a manager in minutes on a phone. A Health Score showing how fresh and complete each record is. One view across bank, agency and multiple employers.",
+    },
+  ],
+
   /** §3. */
   problems: [
     {

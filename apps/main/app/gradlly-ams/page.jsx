@@ -11,6 +11,7 @@ import Nav from "@/components/Home/Nav";
 import Portals from "@/components/Home/Portals";
 import Problem from "@/components/Home/Problem";
 import Why from "@/components/Home/Why";
+import { Breadcrumbs } from "@/components/site/SectionNav";
 
 /**
  * Gradlly AMS: the original design, kept.
@@ -40,6 +41,26 @@ export default function GradllyAmsPage() {
   return (
     <div className="overflow-x-hidden bg-stone-50 text-stone-900">
       <Nav menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+      {/*
+        Breadcrumbs, here and nowhere else. This is the only route a reader can
+        reach that is not the top of the site, so it is the only place the trail
+        carries information. On a single-page site a breadcrumb that always
+        reads "Home" teaches people to ignore breadcrumbs everywhere.
+
+        Set in the marketing system rather than this page's own, because it is
+        wayfinding for the site rather than part of the preserved design.
+      */}
+      <div className="bg-stone-50 px-6 pt-24 md:px-10">
+        <div className="mx-auto max-w-[1200px]">
+          <Breadcrumbs
+            trail={[
+              { href: "/", label: "Gradlly" },
+              { href: "/#positioning", label: "Products" },
+              { label: "Gradlly AMS" },
+            ]}
+          />
+        </div>
+      </div>
       <Hero />
       <Marquee />
       <Problem />

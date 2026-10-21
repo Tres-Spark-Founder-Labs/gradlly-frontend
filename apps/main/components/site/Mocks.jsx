@@ -149,3 +149,183 @@ export function PassportMock({ className = "" }) {
     </Frame>
   );
 }
+
+/**
+ * A table with its toolbar.
+ *
+ * Carbon's data-table guidance keeps search, filters, sort, view settings and
+ * the primary action together above the data they control, rather than
+ * scattered around the page, and this is what that looks like in Gradlly: the
+ * compliance evidence view a registered manager works in.
+ *
+ * Still no figures. The columns are named, the rows are structured, and where a
+ * value would sit there is a sand block.
+ */
+export function TableToolbarMock({ className = "" }) {
+  const columns = ["Worker", "Obligation", "Confirmed by", "Status"];
+  const statuses = ["olive", "olive", "terracotta", "olive"];
+
+  return (
+    <Frame label="Compliance evidence" className={className}>
+      {/* The toolbar. Search, filter, sort and the action, in that order,
+          because that is the order the work happens in. */}
+      <div className="flex flex-wrap items-center gap-2 pb-4">
+        <span className="flex h-8 flex-1 min-w-32 items-center gap-2 rounded-control border border-hairline px-3">
+          <svg width="11" height="11" viewBox="0 0 12 12" aria-hidden>
+            <circle
+              cx="5"
+              cy="5"
+              r="3.6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.4"
+              className="text-ink-muted"
+            />
+            <path
+              d="M8 8l3 3"
+              stroke="currentColor"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+              className="text-ink-muted"
+            />
+          </svg>
+          <Blank w="w-12" />
+        </span>
+        {["Filter", "Sort", "View"].map((control) => (
+          <span
+            key={control}
+            className="flex h-8 items-center rounded-control border border-hairline px-3 text-caption text-ink-muted"
+          >
+            {control}
+          </span>
+        ))}
+        <span className="flex h-8 items-center rounded-control bg-terracotta px-3 text-caption font-medium text-linen">
+          Export pack
+        </span>
+      </div>
+
+      <table className="w-full border-collapse text-left">
+        <thead>
+          <tr className="border-y border-hairline">
+            {columns.map((column) => (
+              <th
+                key={column}
+                scope="col"
+                className="py-2.5 pr-4 text-caption font-medium text-ink-muted last:pr-0"
+              >
+                {column}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {statuses.map((status, index) => (
+            <tr
+              key={index}
+              className="border-b border-hairline last:border-b-0"
+            >
+              <td className="py-3 pr-4">
+                <Blank w="w-20" />
+              </td>
+              <td className="py-3 pr-4">
+                <Blank w="w-16" />
+              </td>
+              <td className="py-3 pr-4">
+                <Blank w="w-14" />
+              </td>
+              <td className="py-3">
+                <span
+                  className="block h-1.5 w-8 rounded-full"
+                  style={{
+                    backgroundColor:
+                      status === "terracotta"
+                        ? "var(--color-terracotta)"
+                        : "var(--color-olive)",
+                  }}
+                  aria-hidden
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Frame>
+  );
+}
+
+/**
+ * The states a screen actually has.
+ *
+ * Empty, loading, error and success, drawn as four small panels. Designing only
+ * the populated screen is the commonest way a product ships something that
+ * breaks the first time a cohort is empty or a DAS call times out, so the
+ * product designs all four and the site says so.
+ */
+export function StatesMock({ className = "" }) {
+  const states = [
+    {
+      name: "Empty",
+      body: "No apprentices enrolled yet",
+      action: "Enrol an apprentice",
+      mark: "olive",
+    },
+    {
+      name: "Loading",
+      body: null,
+      action: null,
+      mark: "olive",
+    },
+    {
+      name: "Error",
+      body: "The DAS balance could not be fetched",
+      action: "Try again",
+      mark: "terracotta",
+    },
+    {
+      name: "Confirmed",
+      body: "Evidence pack ready to download",
+      action: "Download",
+      mark: "olive",
+    },
+  ];
+
+  return (
+    <div className={`grid gap-4 sm:grid-cols-2 ${className}`}>
+      {states.map(({ name, body, action, mark }) => (
+        <div
+          key={name}
+          className="rounded-card border border-hairline bg-linen p-5"
+        >
+          <p className="flex items-center gap-2.5 text-caption text-ink-muted">
+            <span
+              className="mark h-3"
+              style={{
+                "--mark":
+                  mark === "terracotta"
+                    ? "var(--color-terracotta)"
+                    : "var(--color-olive)",
+              }}
+              aria-hidden
+            />
+            {name}
+          </p>
+          {body ? (
+            <p className="mt-3 text-body-sm text-ink">{body}</p>
+          ) : (
+            <span className="mt-3 flex flex-col gap-2" aria-hidden>
+              <Blank w="w-28" />
+              <Blank w="w-20" />
+            </span>
+          )}
+          {action ? (
+            <p className="mt-4 text-caption text-ink-muted underline decoration-hairline underline-offset-4">
+              {action}
+            </p>
+          ) : (
+            <p className="mt-4 text-caption text-ink-muted">Fetching</p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}

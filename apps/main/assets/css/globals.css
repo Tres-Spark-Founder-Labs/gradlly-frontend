@@ -97,10 +97,22 @@
   --text-caption--line-height: 1.45;
   --text-caption--letter-spacing: 0;
 
-  /* ── Shape ─────────────────────────────────────────────────────────────── */
+  /* ── Shape ─────────────────────────────────────────────────────────────────
+     Pulled back for the Swiss pass. A 24px corner on every surface softens the
+     grid until the columns stop reading, and a modernist layout earns its
+     clarity from alignment rather than from rounding. Controls keep 10px
+     because a button is a thing you press; surfaces go flat. */
   --radius-control: 10px;
-  --radius-card: 24px;
+  --radius-card: 4px;
   --radius-full: 999px;
+
+  /* ── The grid ──────────────────────────────────────────────────────────────
+     Twelve columns, a 24px gutter, and a baseline every 8px. Everything on the
+     page starts on a column and sits on a baseline, which is the whole point:
+     the rhythm is the design, not the decoration. */
+  --grid-columns: 12;
+  --grid-gutter: 1.5rem;
+  --baseline: 0.5rem;
 
   --spacing: 0.25rem;
 }
@@ -183,6 +195,91 @@ body {
   /* Behind the glyphs, so a descender crosses the stroke the way it would have
      crossed a pen line. */
   z-index: -1;
+}
+
+/* ==========================================================================
+   The grid
+
+   A twelve column grid with a 24px gutter, collapsing to six at tablet and
+   four at mobile so a span that made sense at 1200 still lands on a column at
+   390 rather than becoming a full-width block.
+   ========================================================================== */
+
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: var(--grid-gutter);
+  row-gap: calc(var(--baseline) * 6);
+}
+
+@media (min-width: 768px) {
+  .grid-12 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-12 {
+    grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  }
+}
+
+/* A rule drawn on the grid rather than around a box. The modernist device:
+   content hangs from a line, it is not enclosed by one. */
+.rule-top {
+  border-top: 1px solid var(--color-ink);
+  padding-top: calc(var(--baseline) * 3);
+}
+
+.rule-top-hair {
+  border-top: 1px solid var(--color-hairline);
+  padding-top: calc(var(--baseline) * 3);
+}
+
+/* ==========================================================================
+   Responsive table
+
+   A table whose columns cannot fit a phone stacks into labelled rows rather
+   than scrolling sideways. Same markup, same order, same semantics: only the
+   presentation changes, which is the rule for every responsive decision on this
+   site.
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  .table-stack thead {
+    /* Not display:none, which removes it from the accessibility tree along
+       with the column associations the row headers rely on. */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .table-stack tr {
+    display: block;
+    padding-block: calc(var(--baseline) * 3);
+  }
+
+  .table-stack th,
+  .table-stack td {
+    display: block;
+    width: auto;
+    padding: 0;
+  }
+
+  .table-stack td {
+    margin-top: calc(var(--baseline) * 1.5);
+  }
+
+  .table-stack td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--color-ink-muted);
+    font-size: var(--text-caption);
+  }
 }
 
 /* ==========================================================================

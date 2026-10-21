@@ -1,5 +1,14 @@
 import { DemoForm } from "@/components/site/DemoForm";
-import { CohortMock, PassportMock, RecordMock } from "@/components/site/Mocks";
+import { Col, Disclose, Grid, Ref } from "@/components/site/Grid";
+import { ListDetail } from "@/components/site/ListDetail";
+import {
+  CohortMock,
+  PassportMock,
+  RecordMock,
+  StatesMock,
+  TableToolbarMock,
+} from "@/components/site/Mocks";
+import { SectionNav } from "@/components/site/SectionNav";
 import {
   Accent,
   Attestation,
@@ -19,8 +28,32 @@ import { CONTENT } from "@/content/landing";
  * so the nav item and the Passport section link out to it rather than repeating
  * it here.
  */
+/**
+ * The page index.
+ *
+ * Eleven sections is long enough that a reader needs to see the shape of it,
+ * and long enough that the local navigation is a requirement rather than a
+ * nicety. The numbers are referenced from the prose, so they have to be
+ * stable.
+ */
+const SECTIONS = [
+  { id: "positioning", number: "01", label: "What Gradlly builds" },
+  { id: "the-problem", number: "02", label: "The problem" },
+  { id: "continuo", number: "03", label: "Continuo" },
+  { id: "the-record", number: "04", label: "What a record carries" },
+  { id: "compliance", number: "05", label: "Compliance evidence" },
+  { id: "passport", number: "06", label: "Apprenticeship Passport" },
+  { id: "how-it-works", number: "07", label: "How it works" },
+  { id: "states", number: "08", label: "Every state, designed" },
+  { id: "who-its-for", number: "09", label: "Who it's for" },
+  { id: "book-a-demo", number: "10", label: "Book a demo" },
+];
+
 const {
   products,
+  positioning,
+  recordItems,
+  capabilities,
   problems,
   continuoCore,
   continuoGroups,
@@ -143,7 +176,95 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* ── The problem, §3 ──────────────────────────────────────────────── */}
+      {/* Local navigation. The global nav says which product area you are in;
+          this says which part of it you are reading, which is a different
+          question and needs its own control. Sticky rail at desktop, horizontal
+          scroller at mobile, same order either way. */}
+      <div className="sticky top-17 z-40 border-y border-hairline bg-cream/95 py-3 backdrop-blur-sm lg:hidden">
+        <div className="mx-auto max-w-[1200px]">
+          <SectionNav sections={SECTIONS} />
+        </div>
+      </div>
+
+      {/* ── 01 What Gradlly builds. The positioning table from the approved
+             copy, which no version of this site has used until now. ────────── */}
+      <Band id="positioning">
+        <Grid>
+          <Col span="col-span-4 md:col-span-6 lg:col-span-4">
+            <Ref number="01">What Gradlly builds</Ref>
+            <h2 className="display mt-6 max-w-[11ch] text-section text-ink">
+              Two products and a Passport.
+            </h2>
+          </Col>
+          <Col span="col-span-4 md:col-span-6 lg:col-span-7 lg:col-start-6">
+            <table className="table-stack w-full border-collapse text-left">
+              <caption className="sr-only">
+                Gradlly products, what each one is, and who buys it
+              </caption>
+              <thead>
+                <tr className="border-b border-ink">
+                  <th
+                    scope="col"
+                    className="py-3 pr-6 text-caption font-medium text-ink-muted md:w-40"
+                  >
+                    Product
+                  </th>
+                  <th
+                    scope="col"
+                    className="py-3 pr-6 text-caption font-medium text-ink-muted"
+                  >
+                    What it is
+                  </th>
+                  <th
+                    scope="col"
+                    className="py-3 text-caption font-medium text-ink-muted md:w-44"
+                  >
+                    Who buys it
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {positioning.map(({ product, what, who, mark, href }) => (
+                  <tr
+                    key={product}
+                    className="border-b border-hairline align-top"
+                  >
+                    <th scope="row" className="py-5 pr-6 text-left font-normal">
+                      <span className="flex items-start gap-3">
+                        <span
+                          className="mark mt-1.5 h-4"
+                          style={{ "--mark": MARK_VAR[mark] }}
+                          aria-hidden
+                        />
+                        <a
+                          href={href}
+                          className="display text-subhead text-ink underline decoration-ink/20 decoration-1 underline-offset-[5px] transition-colors duration-200 ease-out hover:decoration-ink"
+                        >
+                          {product}
+                        </a>
+                      </span>
+                    </th>
+                    <td
+                      data-label="What it is"
+                      className="py-5 pr-6 text-body-sm text-ink-soft"
+                    >
+                      {what}
+                    </td>
+                    <td
+                      data-label="Who buys it"
+                      className="py-5 text-caption text-ink-muted"
+                    >
+                      {who}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Col>
+        </Grid>
+      </Band>
+
+      {/* ── 02 The problem, §3 ───────────────────────────────────────────── */}
       <Band id="the-problem" tone="sand">
         <BandHead
           id="the-problem-heading"
@@ -222,7 +343,67 @@ export default function HomePage() {
         </div>
       </Band>
 
-      {/* ── Passport, §6 ─────────────────────────────────────────────────── */}
+      {/* ── 04 What a record carries. List and detail, over the approved
+             §4 content. ──────────────────────────────────────────────────── */}
+      <Band id="the-record" tone="linen">
+        <Grid className="items-end">
+          <Col span="col-span-4 md:col-span-6 lg:col-span-5">
+            <Ref number="04" tone="olive">
+              What a record carries
+            </Ref>
+            <h2 className="display mt-6 max-w-[12ch] text-section text-ink">
+              Every line, and who stands behind it.
+            </h2>
+          </Col>
+          <Col span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7">
+            <p className="measure text-lead text-ink-soft">
+              A Continuo record is not one document. Filter it, open a line, and
+              the confirmation behind it is the thing you are reading.
+            </p>
+          </Col>
+        </Grid>
+
+        <div className="mt-16">
+          <ListDetail items={recordItems} label="what a record carries" />
+        </div>
+      </Band>
+
+      {/* ── 05 Compliance evidence, with the table and its toolbar. ───────── */}
+      <Band id="compliance">
+        <Grid>
+          <Col span="col-span-4 md:col-span-6 lg:col-span-5">
+            <Ref number="05" tone="olive">
+              Compliance evidence
+            </Ref>
+            <h2 className="display mt-6 max-w-[13ch] text-section text-ink">
+              Organised by obligation, not by folder.
+            </h2>
+            <p className="measure mt-6 text-body text-ink-soft">
+              Proof organised by each regulated obligation, not buried in
+              folders. Gaps and upcoming lapses flagged before they become
+              breaches. Evidence packs for any regulator, funder or client
+              audit, on demand.
+            </p>
+
+            <div className="mt-10">
+              {capabilities.map(({ summary, detail }) => (
+                <Disclose key={summary} summary={summary}>
+                  {detail}
+                </Disclose>
+              ))}
+            </div>
+          </Col>
+          <Col span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7">
+            <TableToolbarMock />
+            <p className="mt-4 text-caption text-ink-muted">
+              Search, filters, sort, view settings and the export action sit
+              together above the data they control.
+            </p>
+          </Col>
+        </Grid>
+      </Band>
+
+      {/* ── 06 Passport, §6 ──────────────────────────────────────────────── */}
       <Band id="passport" tone="linen">
         <BandHead
           id="passport-heading"
@@ -315,7 +496,31 @@ export default function HomePage() {
         </div>
       </Band>
 
-      {/* ── Who it's for, §8 ─────────────────────────────────────────────── */}
+      {/* ── 08 Every state, designed. ────────────────────────────────────── */}
+      <Band id="states" tone="linen">
+        <Grid className="items-end">
+          <Col span="col-span-4 md:col-span-6 lg:col-span-5">
+            <Ref number="08">Every state, designed</Ref>
+            <h2 className="display mt-6 max-w-[13ch] text-section text-ink">
+              Including the ones nobody demos.
+            </h2>
+          </Col>
+          <Col span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7">
+            <p className="measure text-body text-ink-soft">
+              A cohort with nobody in it yet. A DAS call that times out. An
+              evidence pack that is ready. Designing only the populated screen
+              is how a product ships something that breaks the first time
+              reality is not ideal, so every screen in Gradlly has its empty,
+              loading, error and confirmed states drawn.
+            </p>
+          </Col>
+        </Grid>
+        <div className="mt-14">
+          <StatesMock />
+        </div>
+      </Band>
+
+      {/* ── 09 Who it's for, §8 ──────────────────────────────────────────── */}
       <Band id="who-its-for" tone="sand">
         <BandHead id="who-its-for-heading">
           Built for each side of the journey.
