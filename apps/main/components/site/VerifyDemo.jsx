@@ -5,26 +5,30 @@ import { useCallback, useEffect, useRef, useState } from "react";
 /**
  * The hero: a record confirming itself.
  *
- * ── WHY THIS AND NOT A HEADLINE WITH CARDS ──────────────────────────────────
+ * ── WHAT CHANGED IN THE REBUILD, AND WHAT DID NOT ───────────────────────────
  *
- * The most characteristic thing in this product's world is not a dashboard. It
- * is the moment a claim becomes proof: a line that says someone can do
- * something, and then a named person standing behind it. That is the entire
- * proposition, and it is a change over time, which means the honest way to show
- * it is to let it happen rather than to describe it in a paragraph beside a
- * static screenshot.
+ * The confirming animation is the one piece of the first hero that survives
+ * untouched: three lines start as claims, the mark grows in, the status flips
+ * to who confirmed it. That is still the most characteristic thing in this
+ * product's world — the moment a claim becomes proof — and nothing about the
+ * new reference argues against showing it; the reference just wants it inside
+ * a single, more literal product card rather than a floating collage of three.
  *
- * So the hero runs it. Three lines start as claims. One by one the mark draws
- * in, the status flips, and the confirmation attaches. It plays once, settles,
- * and offers to run again.
+ * So the collage is gone (see the removed HeroStack.jsx) and this card grew a
+ * header and a footer to match: a breadcrumb and a status pill above the
+ * confirming list, a readiness checklist below it. Both of the new zones are
+ * built from data that already existed elsewhere in this codebase —
+ * the readiness criteria are the same three HeroStack used to show in its own
+ * floating plate — not invented for the new layout.
  *
  * ── WHAT IT CONTAINS, AND DOES NOT ──────────────────────────────────────────
  *
  * The skills and the confirmer roles are content-v1.md's own words: "Confirmed
  * by whoever assessed or observed them", "Verified at source". There are no
- * names, no dates and no figures, because the thing being demonstrated is the
- * attaching, not a value. Where a date would sit there is a neutral block, the
- * same convention the other product visuals use.
+ * names, no dates and no figures. Where a date would sit there is a neutral
+ * block. The readiness checklist's "2 of 3" is counted from the three rows
+ * actually rendered, not a separate claim — change a row's state and the count
+ * changes with it, because it is derived, not written down twice.
  *
  * ── MOTION ──────────────────────────────────────────────────────────────────
  *
@@ -44,25 +48,55 @@ const LINES = [
     claim: "Moving and handling",
     kind: "Skill",
     by: "Confirmed by the assessor who observed it",
-    mark: "olive",
   },
   {
     id: "check",
     claim: "Right to work",
     kind: "Check",
     by: "Verified at source, live between jobs",
-    mark: "olive",
   },
   {
     id: "signoff",
     claim: "Competence sign-off",
     kind: "Sign-off",
     by: "Confirmed by the manager this quarter",
-    mark: "olive",
   },
 ];
 
+/** The same three gateway criteria the old HeroStack plate showed. Moved here
+    rather than duplicated, now that there is one card instead of three. */
+const READINESS = [
+  { criterion: "Off-the-job hours", met: true },
+  { criterion: "KSB coverage", met: true },
+  { criterion: "Employer sign-off", met: false },
+];
+const READY_COUNT = READINESS.filter((row) => row.met).length;
+
 const STEP_MS = 900;
+
+function CheckIcon({ met }) {
+  return (
+    <span
+      className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
+        met
+          ? "border-olive bg-olive text-linen"
+          : "border-hairline-dark text-transparent"
+      }`}
+      aria-hidden
+    >
+      <svg width="9" height="9" viewBox="0 0 9 9">
+        <path
+          d="M1.5 4.6 L3.4 6.5 L7.5 2"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </span>
+  );
+}
 
 export function VerifyDemo() {
   // -1 is the resting state before anything has confirmed. Starting at LINES
@@ -98,18 +132,13 @@ export function VerifyDemo() {
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reduced.matches) {
-      // The control still appears; only the arrival sequence is suppressed.
       const show = setTimeout(() => setMounted(true), 0);
       return () => clearTimeout(show);
     }
 
-    // Scheduled rather than called in the effect body: setState there causes a
-    // cascading render, and a frame's delay is imperceptible.
-    //
-    // It used to wait 700ms, which meant the record rendered confirmed and then
-    // visibly blanked itself before rebuilding. The server-rendered state has
-    // to stay confirmed, because that is what is correct with no JavaScript, so
-    // the reset happens as early as it can instead.
+    // Scheduled rather than called in the effect body, and as early as
+    // possible: the server-rendered state is confirmed, which is correct with
+    // no JavaScript, so there is no visible blank-and-rebuild on arrival.
     const show = setTimeout(() => setMounted(true), 0);
     const start = setTimeout(play, 60);
     return () => {
@@ -120,14 +149,30 @@ export function VerifyDemo() {
   }, [play]);
 
   return (
-    <figure className="plate">
-      {/* The control used to sit here, at the top right. In the hero it is a
-          collage now, and the plate that overlaps this one crosses exactly that
-          corner: a button under another card is a button nobody can press. It
-          moved to the footer, beside the line it belongs with. */}
-      <figcaption className="border-b border-hairline px-6 py-4 text-caption text-ink-muted">
-        One worker, one record
-      </figcaption>
+    <figure className="shadow-card-lg overflow-hidden rounded-card border border-hairline bg-linen">
+      {/* The header: a breadcrumb for context, a status pill for the claim
+          the whole card rests on. Both read from real copy — "Continuo",
+          "record" and "Verified" all appear in content-v1.md. */}
+      <div className="flex items-center justify-between gap-4 border-b border-hairline px-6 py-4">
+        <p className="flex items-baseline gap-2 text-caption text-ink-muted">
+          <span>Continuo</span>
+          <span aria-hidden>›</span>
+          <span className="font-medium text-ink">One worker, one record</span>
+        </p>
+        <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-olive/10 px-2.5 py-1 text-caption font-medium text-olive">
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden>
+            <path
+              d="M1.5 5.2 L3.8 7.5 L8.5 2.3"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          Verified
+        </span>
+      </div>
 
       <ul className="list-none px-6">
         {LINES.map(({ id, claim, kind, by }, index) => {
@@ -150,10 +195,6 @@ export function VerifyDemo() {
               />
 
               <span className="min-w-0 flex-1">
-                {/* Stacked at phone width, side by side above it. Left to
-                    wrap, the kind dropped below the claim on the two long rows
-                    and stayed inline on the short one, so three identical rows
-                    rendered in two different shapes. */}
                 <span className="flex flex-col gap-x-4 gap-y-0.5 sm:flex-row sm:items-baseline sm:justify-between">
                   <span className="text-body font-medium text-ink">
                     {claim}
@@ -196,22 +237,50 @@ export function VerifyDemo() {
         })}
       </ul>
 
-      {/*
-        The one line that says what just happened, for anyone who cannot see it
-        happen. Polite, so it is not read over the headline on arrival.
-      */}
       <p className="sr-only" role="status" aria-live="polite">
         {confirmed === LINES.length
           ? "All three lines confirmed."
           : `${confirmed} of ${LINES.length} lines confirmed.`}
       </p>
 
-      {/* The footer used to carry "Nothing on a Continuo record is a claim.
-          Every line carries whoever confirmed it." The three rows above say
-          exactly that, each naming who confirmed it, and §3 says it again in
-          the copy. It went so that the card's bottom-right corner is free for
-          the plate that crosses it, and because a card that demonstrates a
-          thing does not also need to assert it. */}
+      {/* The readiness strip. Counted from the rows beside it, not written as
+          a separate figure — the same three criteria HeroStack used to carry
+          in its own floating plate, before this became one card instead of
+          three. */}
+      <div className="border-t border-hairline bg-sand/30 px-6 py-5">
+        <div className="flex items-center justify-between gap-4">
+          <p className="text-caption font-medium text-ink-muted">
+            Gateway readiness
+          </p>
+          <p className="text-caption text-ink-muted">
+            {READY_COUNT} of {READINESS.length} met
+          </p>
+        </div>
+        <span
+          className="mt-3 block h-1.5 overflow-hidden rounded-full bg-sand"
+          aria-hidden
+        >
+          <span
+            className="block h-full rounded-full bg-olive transition-all duration-500 ease-out"
+            style={{
+              width: `${(READY_COUNT / READINESS.length) * 100}%`,
+            }}
+          />
+        </span>
+        <ul className="mt-4 list-none space-y-2.5">
+          {READINESS.map(({ criterion, met }) => (
+            <li key={criterion} className="flex items-center gap-2.5">
+              <CheckIcon met={met} />
+              <span
+                className={`text-body-sm ${met ? "text-ink" : "text-ink-muted"}`}
+              >
+                {criterion}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <div className="border-t border-hairline px-6 py-4">
         {mounted ? (
           <button
@@ -223,8 +292,6 @@ export function VerifyDemo() {
             {playing ? "Confirming" : "Watch it confirm"}
           </button>
         ) : (
-          /* Holds the footer's height before hydration so the collage above it
-             does not reflow when the control appears. */
           <span aria-hidden className="block h-[30px]" />
         )}
       </div>

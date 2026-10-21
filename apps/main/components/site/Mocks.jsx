@@ -19,14 +19,14 @@
  * the real interface changes.
  */
 
-/** The frame. Linen on cream, a hairline, 24px, and the one place a shadow is
-    allowed: an overlapping product visual, which the brief permits. */
+/** The frame every product visual shares: white, bordered, a shadow lifting
+    it off the page. The one shared surface treatment of this rebuild. */
 function Frame({ label, mark = "olive", children, className = "" }) {
   const dot = mark === "terracotta" ? "bg-terracotta" : "bg-olive";
 
   return (
     <figure
-      className={`overflow-hidden rounded-card border border-hairline bg-linen ${className}`}
+      className={`shadow-card overflow-hidden rounded-card border border-hairline bg-linen ${className}`}
     >
       <figcaption className="flex items-center gap-2.5 border-b border-hairline px-6 py-4">
         <span className={`h-1.5 w-1.5 rounded-full ${dot}`} aria-hidden />
@@ -376,7 +376,7 @@ export function StatesMock({ className = "" }) {
       {states.map(({ name, body, action, mark }) => (
         <div
           key={name}
-          className="rounded-card border border-hairline bg-linen p-5"
+          className="shadow-card rounded-card border border-hairline bg-linen p-5"
         >
           <p className="flex items-center gap-2.5 text-caption text-ink-muted">
             <span

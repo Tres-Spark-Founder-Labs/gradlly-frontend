@@ -7,12 +7,10 @@ import {
   ShareDiagram,
 } from "@/components/site/Diagrams";
 import { Col, Disclose, Grid, Ref, StickyPair } from "@/components/site/Grid";
-import { HeroStack } from "@/components/site/HeroStack";
 import { ListDetail } from "@/components/site/ListDetail";
 import { PassportMock, TableToolbarMock } from "@/components/site/Mocks";
 import { Reveal } from "@/components/site/Reveal";
 import { SectionNav } from "@/components/site/SectionNav";
-import { Field } from "@/components/site/Texture";
 import {
   Accent,
   Attestation,
@@ -23,35 +21,37 @@ import {
   SpecList,
   TextLink,
 } from "@/components/site/ui";
+import { VerifyDemo } from "@/components/site/VerifyDemo";
 import { SITE } from "@/config/site.config";
 import { CONTENT } from "@/content/landing";
 
 /**
  * One page, carrying content-v1.md sections 2 to 9.
  *
- * §5 Gradlly AMS lives at /gradlly-ams, which is the original approved design,
- * so the nav item and the Passport section link out to it rather than repeating
- * it here.
- */
-/**
- * The page index.
+ * ── THE SECOND REBUILD ───────────────────────────────────────────────────────
  *
- * Eleven sections is long enough that a reader needs to see the shape of it,
- * and long enough that the local navigation is a requirement rather than a
- * nicety. The numbers are referenced from the prose, so they have to be
- * stable.
+ * The first restyle of this file put a dark olive panel behind the hero, gave
+ * every section a numbered reference in place of an eyebrow, and built a bento
+ * of glass cards for the Continuo pillars. All three retired on a brief that
+ * named a lighter, more conventional reference and said plainly that the first
+ * system was being replaced, not extended: see the comment at the top of
+ * globals.css for what carried across and what did not.
+ *
+ * §5 Gradlly AMS still lives at /gradlly-ams, which is the original approved
+ * design and was out of scope for this rebuild, so the nav item and the
+ * Passport section link out to it rather than repeating it here.
  */
 const SECTIONS = [
-  { id: "positioning", number: "01", label: "What Gradlly builds" },
-  { id: "the-problem", number: "02", label: "The problem" },
-  { id: "continuo", number: "03", label: "Continuo" },
-  { id: "the-record", number: "04", label: "The record" },
-  { id: "compliance", number: "05", label: "Compliance evidence" },
-  { id: "portals", number: "06", label: "The four portals" },
-  { id: "passport", number: "07", label: "Apprenticeship Passport" },
-  { id: "how-it-works", number: "08", label: "How it works" },
-  { id: "who-its-for", number: "09", label: "Who it's for" },
-  { id: "book-a-demo", number: "10", label: "Book a demo" },
+  { id: "positioning", label: "What Gradlly builds" },
+  { id: "the-problem", label: "The problem" },
+  { id: "continuo", label: "Continuo" },
+  { id: "the-record", label: "The record" },
+  { id: "compliance", label: "Compliance evidence" },
+  { id: "portals", label: "The four portals" },
+  { id: "passport", label: "Apprenticeship Passport" },
+  { id: "how-it-works", label: "How it works" },
+  { id: "who-its-for", label: "Who it's for" },
+  { id: "book-a-demo", label: "Book a demo" },
 ];
 
 const {
@@ -79,81 +79,63 @@ export default function HomePage() {
   return (
     <>
       {/* ── Hero, §2 ─────────────────────────────────────────────────────────
-             A deep olive panel with the copy on it and a collage of light
-             plates over it, which is the composition the reference boards are
-             built around. The light hero this replaced put a single card beside
-             a headline on cream: correct, quiet, and the same opening as every
-             other product site. The panel is the one place on the page that
-             raises its voice, and it earns that by being the only one.
-
-             The record still confirms itself inside it. See VerifyDemo for why
-             a demonstration and not a static screenshot, and HeroStack for what
-             the two smaller plates carry and why neither holds a number. ───── */}
-      <header className="relative px-4 pb-16 pt-8 md:px-8 md:pb-24 md:pt-10 lg:px-12">
+             Plain cream, no panel. The headline sits directly on the page, in
+             near-black with one olive word, which is the whole of what the new
+             reference's hero does with colour. The record still confirms
+             itself beside it — see VerifyDemo for what changed there and what
+             did not. ──────────────────────────────────────────────────────── */}
+      <header className="relative px-4 pb-20 pt-14 md:px-8 md:pb-28 md:pt-20 lg:px-12">
         <div className="mx-auto max-w-[1200px]">
-          <div className="hero-panel on-olive px-6 py-14 md:px-10 md:py-16 lg:px-14 lg:py-20">
-            {/* Warm light in the corners of the panel, clipped to its radius.
-                Terracotta rather than olive: olive on olive is invisible. */}
-            <div className="hero-panel-texture">
-              <Field tone="terracotta" density="soft" />
-            </div>
-
-            <Grid className="items-center">
-              <Col
-                span="col-span-4 md:col-span-6 xl:col-span-5"
-                className="hero-copy"
+          <Grid className="items-center">
+            <Col span="col-span-4 md:col-span-6 lg:col-span-5">
+              <p
+                className="enter flex items-center gap-2.5 text-caption text-ink-muted"
+                style={{ "--enter-delay": "0ms" }}
               >
-                <p
-                  className="enter flex items-center gap-3 text-caption text-linen/70"
-                  style={{ "--enter-delay": "0ms" }}
-                >
-                  <span
-                    className="mark h-3.5"
-                    style={{ "--mark": "var(--color-chartreuse)" }}
-                    aria-hidden
-                  />
-                  Verified skills and apprenticeships, for UK regulated work
-                </p>
+                <span
+                  className="h-1.5 w-1.5 rounded-full bg-olive"
+                  aria-hidden
+                />
+                Verified skills and apprenticeships, for UK regulated work
+              </p>
 
-                <h1
-                  className="enter display mt-8 max-w-[11ch] text-display text-chartreuse"
-                  style={{ "--enter-delay": "120ms" }}
-                >
-                  From trained to <Accent>trusted</Accent>.
-                </h1>
-
-                <p
-                  className="enter measure-lead mt-9 text-lead text-linen/75"
-                  style={{ "--enter-delay": "260ms" }}
-                >
-                  Skills you can prove. Workers you can trust.
-                </p>
-
-                <div
-                  className="enter mt-9 flex flex-col gap-3 sm:flex-row"
-                  style={{ "--enter-delay": "340ms" }}
-                >
-                  <Button href="/#book-a-demo">Book a demo</Button>
-                  <Button href="/#how-it-works" variant="outline-olive">
-                    See how it works
-                  </Button>
-                </div>
-              </Col>
-
-              <Col
-                span="col-span-4 md:col-span-6 xl:col-span-6 xl:col-start-7"
-                className="mt-10 xl:mt-0"
+              <h1
+                className="enter display mt-7 max-w-[11ch] text-display text-ink"
+                style={{ "--enter-delay": "120ms" }}
               >
-                <div className="enter" style={{ "--enter-delay": "420ms" }}>
-                  <HeroStack />
-                </div>
-              </Col>
-            </Grid>
-          </div>
+                From trained to <Accent>trusted</Accent>.
+              </h1>
+
+              <p
+                className="enter measure-lead mt-8 text-lead text-ink-soft"
+                style={{ "--enter-delay": "260ms" }}
+              >
+                Skills you can prove. Workers you can trust.
+              </p>
+
+              <div
+                className="enter mt-9 flex flex-col gap-3 sm:flex-row"
+                style={{ "--enter-delay": "340ms" }}
+              >
+                <Button href="/#book-a-demo">Book a demo</Button>
+                <Button href="/#how-it-works" variant="outline">
+                  See how it works
+                </Button>
+              </div>
+            </Col>
+
+            <Col
+              span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7"
+              className="mt-12 lg:mt-0"
+            >
+              <div className="enter" style={{ "--enter-delay": "420ms" }}>
+                <VerifyDemo />
+              </div>
+            </Col>
+          </Grid>
 
           {/* The body copy and the two products, below the fold rather than
-              crowding the demonstration. A reader who has watched a line
-              confirm itself already knows what the paragraph is going to say. */}
+              crowding the demonstration. */}
           <Grid className="mt-20 rule-top-hair">
             <Col span="col-span-4 md:col-span-6 lg:col-span-5">
               <p className="measure text-body text-ink-soft">
@@ -196,25 +178,22 @@ export default function HomePage() {
       </header>
 
       {/* Local navigation. The global nav says which product area you are in;
-          this says which part of it you are reading, which is a different
-          question and needs its own control. Sticky rail at desktop, horizontal
-          scroller at mobile, same order either way. */}
+          this says which part of it you are reading. */}
       <div className="sticky top-17 z-40 border-y border-hairline bg-cream/95 py-3 backdrop-blur-sm lg:hidden">
         <div className="mx-auto max-w-[1200px]">
           <SectionNav sections={SECTIONS} />
         </div>
       </div>
 
-      {/* ── 01 What Gradlly builds. The positioning table from the approved
-             copy, which no version of this site has used until now. ────────── */}
+      {/* ── 01 What Gradlly builds. ─────────────────────────────────────────── */}
       <Band id="positioning" labelledBy="positioning-heading">
         <StickyPair
           aside={
             <Reveal>
-              <Ref number="01">What Gradlly builds</Ref>
+              <Ref>What Gradlly builds</Ref>
               <h2
                 id="positioning-heading"
-                className="display mt-6 max-w-[11ch] text-section text-ink"
+                className="display mt-5 max-w-[11ch] text-section text-ink"
               >
                 Two products and a Passport.
               </h2>
@@ -298,10 +277,10 @@ export default function HomePage() {
         <StickyPair
           aside={
             <Reveal>
-              <Ref number="02">The problem</Ref>
+              <Ref>The problem</Ref>
               <h2
                 id="the-problem-heading"
-                className="display mt-6 max-w-[12ch] text-section text-ink"
+                className="display mt-5 max-w-[12ch] text-section text-ink"
               >
                 Proof gets rebuilt at every step. It shouldn&rsquo;t.
               </h2>
@@ -316,8 +295,6 @@ export default function HomePage() {
             <SpecList items={problems} />
           </Reveal>
 
-          {/* The second problem, drawn. "Not buried in folders" is a claim
-              every compliance product makes and nobody illustrates. */}
           <Reveal className="mt-14">
             <EvidenceCompare />
           </Reveal>
@@ -328,7 +305,6 @@ export default function HomePage() {
       <Band id="continuo" labelledBy="continuo-heading">
         <BandHead
           id="continuo-heading"
-          number="03"
           tone="olive"
           eyebrow="For employers and agencies in regulated work"
           note="Continuo proves what a worker can do, backed by the checks that show they're cleared to do it, and keeps that proof true between jobs, not just at the moment of hire. The record belongs to the worker, and it's free for them, always."
@@ -336,25 +312,16 @@ export default function HomePage() {
           Continuo. Verified skills for the workforce.
         </BandHead>
 
-        {/* The claim the product rests on, on the page's one olive surface.
-
-            An editorial split: one message on the left, its four supporting
-            points on the right, both centred against each other so the panel
-            reads as a spread rather than as a box with a heading in the corner.
-            Roughly 40/60 rather than the 45/55 it was, because the points carry
-            more words than the message and the measure should follow the
-            content, not the other way round.
-
-            Stacked and left aligned below the large breakpoint, with the panel
-            padding down to 24px: at 390 the old 28px inset left the text in a
-            column barely wider than its own measure. */}
-        <div className="on-olive mt-16 rounded-card bg-olive px-6 py-12 text-linen md:px-14 md:py-16">
+        {/* The claim the product rests on. This used to be the page's one
+            solid-olive surface; it is a card now, like everything else, with
+            olive carrying the heading and the rule rather than the fill. */}
+        <div className="shadow-card mt-16 rounded-card border-2 border-olive bg-linen px-6 py-12 md:px-14 md:py-16">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,6fr)] lg:items-center lg:gap-24">
             <Reveal>
-              <h3 className="display max-w-[12ch] text-section text-linen">
+              <h3 className="display max-w-[12ch] text-section text-olive">
                 Verified skills, not claimed ones.
               </h3>
-              <p className="measure mt-6 text-body text-linen/75">
+              <p className="measure mt-6 text-body text-ink-soft">
                 Every skill on a Continuo record is confirmed by the trainer,
                 assessor or employer who saw it, with the date and the evidence.
                 Employers hire and deploy on what workers can actually do, not
@@ -362,64 +329,48 @@ export default function HomePage() {
               </p>
             </Reveal>
             <Reveal>
-              <SpecList items={continuoCore} dark />
+              <SpecList items={continuoCore} />
             </Reveal>
           </div>
         </div>
 
-        {/* Three equal columns of hairline-ruled text was the most basic thing
-            on the page: same width, same weight, same rhythm, nothing arriving.
-
-            Now a bento over a field of drifting colour. Six columns, three
-            cells of two sizes: a wide cell, a tall narrow one beside it, and a
-            second wide cell under the first. The sizes are not arbitrary —
-            "Verified checks" and "Continuous, not one-off" carry the longer
-            lines and take the wide cells; the evidence engine's three points
-            are short and read well in a tall column.
-
-            The wrapper isolates so the field stays behind the cards rather
-            than escaping behind the band. See .glass in globals.css for why
-            the blur needs something to blur and what happens without it.
-
-            Two animations, nested: the grid staggers the cards in, and each
-            card's list staggers its own points. That is the text arriving,
-            which is what was missing. */}
-        <div className="relative isolate mt-20 overflow-hidden rounded-card">
-          <Field tone="mixed" density="strong" />
-
-          <Reveal className="grid gap-5 lg:grid-cols-6" stagger={120}>
-            {continuoGroups.map(({ title, points }, index) => (
-              <div
-                key={title}
-                className={`glass p-7 md:p-9 ${
-                  index === 1 ? "lg:col-span-2 lg:row-span-2" : "lg:col-span-4"
-                }`}
+        {/* Three pillars, each with its three points. The first rebuild drew
+            these as a bento of glass cards over a drifting field; both retired
+            with the panel. What is left is plainer and, for a page that is
+            light everywhere else now, more consistent: three equal cards,
+            shadowed like every other card, the text arriving with a stagger
+            rather than a blurred backdrop doing the work of holding a
+            reader's attention. */}
+        <Reveal className="mt-20 grid gap-5 md:grid-cols-3" stagger={100}>
+          {continuoGroups.map(({ title, points }) => (
+            <div
+              key={title}
+              className="shadow-card rounded-card border border-hairline bg-linen p-7 md:p-8"
+            >
+              <span
+                className="mark mb-6 h-3.5"
+                style={{ "--mark": "var(--color-olive)" }}
+                aria-hidden
+              />
+              <h3 className="display text-subhead text-ink">{title}</h3>
+              <Reveal
+                as="ul"
+                className="mt-5 list-none"
+                stagger={70}
+                distance={12}
               >
-                <span
-                  className="mark mb-6 h-3.5"
-                  style={{ "--mark": "var(--color-olive)" }}
-                  aria-hidden
-                />
-                <h3 className="display text-subhead text-ink">{title}</h3>
-                <Reveal
-                  as="ul"
-                  className="mt-5 list-none"
-                  stagger={70}
-                  distance={12}
-                >
-                  {points.map((point) => (
-                    <li
-                      key={point}
-                      className="border-t border-hairline py-4 text-body-sm text-ink-soft"
-                    >
-                      {point}
-                    </li>
-                  ))}
-                </Reveal>
-              </div>
-            ))}
-          </Reveal>
-        </div>
+                {points.map((point) => (
+                  <li
+                    key={point}
+                    className="border-t border-hairline py-4 text-body-sm text-ink-soft"
+                  >
+                    {point}
+                  </li>
+                ))}
+              </Reveal>
+            </div>
+          ))}
+        </Reveal>
 
         <div className="mt-20">
           <h3 className="display text-section text-ink">
@@ -436,29 +387,18 @@ export default function HomePage() {
         </div>
       </Band>
 
-      {/* ── 04 What a record carries. List and detail, over the approved
-             §4 content. ──────────────────────────────────────────────────── */}
+      {/* ── 04 What a record carries. ───────────────────────────────────── */}
       <Band id="the-record" tone="linen" labelledBy="the-record-heading">
-        {/* A flat three-column composition rather than StickyPair's nested
-            aside+content: intro 4/12, selector 3/12, detail 5/12, which is
-            what distinguishes this section from 02 and 05. ListDetail owns the
-            3fr/5fr split of its own 8-column host, so the figures here are
-            4 and 8, and 3:5 is set inside that component. At md both columns
-            are full width, which stacks them — intro first, then the selector
-            and detail ListDetail already lays out side by side on its own.
-            Below md, ListDetail collapses to the single-open accordion. */}
         <Grid className="lg:items-start">
           <Col
             span="col-span-4 md:col-span-6 lg:col-span-4"
             className="lg:sticky lg:top-28"
           >
             <Reveal>
-              <Ref number="04" tone="olive">
-                The record
-              </Ref>
+              <Ref tone="olive">The record</Ref>
               <h2
                 id="the-record-heading"
-                className="display mt-6 max-w-[12ch] text-section text-ink"
+                className="display mt-5 max-w-[12ch] text-section text-ink"
               >
                 Every line, and who stands behind it.
               </h2>
@@ -479,10 +419,6 @@ export default function HomePage() {
           </Col>
         </Grid>
 
-        {/* Sharing was its own section before it was folded in here. It
-            answers the same question as the list above it, which is what a
-            record is and who gets to see it, so it stays below the pair
-            rather than crowding into one of the three columns. */}
         <Reveal className="mt-16">
           <h3 className="display text-subhead text-ink">
             What the worker shares
@@ -497,12 +433,10 @@ export default function HomePage() {
       <Band id="compliance" labelledBy="compliance-heading">
         <Grid>
           <Col span="col-span-4 md:col-span-6 lg:col-span-5">
-            <Ref number="05" tone="olive">
-              Compliance evidence
-            </Ref>
+            <Ref tone="olive">Compliance evidence</Ref>
             <h2
               id="compliance-heading"
-              className="display mt-6 max-w-[13ch] text-section text-ink"
+              className="display mt-5 max-w-[13ch] text-section text-ink"
             >
               Organised by obligation, not by folder.
             </h2>
@@ -521,32 +455,23 @@ export default function HomePage() {
               ))}
             </div>
           </Col>
-          {/* Sticky the other way round from StickyPair: here the left column
-              is the long one, because the disclosures open into it, so the
-              toolbar is what should stay in view while they are read. */}
           <Col
             span="col-span-4 md:col-span-6 lg:col-span-6 lg:col-start-7"
             className="lg:sticky lg:top-28"
           >
-            {/* Search, status tabs, filters and the export actions sitting
-                together above the data they control, which is the whole claim
-                of this section: evidence organised by the obligation it
-                answers, reachable without opening a folder. */}
             <TableToolbarMock />
           </Col>
         </Grid>
       </Band>
 
-      {/* ── 06 The four portals, and what the Forge does. ─────────────────────────────────────────── */}
+      {/* ── 06 The four portals, and what the Forge does. ─────────────────── */}
       <Band id="portals" labelledBy="portals-heading">
         <Grid className="items-end">
           <Col span="col-span-4 md:col-span-6 lg:col-span-5">
-            <Ref number="06" tone="terracotta">
-              The four portals
-            </Ref>
+            <Ref tone="terracotta">The four portals</Ref>
             <h2
               id="portals-heading"
-              className="display mt-6 max-w-[13ch] text-section text-ink"
+              className="display mt-5 max-w-[13ch] text-section text-ink"
             >
               Four doors onto one apprenticeship.
             </h2>
@@ -568,8 +493,6 @@ export default function HomePage() {
           <PortalMap />
         </Reveal>
 
-        {/* Levy transfer was its own section. It is what the fourth portal
-            does, so a separate one described a part as though it were a peer. */}
         <Reveal className="mt-20">
           <h3 className="display max-w-[16ch] text-section text-ink">
             What the Forge does.
@@ -589,7 +512,6 @@ export default function HomePage() {
       <Band id="passport" tone="linen" labelledBy="passport-heading">
         <BandHead
           id="passport-heading"
-          number="07"
           eyebrow="Included with Gradlly AMS"
           tone="terracotta"
           note="Every apprentice leaves with a verified record of what they achieved. It's built automatically as they train, owned by them, and free for them."
@@ -624,15 +546,12 @@ export default function HomePage() {
             <PassportMock />
           </div>
         </div>
-
-        <div className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-14"></div>
       </Band>
 
       {/* ── 08 How it works, §7 ─────────────────────────────────────────────── */}
       <Band id="how-it-works" labelledBy="how-it-works-heading">
         <BandHead
           id="how-it-works-heading"
-          number="08"
           note="Two products, two flows. Each works on its own."
         >
           How it works
@@ -698,16 +617,18 @@ export default function HomePage() {
       <Band id="who-its-for" tone="sand" labelledBy="who-its-for-heading">
         <BandHead
           id="who-its-for-heading"
-          number="09"
           eyebrow="Who it's for"
           note="Four audiences reading the same record from different sides."
         >
           Built for each side of the journey.
         </BandHead>
 
-        <ul className="mt-16 grid list-none gap-14 md:grid-cols-2 md:gap-x-20">
+        <ul className="mt-16 grid list-none gap-6 md:grid-cols-2">
           {audiences.map(({ who, detail, products: owned }) => (
-            <li key={who}>
+            <li
+              key={who}
+              className="shadow-card rounded-card border border-hairline bg-linen p-7"
+            >
               <span className="flex gap-1.5" aria-hidden>
                 {owned.map(({ name, mark }) => (
                   <span
@@ -737,7 +658,6 @@ export default function HomePage() {
       <Band id="book-a-demo" labelledBy="book-a-demo-heading">
         <BandHead
           id="book-a-demo-heading"
-          number="10"
           eyebrow="Book a demo"
           note="Whether you hire into regulated roles or run apprenticeships, we'll walk you through the parts of Gradlly that matter to you."
         >
@@ -760,7 +680,6 @@ export default function HomePage() {
                 </li>
               ))}
             </ul>
-            {/* Renders once there is an address. See SITE.contactEmail. */}
             {SITE.contactEmail ? (
               <p className="mt-8 text-body-sm text-ink-soft">
                 Or email us at{" "}

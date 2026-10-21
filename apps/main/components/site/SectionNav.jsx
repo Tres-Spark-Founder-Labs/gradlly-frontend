@@ -15,6 +15,11 @@ import { useEffect, useState } from "react";
  * mobile, so the hierarchy survives the breakpoint rather than disappearing at
  * it.
  *
+ * No numbers on the rows any more. The numbered-reference system this nav used
+ * to agree with — 01, 02, 03 on every section heading — retired with the rest
+ * of the first restyle; an active-row border and weight carry the same "where
+ * you are" information a figure used to.
+ *
  * The active section comes from an IntersectionObserver with a rootMargin that
  * puts the detection line a third of the way down the viewport, rather than
  * from scroll position arithmetic: the observer fires once per crossing
@@ -55,20 +60,19 @@ export function SectionNav({ sections }) {
       {/* Mobile: a scroller. The same list, the same order, laid along the one
           axis a narrow screen has to spare. */}
       <ul className="flex list-none gap-6 overflow-x-auto overscroll-x-contain px-6 pb-1 md:px-10 lg:mt-4 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0">
-        {sections.map(({ id, number, label }) => {
+        {sections.map(({ id, label }) => {
           const current = active === id;
           return (
             <li key={id} className="shrink-0 lg:w-full lg:shrink">
               <a
                 href={`#${id}`}
                 aria-current={current ? "true" : undefined}
-                className={`flex items-baseline gap-3 whitespace-nowrap py-1.5 text-caption transition-colors duration-200 ease-out hover:text-ink lg:whitespace-normal lg:border-l lg:py-2 lg:pl-4 ${
+                className={`block whitespace-nowrap py-1.5 text-caption transition-colors duration-200 ease-out hover:text-ink lg:whitespace-normal lg:border-l lg:py-2 lg:pl-4 ${
                   current
-                    ? "text-ink lg:border-ink"
+                    ? "font-medium text-ink lg:border-ink"
                     : "text-ink-muted lg:border-hairline"
                 }`}
               >
-                <span className="tabular-nums opacity-60">{number}</span>
                 {label}
               </a>
             </li>

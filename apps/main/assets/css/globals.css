@@ -1,26 +1,39 @@
 /* ==========================================================================
    Gradlly marketing site
 
-   Visual system taken from kindsight.io: cream surfaces, deep olive for
-   selective contrast, oversized light serif headlines, chartreuse used sparingly
-   as emphasis, terracotta carrying the actions, and whitespace doing most of
-   the work.
+   ── THE SECOND REBUILD, AND WHAT CHANGED FROM THE FIRST ─────────────────────
 
-   Gradlly's own content, terminology, brand name and information architecture
-   are unchanged. Only the visual language moved.
+   The first pass took kindsight.io as its reference: cream surfaces, a deep
+   olive panel for the hero and the Continuo claim, numbered references in
+   place of an eyebrow, a bento of glass cards over a drifting field. It was
+   built carefully and it worked.
 
-   ── WHAT THIS REPLACED, AND WHY THE PRODUCT COLOURS SURVIVED ─────────────────
+   This pass replaces it, on a brief that named a different reference: a light
+   page throughout, a realistic product card rather than an abstract diagram,
+   no panel, no numbers, no glass. "Rebuild the entire website, from colour to
+   structure to typography" was explicit that the first system is replaced,
+   not extended, so the dark surfaces are gone — the hero panel, the Continuo
+   claim block, the bento's glass, the footer — everywhere a surface used to go
+   dark, it now stays on the page's own cream or a plain white card instead.
 
-   The previous system was navy, teal and brass with glass tiles over gradient
-   washes. This brief asks for warm light surfaces, minimal cards, rare shadows
-   and no gradients, which is the opposite, so the glass and the bento are gone.
+   What survived, because nothing about it was particular to either reference:
+   the colour tokens (cream, olive, terracotta, chartreuse are still Gradlly's
+   palette, just no longer pooled into a panel), the accessible-contrast pairs
+   measured against sand and cream, the twelve-column grid, the motion system,
+   and the product-colour rule — olive identifies Continuo, terracotta
+   identifies Gradlly AMS and the Passport, in a 4px mark, which has held
+   across both restyles because it was never about which visual system was on
+   top of it.
 
-   One rule had to be carried across rather than dropped: colour identifies a
-   product. Teal meant Continuo and brass meant Gradlly AMS, and the new palette
-   has neither. They are mapped onto it rather than abandoned: Continuo takes
-   deep olive, Gradlly AMS and the Passport take terracotta. Both are in the
-   reference palette, both are distinguishable at a 4px mark, and the rule the
-   site has always followed keeps working.
+   ── CARDS NOW CARRY A SHADOW ──────────────────────────────────────────────
+
+   The first system's rule was "surfaces separate tonally, not by elevation",
+   which is a legitimate editorial choice and was true of its reference. It is
+   not true of this one: the product card in the new reference is unmistakably
+   lifted off the page, with a visible border and a soft shadow under it. So
+   .shadow-card exists now and nothing is precious about it — it is the
+   default for a card showing content, the same way .plate always was for the
+   hero.
    ========================================================================== */
 
 @import "tailwindcss";
@@ -34,8 +47,9 @@
   --color-ink: #0e0f0a;
 
   /* ── Accents ───────────────────────────────────────────────────────────────
-     Terracotta carries the actions. Chartreuse is emphasis only and never
-     appears in body text. Coral is an occasional outlined detail. */
+     Terracotta carries the actions. Chartreuse is now rarer than it was: it
+     had a job on the dark hero panel that no longer exists, so what is left is
+     a text-selection colour and a single small dot in the social proof strip. */
   --color-terracotta: #de7653;
   --color-coral: #e7573d;
   --color-chartreuse: #e1f079;
@@ -52,18 +66,16 @@
      text: 5.51 on cream, 4.57 on sand. */
   --color-terracotta-ink: #975038;
 
-  /* Hairlines. Low contrast on purpose: the reference separates with tonal
-     surface change, not with drawn lines. */
+  /* Olive itself passes everywhere (9.77:1 on cream) and is used as text
+     directly — the accent word in the hero, status pills, icons. */
+
   --color-hairline: #e3ddd4;
-  --color-hairline-dark: #565a42;
+  --color-hairline-dark: #d9d2c5;
 
   /* ── Type ──────────────────────────────────────────────────────────────── */
   --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
 
-  /* Display scales toward 112px at wide, inside the 80 to 120 the brief asks
-     for. Line height under 1 is deliberate: an oversized serif at 1.1 reads as
-     a paragraph rather than as a statement. */
   --text-display: clamp(2.75rem, 1.2rem + 6.4vw, 7rem);
   --text-display--line-height: 0.95;
   --text-display--letter-spacing: -0.03em;
@@ -98,21 +110,17 @@
   --text-caption--letter-spacing: 0;
 
   /* ── Shape ─────────────────────────────────────────────────────────────────
-     A 4px corner was the Swiss pass, on the argument that rounding softens a
-     grid until the columns stop reading. The reference boards for this project
-     settle it the other way: generous corners on the surfaces, stadium buttons,
-     and the grid carried by alignment, which it still is. 20px is the figure
-     those boards sit at. Controls keep 10px for inputs; buttons go to a full
-     stadium, which is what the boards show. */
+     Unchanged from the first restyle: generous corners, stadium buttons,
+     10px on controls. The reference for this rebuild sits at roughly the same
+     figures, so there was nothing to revise here — only what sits inside the
+     corners changed. */
   --radius-control: 10px;
   --radius-card: 20px;
-  --radius-panel: 28px;
   --radius-full: 999px;
 
   /* ── The grid ──────────────────────────────────────────────────────────────
-     Twelve columns, a 24px gutter, and a baseline every 8px. Everything on the
-     page starts on a column and sits on a baseline, which is the whole point:
-     the rhythm is the design, not the decoration. */
+     Twelve columns, a 24px gutter, and a baseline every 8px. Unchanged: this
+     is a layout mechanism, not a visual identity, and holds under either. */
   --grid-columns: 12;
   --grid-gutter: 1.5rem;
   --baseline: 0.5rem;
@@ -157,95 +165,27 @@ body {
   border-radius: 2px;
 }
 
-/* On olive, ink would vanish: it is 1.47:1 against it. */
-.on-olive :focus-visible {
-  outline-color: var(--color-chartreuse);
-}
-
 /* ==========================================================================
-   The hero panel, and the plates that float over it
+   Card shadow
 
-   The deep olive field with light cards collaged over it is the composition
-   the reference boards are built around, so it is the one place on this site
-   where a surface sits on top of another surface rather than beside it.
-
-   Shadows are used here and nowhere else. The rule for the rest of the page is
-   thin borders and tonal change, and that rule is right there: a border is
-   enough to separate a card from the page it sits on. It is not enough to
-   separate three light cards from *each other* when they overlap, which is the
-   whole point of a collage, and value alone cannot do it because all three are
-   the same linen. So the plates cast a shadow and nothing else does.
+   The one visual-elevation rule on the page, used everywhere a surface shows
+   content: the product cards, the comparison panels, the demo form. A border
+   alone separated a card from the page under the first system; this reference
+   lifts it instead, so the shadow is soft and wide rather than tight and dark
+   — closer to daylight falling on paper than a drawn outline.
    ========================================================================== */
 
-.hero-panel {
-  position: relative;
-  border-radius: var(--radius-panel);
-  background-color: var(--color-olive);
-  color: var(--color-linen);
-  /* No overflow clip: the plates deliberately break the top and right edges.
-     The panel's own texture is clipped by .hero-panel-texture instead. */
-}
-
-.hero-panel-texture {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: inherit;
-  pointer-events: none;
-  /* Field paints itself at z-index -1. Without a stacking context here that is
-     behind the olive, and in fact behind the page. */
-  isolation: isolate;
-}
-
-/* The accent stroke sits at z-index -1 so a descender crosses it. Inside the
-   panel that would put it behind the olive, so the copy column becomes its own
-   stacking context and the stroke stays between the panel and the glyphs. */
-.hero-copy {
-  position: relative;
-  isolation: isolate;
-}
-
-/* ==========================================================================
-   Glass
-
-   Used by one group of cards and nowhere else: the three Continuo pillars,
-   which sit over a field of drifting colour so there is something behind them
-   worth blurring. Glass over a flat surface is just a tinted box with a
-   performance cost.
-
-   The wrapper that holds them isolates, because the field paints at z-index -1
-   and would otherwise escape behind the band's own background.
-
-   backdrop-filter is not universal and the fallback is not "no background":
-   an unsupported browser gets the solid linen surface, because translucent
-   text panels over a moving field are unreadable without the blur.
-   ========================================================================== */
-
-.glass {
-  border-radius: var(--radius-card);
-  background-color: color-mix(in oklab, var(--color-linen) 46%, transparent);
-  border: 1px solid color-mix(in oklab, var(--color-linen) 78%, transparent);
-  box-shadow: 0 1px 1px 0
-    color-mix(in oklab, var(--color-linen) 90%, transparent) inset;
-  backdrop-filter: blur(22px) saturate(150%);
-  -webkit-backdrop-filter: blur(22px) saturate(150%);
-}
-
-@supports not (
-  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
-) {
-  .glass {
-    background-color: var(--color-linen);
-    border-color: var(--color-hairline);
-  }
-}
-
-.plate {
-  border-radius: var(--radius-card);
-  background-color: var(--color-linen);
+.shadow-card {
   box-shadow:
-    0 22px 48px -26px rgb(14 15 10 / 0.55),
-    0 3px 10px -5px rgb(14 15 10 / 0.3);
+    0 1px 2px 0 rgb(14 15 10 / 0.04),
+    0 16px 32px -20px rgb(14 15 10 / 0.16);
+}
+
+/* A touch more lift for the one card the whole hero is built around. */
+.shadow-card-lg {
+  box-shadow:
+    0 2px 4px 0 rgb(14 15 10 / 0.04),
+    0 28px 56px -24px rgb(14 15 10 / 0.22);
 }
 
 /* ==========================================================================
@@ -258,18 +198,21 @@ body {
 }
 
 /**
- * The brand gesture: one meaningful word in a display headline set in italic
- * with a hand-drawn chartreuse underline beneath it.
+ * One meaningful word in a display headline, set in italic with a hand-drawn
+ * underline beneath it.
+ *
+ * The underline used to be fixed to chartreuse, because it only ever ran
+ * under linen on a dark olive panel. The panel is gone and the colour now
+ * comes from wherever the word itself is set — currentColor, so an olive
+ * headline gets an olive stroke without a second colour decision.
  *
  * Drawn as an SVG stroke rather than a border, because a straight 3px rule
- * under a 112px serif reads as an underline on a link. The path is deliberately
- * uneven.
- *
- * Used once per page at most. The brief calls it a selective gesture, and it
- * stops being one the moment a second heading has it.
+ * under a 112px serif reads as a link underline. The path is deliberately
+ * uneven. Used once per page at most.
  */
 .accent {
   position: relative;
+  color: var(--color-olive);
   font-style: italic;
   white-space: nowrap;
 }
@@ -280,7 +223,7 @@ body {
   inset-block-end: -0.1em;
   inline-size: calc(100% + 0.12em);
   block-size: 0.2em;
-  color: var(--color-chartreuse);
+  color: currentColor;
   /* Behind the glyphs, so a descender crosses the stroke the way it would have
      crossed a pen line. */
   z-index: -1;
@@ -313,8 +256,7 @@ body {
   }
 }
 
-/* A rule drawn on the grid rather than around a box. The modernist device:
-   content hangs from a line, it is not enclosed by one. */
+/* A rule drawn on the grid rather than around a box. */
 .rule-top {
   border-top: 1px solid var(--color-ink);
   padding-top: calc(var(--baseline) * 3);
@@ -520,136 +462,6 @@ body {
   .reveal > * {
     opacity: 1;
     translate: none;
-  }
-}
-
-/* ==========================================================================
-   Ambient motion
-
-   The drifting fields behind sections, and the artwork's own animation. All of
-   it is slow, none of it loops in a way a reader can catch repeating, and every
-   one of these animates transform or opacity only, so none can move the layout.
-
-   Suppressed entirely under prefers-reduced-motion by the block above, which
-   sets animation-duration on everything. The grain is not motion and stays.
-   ========================================================================== */
-
-@media (prefers-reduced-motion: no-preference) {
-  .drift {
-    animation: drift-a 26s ease-in-out infinite alternate;
-    will-change: transform;
-  }
-
-  .drift-b {
-    animation-name: drift-b;
-    animation-duration: 34s;
-  }
-
-  .drift-c {
-    animation-name: drift-c;
-    animation-duration: 42s;
-  }
-
-  /* Artwork. Each piece moves at its own tempo so two of them on screen never
-     beat together. */
-  .spin {
-    /* transform-box defaults to view-box in SVG, so "center" resolves to the
-       centre of the viewBox rather than of the element. On a circle sitting in
-       a translated group that turns a spin into an orbit, which is what it was
-       doing. fill-box makes the origin the element.
-
-       A plain circle rotating is invisible; the point is the dashed rings,
-       whose dashes travel round. */
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: spin linear infinite;
-  }
-
-  .lift {
-    animation: lift 7s ease-in-out infinite alternate;
-  }
-
-  .weave {
-    stroke-dasharray: 420;
-    stroke-dashoffset: 420;
-    animation: weave-draw 2.4s cubic-bezier(0.16, 0.8, 0.26, 1) both;
-  }
-
-  .pulse {
-    animation: pulse 5.5s ease-in-out infinite alternate;
-  }
-
-  .rise {
-    transform-origin: 50% 100%;
-    animation: rise 900ms cubic-bezier(0.16, 0.8, 0.26, 1) both;
-  }
-}
-
-@keyframes drift-a {
-  from {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  to {
-    transform: translate3d(5rem, 3rem, 0) scale(1.12);
-  }
-}
-
-@keyframes drift-b {
-  from {
-    transform: translate3d(0, 0, 0) scale(1.08);
-  }
-  to {
-    transform: translate3d(-4rem, 4.5rem, 0) scale(0.94);
-  }
-}
-
-@keyframes drift-c {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(3rem, -3.5rem, 0);
-  }
-}
-
-@keyframes spin {
-  to {
-    rotate: 360deg;
-  }
-}
-
-@keyframes lift {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-6px);
-  }
-}
-
-@keyframes weave-draw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes pulse {
-  from {
-    opacity: 0.55;
-  }
-  to {
-    opacity: 0.95;
-  }
-}
-
-@keyframes rise {
-  from {
-    transform: scaleY(0.2);
-    opacity: 0;
-  }
-  to {
-    transform: scaleY(1);
-    opacity: 1;
   }
 }
 

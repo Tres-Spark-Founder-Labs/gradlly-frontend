@@ -356,7 +356,7 @@ export function DemoForm() {
           <button
             type="button"
             onClick={() => goTo(step - 1)}
-            className="rounded-control border border-ink px-6 py-3 text-body-sm font-medium text-ink transition-colors duration-200 ease-out hover:bg-ink hover:text-linen"
+            className="rounded-full border border-ink px-6 py-3 text-body-sm font-medium text-ink transition-colors duration-200 ease-out hover:bg-ink hover:text-linen"
           >
             Back
           </button>
@@ -365,7 +365,7 @@ export function DemoForm() {
         <button
           type="submit"
           disabled={state === "sending"}
-          className="rounded-control bg-terracotta px-7 py-3 text-body-sm font-medium text-linen transition-colors duration-200 ease-out hover:bg-coral disabled:opacity-60"
+          className="rounded-full bg-terracotta px-7 py-3 text-body-sm font-medium text-linen transition-colors duration-200 ease-out hover:bg-coral disabled:opacity-60"
         >
           {isLast
             ? state === "sending"

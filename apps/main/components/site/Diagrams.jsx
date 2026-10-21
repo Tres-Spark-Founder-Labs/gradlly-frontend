@@ -19,6 +19,12 @@ import { useId, useState } from "react";
  * Motion answers an action. Hovering or focusing a step in a flow lights its
  * path; choosing a share mode redraws what that mode reaches. Nothing plays on
  * scroll.
+ *
+ * Every card in here carries .shadow-card now, and none of them fills solid
+ * olive any more — both follow from the same rebuild that retired the hero
+ * panel. Where a card used to sit on a dark olive surface to mark "the thing
+ * the diagram is about", it now sits on linen with an olive border instead,
+ * consistent with the rest of the page: olive marks, it does not fill.
  */
 
 const OLIVE = "var(--color-olive)";
@@ -237,7 +243,7 @@ export function ShareDiagram() {
           />
         </svg>
 
-        <div className="rounded-card border border-hairline bg-linen p-5">
+        <div className="shadow-card rounded-card border border-hairline bg-linen p-5">
           <p className="text-caption text-ink-muted">The hirer sees</p>
           <p className="mt-2 text-body-sm text-ink">
             {mode.reaches.length === 0
@@ -308,12 +314,12 @@ export function PortalMap() {
       </ul>
 
       <div className="flex items-center justify-center">
-        <div className="rounded-card border border-ink bg-olive px-6 py-8 text-center">
-          <p className="text-caption text-linen/60">One apprenticeship</p>
-          <p className="display mt-2 text-subhead text-linen">
+        <div className="shadow-card rounded-card border-2 border-olive bg-linen px-6 py-8 text-center">
+          <p className="text-caption text-olive">One apprenticeship</p>
+          <p className="display mt-2 text-subhead text-ink">
             One shared record
           </p>
-          <p className="mx-auto mt-3 max-w-[22ch] text-caption text-linen/70">
+          <p className="mx-auto mt-3 max-w-[22ch] text-caption text-ink-muted">
             Four doors onto the same evidence, so nothing has to be reconciled
             between them.
           </p>
@@ -342,7 +348,7 @@ function PortalCard({ portal, active, onEnter, onLeave }) {
       onMouseLeave={onLeave}
       onFocus={onEnter}
       onBlur={onLeave}
-      className="rounded-card border bg-linen p-5 transition-colors duration-200 ease-out"
+      className="shadow-card rounded-card border bg-linen p-5 transition-colors duration-200 ease-out"
       style={{
         borderColor: active ? "var(--color-ink)" : HAIRLINE,
       }}
@@ -381,7 +387,7 @@ function PortalCard({ portal, active, onEnter, onLeave }) {
 export function EvidenceCompare() {
   return (
     <div className="grid gap-5 md:grid-cols-2">
-      <div className="rounded-card border border-hairline bg-linen p-6">
+      <div className="shadow-card rounded-card border border-hairline bg-linen p-6">
         <p className="text-caption text-ink-muted">How it usually sits</p>
         <ul className="mt-5 list-none space-y-2.5">
           {[
@@ -415,7 +421,7 @@ export function EvidenceCompare() {
         </p>
       </div>
 
-      <div className="rounded-card border border-ink bg-linen p-6">
+      <div className="shadow-card rounded-card border-2 border-olive bg-linen p-6">
         <p className="text-caption text-ink-muted">How Continuo holds it</p>
         <ul className="mt-5 list-none">
           {[
@@ -473,27 +479,19 @@ export function LevyFlow() {
       {stages.map((stage, index) => (
         <div key={stage.label} className="contents">
           <div
-            className={`rounded-card border p-5 ${
+            className={`shadow-card rounded-card border p-5 ${
               index === 1
-                ? "border-ink bg-olive text-linen"
+                ? "border-2 border-olive bg-linen"
                 : "border-hairline bg-linen"
             }`}
           >
             <p
-              className={`text-caption ${index === 1 ? "text-linen/60" : "text-ink-muted"}`}
+              className={`text-caption ${index === 1 ? "text-olive" : "text-ink-muted"}`}
             >
               {index === 1 ? "The marketplace" : index === 0 ? "From" : "To"}
             </p>
-            <p
-              className={`display mt-2 text-subhead ${index === 1 ? "text-linen" : "text-ink"}`}
-            >
-              {stage.label}
-            </p>
-            <p
-              className={`mt-2 text-body-sm ${index === 1 ? "text-linen/75" : "text-ink-soft"}`}
-            >
-              {stage.note}
-            </p>
+            <p className="display mt-2 text-subhead text-ink">{stage.label}</p>
+            <p className="mt-2 text-body-sm text-ink-soft">{stage.note}</p>
           </div>
 
           {index < stages.length - 1 ? (

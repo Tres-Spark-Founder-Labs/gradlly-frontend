@@ -4,24 +4,30 @@ import { LEGAL_PAGES, PORTAL_SIGN_IN, SITE } from "@/config/site.config";
 import { Wordmark } from "./Wordmark";
 
 /**
- * Abyss, the deepest surface, bookending the page against the paper above it.
+ * The footer.
  *
- * It carries the whole page set with its reference numbers, because a reader at
- * the bottom of page four needs to see where to go next and how much of the
- * argument is left.
+ * ── WHY THIS IS LIGHT NOW ────────────────────────────────────────────────────
+ *
+ * It used to be the deepest surface on the page, a solid olive band bookending
+ * the paper above it, on the same reasoning that justified the hero panel.
+ * That reasoning retired along with the panel: this rebuild's reference has no
+ * dark surface anywhere, and a footer left solid olive would have been the one
+ * holdout, not a deliberate anchor. So it is sand now, the same tone the page
+ * already alternates sections through, with ink text and hairline dividers —
+ * the last section rather than a different kind of surface.
  */
 export function Footer() {
   return (
-    <footer className="on-olive bg-olive px-5 py-16 text-linen md:px-8 md:py-20 lg:px-12">
+    <footer className="border-t border-hairline bg-sand px-5 py-16 md:px-8 md:py-20 lg:px-12">
       <div className="mx-auto max-w-[1320px]">
-        <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2 border-b border-linen/15 pb-10">
+        <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2 border-b border-hairline-dark pb-10">
           <Wordmark />
-          <p className="text-body-sm text-linen/55">{SITE.tagline}</p>
+          <p className="text-body-sm text-ink-muted">{SITE.tagline}</p>
         </div>
 
         <div className="grid gap-10 pt-10 md:grid-cols-[1.5fr_1fr_1fr] md:gap-14">
           <nav aria-label="Sections">
-            <h2 className="text-caption text-linen/40">On this page</h2>
+            <h2 className="text-caption text-ink-muted">On this page</h2>
             <ul className="mt-4 grid list-none gap-x-10 sm:grid-cols-2">
               {[
                 ...SECTIONS,
@@ -30,7 +36,7 @@ export function Footer() {
                 <li key={href}>
                   <a
                     href={href}
-                    className="block py-2 text-body-sm text-linen/75 transition-colors duration-[140ms] ease-out hover:text-linen"
+                    className="block py-2 text-body-sm text-ink-soft transition-colors duration-[140ms] ease-out hover:text-ink"
                   >
                     {label}
                   </a>
@@ -47,13 +53,13 @@ export function Footer() {
           */}
           {PORTAL_SIGN_IN.length > 0 ? (
             <div id="sign-in" className="scroll-mt-24">
-              <h2 className="text-caption text-linen/40">Sign in</h2>
+              <h2 className="text-caption text-ink-muted">Sign in</h2>
               <ul className="mt-4 list-none">
                 {PORTAL_SIGN_IN.map(({ name, url }) => (
                   <li key={name}>
                     <a
                       href={url}
-                      className="block py-2 text-body-sm text-linen/75 transition-colors duration-[140ms] ease-out hover:text-linen"
+                      className="block py-2 text-body-sm text-ink-soft transition-colors duration-[140ms] ease-out hover:text-ink"
                     >
                       {name}
                     </a>
@@ -64,13 +70,13 @@ export function Footer() {
           ) : null}
 
           <div>
-            <h2 className="text-caption text-linen/40">Legal</h2>
+            <h2 className="text-caption text-ink-muted">Legal</h2>
             <ul className="mt-4 list-none">
               {LEGAL_PAGES.map(({ href, label }) => (
                 <li key={href}>
                   <a
                     href={href}
-                    className="block py-2 text-body-sm text-linen/75 transition-colors duration-[140ms] ease-out hover:text-linen"
+                    className="block py-2 text-body-sm text-ink-soft transition-colors duration-[140ms] ease-out hover:text-ink"
                   >
                     {label}
                   </a>
@@ -80,7 +86,7 @@ export function Footer() {
           </div>
         </div>
 
-        <p className="mt-12 border-t border-linen/15 pt-6 text-caption text-linen/45">
+        <p className="mt-12 border-t border-hairline-dark pt-6 text-caption text-ink-muted">
           © 2026 Gradlly.
           {SITE.registeredDetails ? ` ${SITE.registeredDetails}` : ""}
         </p>

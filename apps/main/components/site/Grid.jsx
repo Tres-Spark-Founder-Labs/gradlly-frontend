@@ -22,39 +22,43 @@ export function Col({
 }
 
 /**
- * A reference label: a figure number and, usually, a short name.
+ * An eyebrow: a small dot in the section's product colour, and a label.
  *
- * This is the modernist device that replaces an eyebrow, and it is information
- * rather than decoration. The number is the one the section nav shows for this
- * section, so a reader who jumps to the compliance section from the rail, or
- * from a search result, can see they landed on 05 of 10 rather than inferring
- * it from how far down the scrollbar sits.
+ * ── WHAT THIS REPLACED ───────────────────────────────────────────────────────
  *
- * (An earlier version of this comment claimed the numbers made cross-references
- * of the form "see 04" resolvable. There are none in the copy. Agreement with
- * the nav is the actual reason, and it is a better one.)
+ * The first restyle of this site used a figure number here instead — 01, 02,
+ * 03 — on the reasoning that it was information (agreement with the section
+ * nav) rather than decoration. That was a genuine Swiss-modernist device, and
+ * it is exactly the kind of thing the brief for this rebuild named directly:
+ * the numbered references are retired along with the rest of that system. A
+ * dot and a label is the more conventional device, and conventional is the
+ * point this time — it is also one less thing for a section that gets
+ * reordered, merged or split to keep in sync.
  *
- * The label is optional. Where the heading beneath it already is the label, as
- * with "How it works", repeating it would be noise, so the number stands alone
- * and the rule goes with the label it would otherwise have pointed at.
+ * `tone` sets the dot and text colour together, so a reader never has to
+ * infer which product a section belongs to from colour alone at a glance —
+ * the label beside it always says so in words too.
  */
-export function Ref({ number, children, tone = "ink" }) {
+export function Ref({ children, tone = "ink" }) {
   const ink = {
     ink: "text-ink-muted",
     olive: "text-olive",
     terracotta: "text-terracotta-ink",
     linen: "text-linen/60",
   }[tone];
+  const dot = {
+    ink: "bg-ink-muted",
+    olive: "bg-olive",
+    terracotta: "bg-terracotta",
+    linen: "bg-linen/60",
+  }[tone];
+
+  if (!children) return null;
 
   return (
-    <p className={`flex items-baseline gap-3 text-caption ${ink}`}>
-      <span className="tabular-nums">{number}</span>
-      {children ? (
-        <>
-          <span aria-hidden className="h-px w-5 bg-current opacity-40" />
-          <span>{children}</span>
-        </>
-      ) : null}
+    <p className={`flex items-center gap-2.5 text-caption ${ink}`}>
+      <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${dot}`} />
+      <span>{children}</span>
     </p>
   );
 }
