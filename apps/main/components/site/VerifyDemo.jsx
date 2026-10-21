@@ -70,7 +70,10 @@ export function VerifyDemo() {
   // no-JavaScript state.
   const [confirmed, setConfirmed] = useState(LINES.length);
   const [playing, setPlaying] = useState(false);
-  const [canAnimate, setCanAnimate] = useState(false);
+  // Only governs whether the sequence plays on arrival. The control is always
+  // offered: prefers-reduced-motion is a request not to be moved at without
+  // asking, and a demonstration somebody presses a button for is asked for.
+  const [mounted, setMounted] = useState(false);
   const timers = useRef([]);
 
   const clear = () => {
@@ -94,20 +97,23 @@ export function VerifyDemo() {
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (reduced.matches) return;
+    if (reduced.matches) {
+      // The control still appears; only the arrival sequence is suppressed.
+      const show = setTimeout(() => setMounted(true), 0);
+      return () => clearTimeout(show);
+    }
 
-    // Both the control and the sequence are turned on inside the timeout
-    // rather than in the effect body. Setting state synchronously in an effect
-    // causes a cascading render, and the behaviour here is identical: the
-    // control appears at the same moment the first line confirms.
+    // Scheduled rather than called in the effect body: setState there causes a
+    // cascading render, and a frame's delay is imperceptible.
     //
-    // The beat before it starts is so the headline has landed and the reader is
-    // looking at the right thing when it does.
-    const start = setTimeout(() => {
-      setCanAnimate(true);
-      play();
-    }, 700);
+    // It used to wait 700ms, which meant the record rendered confirmed and then
+    // visibly blanked itself before rebuilding. The server-rendered state has
+    // to stay confirmed, because that is what is correct with no JavaScript, so
+    // the reset happens as early as it can instead.
+    const show = setTimeout(() => setMounted(true), 0);
+    const start = setTimeout(play, 60);
     return () => {
+      clearTimeout(show);
       clearTimeout(start);
       clear();
     };
@@ -119,14 +125,14 @@ export function VerifyDemo() {
         <span className="text-caption text-ink-muted">
           One worker, one record
         </span>
-        {canAnimate ? (
+        {mounted ? (
           <button
             type="button"
             onClick={play}
             disabled={playing}
             className="rounded-control border border-hairline px-3 py-1.5 text-caption text-ink transition-colors duration-200 ease-out hover:border-ink disabled:opacity-45"
           >
-            {playing ? "Confirming" : "Run it again"}
+            {playing ? "Confirming" : "Watch it confirm"}
           </button>
         ) : null}
       </figcaption>
