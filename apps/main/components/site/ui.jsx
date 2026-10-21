@@ -11,6 +11,7 @@
  *   Whitespace does most of the work: no extra dividers, no decoration.
  */
 
+import { Ref } from "./Grid";
 import { Reveal } from "./Reveal";
 
 const MARK = {
@@ -39,7 +40,13 @@ const MARK_INK = {
  * oversized serif needs the page to stop before the headline runs out of
  * breath.
  */
-export function Band({ id, children, tone = "cream", className = "" }) {
+export function Band({
+  id,
+  children,
+  tone = "cream",
+  className = "",
+  labelledBy,
+}) {
   const surface = {
     cream: "bg-cream",
     linen: "bg-linen",
@@ -50,6 +57,7 @@ export function Band({ id, children, tone = "cream", className = "" }) {
   return (
     <section
       id={id}
+      aria-labelledby={labelledBy}
       className={`${surface} px-6 py-20 md:px-10 md:py-28 lg:px-12 lg:py-30 ${className}`}
     >
       <div className="mx-auto max-w-[1200px]">{children}</div>
@@ -67,10 +75,11 @@ export function Band({ id, children, tone = "cream", className = "" }) {
  */
 export function BandHead({
   id,
+  number,
   eyebrow,
   children,
   note,
-  mark = "olive",
+  tone = "ink",
   dark = false,
 }) {
   return (
@@ -82,23 +91,20 @@ export function BandHead({
       }
     >
       <Reveal>
-        {eyebrow ? (
-          <p
-            className={`flex items-center gap-3 text-caption ${dark ? "text-linen/60" : "text-ink-muted"}`}
-          >
-            <span
-              className="mark h-3.5"
-              style={{
-                "--mark": dark ? "var(--color-chartreuse)" : MARK[mark],
-              }}
-              aria-hidden
-            />
+        {/* One eyebrow device on the page, not two. This was a coloured dot and
+            a line of copy, while the sections built straight on the grid
+            primitives used a numbered reference instead, so a reader scrolling
+            saw 01, 02, a heading with no number, then 04 — which reads as a
+            mistake because it was one. The number is the nav's, so the rail and
+            the section agree about where you are. */}
+        {number ? (
+          <Ref number={number} tone={dark ? "linen" : tone}>
             {eyebrow}
-          </p>
+          </Ref>
         ) : null}
         <h2
           id={id}
-          className={`display measure-display text-section ${dark ? "text-linen" : "text-ink"} ${eyebrow ? "mt-6" : ""}`}
+          className={`display measure-display text-section ${dark ? "text-linen" : "text-ink"} ${number ? "mt-6" : ""}`}
         >
           {children}
         </h2>

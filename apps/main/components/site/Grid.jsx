@@ -22,12 +22,21 @@ export function Col({
 }
 
 /**
- * A reference label: a figure number and a short name, on a rule.
+ * A reference label: a figure number and, usually, a short name.
  *
- * This is the modernist device that replaces an eyebrow. It is information
- * rather than decoration: with the page this long, a reader scanning for the
- * compliance section needs the page to be indexed, and the number is what makes
- * the cross-references in the text ("see 04") resolvable.
+ * This is the modernist device that replaces an eyebrow, and it is information
+ * rather than decoration. The number is the one the section nav shows for this
+ * section, so a reader who jumps to the compliance section from the rail, or
+ * from a search result, can see they landed on 05 of 10 rather than inferring
+ * it from how far down the scrollbar sits.
+ *
+ * (An earlier version of this comment claimed the numbers made cross-references
+ * of the form "see 04" resolvable. There are none in the copy. Agreement with
+ * the nav is the actual reason, and it is a better one.)
+ *
+ * The label is optional. Where the heading beneath it already is the label, as
+ * with "How it works", repeating it would be noise, so the number stands alone
+ * and the rule goes with the label it would otherwise have pointed at.
  */
 export function Ref({ number, children, tone = "ink" }) {
   const ink = {
@@ -40,8 +49,12 @@ export function Ref({ number, children, tone = "ink" }) {
   return (
     <p className={`flex items-baseline gap-3 text-caption ${ink}`}>
       <span className="tabular-nums">{number}</span>
-      <span aria-hidden className="h-px w-5 bg-current opacity-40" />
-      <span>{children}</span>
+      {children ? (
+        <>
+          <span aria-hidden className="h-px w-5 bg-current opacity-40" />
+          <span>{children}</span>
+        </>
+      ) : null}
     </p>
   );
 }

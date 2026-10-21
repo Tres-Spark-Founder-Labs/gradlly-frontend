@@ -185,11 +185,14 @@ export default function HomePage() {
 
       {/* ── 01 What Gradlly builds. The positioning table from the approved
              copy, which no version of this site has used until now. ────────── */}
-      <Band id="positioning">
+      <Band id="positioning" labelledBy="positioning-heading">
         <Grid>
           <Col span="col-span-4 md:col-span-6 lg:col-span-4">
             <Ref number="01">What Gradlly builds</Ref>
-            <h2 className="display mt-6 max-w-[11ch] text-section text-ink">
+            <h2
+              id="positioning-heading"
+              className="display mt-6 max-w-[11ch] text-section text-ink"
+            >
               Two products and a Passport.
             </h2>
           </Col>
@@ -262,7 +265,7 @@ export default function HomePage() {
       </Band>
 
       {/* ── 02 The problem, §3 ───────────────────────────────────────────── */}
-      <Band id="the-problem" tone="sand">
+      <Band id="the-problem" tone="sand" labelledBy="the-problem-heading">
         <StickyPair
           aside={
             <Reveal>
@@ -292,10 +295,12 @@ export default function HomePage() {
         </StickyPair>
       </Band>
 
-      {/* ── Continuo, §4 ─────────────────────────────────────────────────── */}
-      <Band id="continuo">
+      {/* ── 03 Continuo, §4 ─────────────────────────────────────────────────── */}
+      <Band id="continuo" labelledBy="continuo-heading">
         <BandHead
           id="continuo-heading"
+          number="03"
+          tone="olive"
           eyebrow="For employers and agencies in regulated work"
           note="Continuo proves what a worker can do, backed by the checks that show they're cleared to do it, and keeps that proof true between jobs, not just at the moment of hire. The record belongs to the worker, and it's free for them, always."
         >
@@ -360,7 +365,7 @@ export default function HomePage() {
 
       {/* ── 04 What a record carries. List and detail, over the approved
              §4 content. ──────────────────────────────────────────────────── */}
-      <Band id="the-record" tone="linen">
+      <Band id="the-record" tone="linen" labelledBy="the-record-heading">
         <StickyPair
           aside={
             <Reveal>
@@ -403,13 +408,16 @@ export default function HomePage() {
       </Band>
 
       {/* ── 05 Compliance evidence, with the table and its toolbar. ───────── */}
-      <Band id="compliance">
+      <Band id="compliance" labelledBy="compliance-heading">
         <Grid>
           <Col span="col-span-4 md:col-span-6 lg:col-span-5">
             <Ref number="05" tone="olive">
               Compliance evidence
             </Ref>
-            <h2 className="display mt-6 max-w-[13ch] text-section text-ink">
+            <h2
+              id="compliance-heading"
+              className="display mt-6 max-w-[13ch] text-section text-ink"
+            >
               Organised by obligation, not by folder.
             </h2>
             <p className="measure mt-6 text-body text-ink-soft">
@@ -436,14 +444,17 @@ export default function HomePage() {
         </Grid>
       </Band>
 
-      {/* ── 07 The four portals. ─────────────────────────────────────────── */}
-      <Band id="portals">
+      {/* ── 06 The four portals, and what the Forge does. ─────────────────────────────────────────── */}
+      <Band id="portals" labelledBy="portals-heading">
         <Grid className="items-end">
           <Col span="col-span-4 md:col-span-6 lg:col-span-5">
             <Ref number="06" tone="terracotta">
               The four portals
             </Ref>
-            <h2 className="display mt-6 max-w-[13ch] text-section text-ink">
+            <h2
+              id="portals-heading"
+              className="display mt-6 max-w-[13ch] text-section text-ink"
+            >
               Four doors onto one apprenticeship.
             </h2>
           </Col>
@@ -481,12 +492,13 @@ export default function HomePage() {
         </Reveal>
       </Band>
 
-      {/* ── 09 Passport, §6 ──────────────────────────────────────────────── */}
-      <Band id="passport" tone="linen">
+      {/* ── 07 Passport, §6 ──────────────────────────────────────────────── */}
+      <Band id="passport" tone="linen" labelledBy="passport-heading">
         <BandHead
           id="passport-heading"
+          number="07"
           eyebrow="Included with Gradlly AMS"
-          mark="terracotta"
+          tone="terracotta"
           note="Every apprentice leaves with a verified record of what they achieved. It's built automatically as they train, owned by them, and free for them."
         >
           The Apprenticeship Passport. What the apprentice keeps.
@@ -523,10 +535,11 @@ export default function HomePage() {
         <div className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-14"></div>
       </Band>
 
-      {/* ── How it works, §7 ─────────────────────────────────────────────── */}
-      <Band id="how-it-works">
+      {/* ── 08 How it works, §7 ─────────────────────────────────────────────── */}
+      <Band id="how-it-works" labelledBy="how-it-works-heading">
         <BandHead
           id="how-it-works-heading"
+          number="08"
           note="Two products, two flows. Each works on its own."
         >
           How it works
@@ -589,9 +602,11 @@ export default function HomePage() {
       </Band>
 
       {/* ── 09 Who it's for, §8 ──────────────────────────────────────────── */}
-      <Band id="who-its-for" tone="sand">
+      <Band id="who-its-for" tone="sand" labelledBy="who-its-for-heading">
         <BandHead
           id="who-its-for-heading"
+          number="09"
+          eyebrow="Who it's for"
           note="Four audiences reading the same record from different sides."
         >
           Built for each side of the journey.
@@ -625,10 +640,12 @@ export default function HomePage() {
         </ul>
       </Band>
 
-      {/* ── Book a demo, §9 ──────────────────────────────────────────────── */}
-      <Band id="book-a-demo">
+      {/* ── 10 Book a demo, §9 ──────────────────────────────────────────────── */}
+      <Band id="book-a-demo" labelledBy="book-a-demo-heading">
         <BandHead
           id="book-a-demo-heading"
+          number="10"
+          eyebrow="Book a demo"
           note="Whether you hire into regulated roles or run apprenticeships, we'll walk you through the parts of Gradlly that matter to you."
         >
           See Gradlly with your own programme.

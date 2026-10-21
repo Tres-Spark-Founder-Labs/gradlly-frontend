@@ -7,9 +7,9 @@ import { useEffect, useState } from "react";
  *
  * The global navigation says which product area you are in. This says which
  * part of it you are reading, which is a different question and needs a
- * different control. With eleven sections on one page, a reader who arrives at
- * the compliance section from a search result has no way to know what is above
- * or below it without one.
+ * different control. With ten sections on one page, a reader who arrives at the
+ * compliance section from a search result has no way to know what is above or
+ * below it without one.
  *
  * It is a sticky rail at desktop and a horizontal scroller under the header at
  * mobile, so the hierarchy survives the breakpoint rather than disappearing at
