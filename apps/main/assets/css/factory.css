@@ -1,0 +1,226 @@
+/* ==========================================================================
+   Factory — a second visual system, for comparison against the main site
+
+   Imported only by app/factory/layout.jsx, which is its own Next.js root
+   layout in its own route group. Nothing here reaches /, /gradlly-ams or any
+   other Gradlly-branded page, and nothing in globals.css reaches this one —
+   two independent Tailwind themes, two independent `<html>` trees, living in
+   the same Next.js app on two different URLs.
+
+   The brief: a terminal war room. Deep black canvas (#101010), one light
+   "Bone" card (#eeeeee) as the only bright object in the room, Geist at
+   weight 400 almost everywhere with tight negative tracking carrying the
+   authority that bolding would carry elsewhere, and two functional accents —
+   signal orange, metric green — that mark live state and never decorate.
+   Flat corners (3px controls, 10px cards, 20px at most), no shadows: depth is
+   figure-on-ground contrast, not blur.
+
+   Same discipline as the rest of this project applies here too: every string
+   on this page is real Gradlly copy, and nowhere does a metric tile carry an
+   invented number. See app/factory/page.jsx's own notes on where this system
+   was applied strictly (Metric Tile's VALUE is a status word, "MET" or
+   "VERIFIED", never a figure) and where a component in the reference — the
+   trust-bar logo strip — was left out entirely, because this project has no
+   real client logos to put there.
+   ========================================================================== */
+
+@import "tailwindcss";
+
+@theme {
+  /* ── Colour ────────────────────────────────────────────────────────────── */
+  --color-obsidian-canvas: #101010;
+  --color-carbon-lift: #1d1a18;
+  --color-ash-stroke: #3d3a39;
+  /* Fill colour only — 2.14:1 on obsidian-canvas, which fails even the 3:1
+     large-text floor. Caught once already in this build (a muted metric
+     value and two caption lines used it as text); use warm-granite for any
+     text that needs to read as secondary on the dark canvas instead. */
+  --color-graphite-mid: #4d4947;
+  --color-warm-granite: #8a8380;
+  --color-pale-stone: #b8b3b0;
+  --color-bone: #eeeeee;
+  --color-chalk: #fafafa;
+  --color-signal-orange: #ee6018;
+  --color-metric-green: #a0ca92;
+
+  /* Text that sits on the bone card needs its own ink — the reference's own
+     note is that card text is "#101010 or #060505" even though the token
+     table lists #eeeeee as the role description. */
+  --color-card-ink: #101010;
+  --color-card-ink-soft: #4d4947;
+
+  /* ── Type ──────────────────────────────────────────────────────────────── */
+  --font-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+  --font-mono:
+    var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, monospace;
+
+  --text-caption: 12px;
+  --text-caption--line-height: 1;
+  --text-caption--letter-spacing: -0.24px;
+
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 1.43;
+
+  --text-body: 16px;
+  --text-body--line-height: 1.5;
+
+  --text-heading: 36px;
+  --text-heading--line-height: 1.1;
+  --text-heading--letter-spacing: -1.12px;
+
+  --text-heading-lg: 44px;
+  --text-heading-lg--line-height: 1.12;
+  --text-heading-lg--letter-spacing: -1.1px;
+
+  --text-display: 72px;
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -2.88px;
+
+  /* ── Shape ─────────────────────────────────────────────────────────────── */
+  --radius-control: 3px;
+  --radius-card: 10px;
+  --radius-panel: 20px;
+
+  /* ── Spacing ───────────────────────────────────────────────────────────────
+     8px base, set as Tailwind's own spacing unit rather than as named tokens:
+     with --spacing at 8px, p-3 is 24px, gap-12 is 96px, and the whole numeric
+     utility scale (p-1 … gap-20) lines up with the reference's named steps
+     (8, 16, 24, 32, 40, 56, 80, 96, 120 = ×1, 2, 3, 4, 5, 7, 10, 12, 15)
+     without a single custom spacing token. */
+  --spacing: 8px;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-obsidian-canvas);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background-color: var(--color-signal-orange);
+  color: var(--color-obsidian-canvas);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-bone);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* On the bone card, a bone-coloured ring would vanish. */
+.on-bone :focus-visible {
+  outline-color: var(--color-obsidian-canvas);
+}
+
+/* ==========================================================================
+   Grain
+
+   "Optional subtle grain/noise texture overlay" on the light card, per the
+   reference. Same SVG-turbulence technique the main site's Grain component
+   uses, at a lower opacity and warm-neutral tint so it reads on #eeeeee
+   instead of #faf5f1.
+   ========================================================================== */
+
+.grain {
+  position: relative;
+}
+
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  border-radius: inherit;
+}
+
+/* ==========================================================================
+   Motion
+
+   "Short and mechanical: 0.15s–0.2s, cubic-bezier(0.4, 0, 0.2, 1)" for every
+   interactive state change — the single system-wide transition, applied as a
+   utility rather than declared per component.
+   ========================================================================== */
+
+.mech {
+  transition-property: color, background-color, border-color, stroke;
+  transition-duration: 180ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes marquee-scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .marquee {
+    animation: marquee-scroll 32s linear infinite;
+  }
+
+  @keyframes dashboard-frame-in {
+    from {
+      opacity: 0;
+      translate: 0 10px;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  .dashboard-enter {
+    animation: dashboard-frame-in 500ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    animation: none;
+  }
+  .dashboard-enter {
+    opacity: 1;
+    translate: none;
+  }
+}
+
+/* ==========================================================================
+   Skip link
+   ========================================================================== */
+
+.skip-link {
+  position: absolute;
+  inset-inline-start: 1rem;
+  inset-block-start: -4rem;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-control);
+  background-color: var(--color-chalk);
+  color: var(--color-obsidian-canvas);
+  font-size: var(--text-body-sm);
+  font-weight: 500;
+  transition: inset-block-start 140ms ease-out;
+}
+
+.skip-link:focus {
+  inset-block-start: 1rem;
+}

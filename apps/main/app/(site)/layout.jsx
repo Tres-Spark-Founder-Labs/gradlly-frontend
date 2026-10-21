@@ -1,12 +1,11 @@
 import "@/assets/css/globals.css";
 
+import { inter, playfair } from "@/app/fonts";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { Grain } from "@/components/site/Texture";
 import { SITE } from "@/config/site.config";
 import { createPageSeo, organizationJsonLd } from "@/utils/metadata";
-
-import { inter, playfair } from "./fonts";
 
 export const metadata = createPageSeo();
 
@@ -18,8 +17,13 @@ export const viewport = {
 };
 
 /**
- * The shell is the same on every page: a navy band above, a navy band below,
- * white content between them. Pages write content only.
+ * The shell for the Gradlly-branded pages: cream and olive, Playfair and
+ * Inter. Pages write content only.
+ *
+ * Lives in the (site) route group now, which gives it its own `<html>` —
+ * `app/factory` is a second, unrelated root layout beside it, for the
+ * comparison build at /factory. Route groups don't affect the URL, so this
+ * still serves every path it served before the move.
  */
 export default function RootLayout({ children }) {
   return (
