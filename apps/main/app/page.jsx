@@ -23,6 +23,7 @@ import {
   SpecList,
   TextLink,
 } from "@/components/site/ui";
+import { SITE } from "@/config/site.config";
 import { CONTENT } from "@/content/landing";
 
 /**
@@ -702,15 +703,15 @@ export default function HomePage() {
                 </li>
               ))}
             </ul>
-            <p className="mt-8 text-body-sm text-ink-soft">
-              Or email us at{" "}
-              <span
-                className="font-semibold text-ink"
-                title="Placeholder. Recorded in docs/marketing/LAUNCH-CHECKLIST.md."
-              >
-                [CONTACT EMAIL]
-              </span>
-            </p>
+            {/* Renders once there is an address. See SITE.contactEmail. */}
+            {SITE.contactEmail ? (
+              <p className="mt-8 text-body-sm text-ink-soft">
+                Or email us at{" "}
+                <TextLink href={`mailto:${SITE.contactEmail}`}>
+                  {SITE.contactEmail}
+                </TextLink>
+              </p>
+            ) : null}
           </div>
         </div>
       </Band>

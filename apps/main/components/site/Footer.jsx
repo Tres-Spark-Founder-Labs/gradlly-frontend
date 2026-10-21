@@ -81,10 +81,8 @@ export function Footer() {
         </div>
 
         <p className="mt-12 border-t border-linen/15 pt-6 text-caption text-linen/45">
-          © 2026 Gradlly.{" "}
-          <span title="Placeholder. Recorded in docs/marketing/LAUNCH-CHECKLIST.md.">
-            [REGISTERED COMPANY DETAILS]
-          </span>
+          © 2026 Gradlly.
+          {SITE.registeredDetails ? ` ${SITE.registeredDetails}` : ""}
         </p>
       </div>
     </footer>

@@ -36,6 +36,26 @@ export const SITE = Object.freeze({
   locale: "en_GB",
   lang: "en-GB",
   themeColor: "#13233a",
+
+  /**
+   * The two values the client still has to supply, which are the first two
+   * items of the "Before launch" list in docs/marketing/content-v1.md.
+   *
+   * They shipped as literal bracketed text — "[CONTACT EMAIL]" in the demo
+   * section and "[REGISTERED COMPANY DETAILS]" in the footer — each carrying a
+   * title attribute that pointed at a launch checklist which did not exist. A
+   * visitor does not read a title attribute, and a page printing its own
+   * placeholders in square brackets reads as broken rather than as unfinished.
+   *
+   * Null, so the lines that need them do not render at all. That is the rule
+   * PORTAL_SIGN_IN already follows below, for the same reason it gives: the
+   * previous site ended up with nine dead links by rendering the slot anyway.
+   *
+   * To go live, replace a null with the real value; the line appears on its
+   * own and nothing else changes.
+   */
+  contactEmail: null,
+  registeredDetails: null,
 });
 
 /**
