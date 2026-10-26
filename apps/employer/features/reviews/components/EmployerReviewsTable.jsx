@@ -2,6 +2,7 @@
 
 import { CalendarDays, Eye } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { SingleSelectField } from "@/components/form/SingleSelectField";
@@ -20,6 +21,7 @@ import { useReviews } from "../queries/reviews.query";
  * review completed can actually open it.
  */
 export function EmployerReviewsTable() {
+  const router = useRouter();
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
@@ -110,6 +112,7 @@ export function EmployerReviewsTable() {
         data={reviews}
         rowKey={(row) => row.id}
         isLoading={isLoading}
+        onRowClick={(row) => router.push(`/reviews/${row.id}`)}
         meta={meta}
         onPageChange={setPage}
         onPerPageChange={(next) => {

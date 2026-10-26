@@ -102,14 +102,23 @@ export function CommitmentBoardTable({ rows = [], onSign, onView, isLoading }) {
               rows.map((row) => (
                 <tr
                   key={row.statementId}
+                  onClick={() => onView?.(row)}
+                  /* Matches the Apprentices roster: the whole row opens the
+                     detail panel, not just the "View" button in the actions
+                     column. */
+                  className="cursor-pointer transition-colors duration-150 hover:bg-neutral-50/80"
                   /* AC3 — "highlighted". A left accent plus a tinted row, so
                      it reads at a glance without relying on colour alone: the
                      Sign button only appears on these rows. */
                   style={{
                     borderLeft: `3px solid ${row.actionRequired ? T.blue : "transparent"}`,
-                    backgroundColor: row.actionRequired
-                      ? T.blueLight
-                      : "transparent",
+                    // Only set inline when highlighted: an inline
+                    // `backgroundColor` (even "transparent") beats the
+                    // Tailwind `hover:` class in specificity, which would
+                    // silently kill the hover feedback on every other row.
+                    ...(row.actionRequired
+                      ? { backgroundColor: T.blueLight }
+                      : {}),
                     borderBottom: `1px solid ${T.border}`,
                   }}
                 >
@@ -153,7 +162,10 @@ export function CommitmentBoardTable({ rows = [], onSign, onView, isLoading }) {
                       {statementStatusLabel(row.statementStatus)}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right whitespace-nowrap">
+                  <td
+                    className="px-4 py-3 text-right whitespace-nowrap"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <div className="inline-flex items-center gap-1.5">
                       <button
                         type="button"
