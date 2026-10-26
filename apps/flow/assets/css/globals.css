@@ -320,7 +320,15 @@
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    /* Not translateY(0): any transform value other than the "none" keyword
+       establishes a new containing block for descendants with position:
+       fixed, even one that resolves to the identity transform. With
+       `animation-fill-mode: both`, a page wrapper div keeps this value
+       forever once the entrance animation ends — so any `position: fixed`
+       drawer/backdrop/modal rendered inside it (unless portaled to
+       document.body) gets sized against the wrapper's content box instead
+       of the real viewport. */
+    transform: none;
   }
 }
 

@@ -322,7 +322,16 @@
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    /* Not translateY(0): any transform value other than the "none" keyword
+       establishes a new containing block for descendants with position:
+       fixed, even one that resolves to the identity transform. With
+       `animation-fill-mode: both`, the page wrapper div keeps this value
+       forever once the entrance animation ends — so every `position: fixed`
+       drawer/backdrop/modal rendered inside it (none of which are portaled
+       to document.body, unlike Modal.jsx) was being sized against the
+       wrapper's content box instead of the real viewport. That is the "panel
+       doesn't reach the bottom of the screen" bug. */
+    transform: none;
   }
 }
 
