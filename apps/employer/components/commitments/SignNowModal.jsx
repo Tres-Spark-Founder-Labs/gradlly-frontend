@@ -143,6 +143,15 @@ export function SignNowModal({ open, onClose, statement }) {
   const signatoryName = getFullName(user) || user?.email || "the signatory";
 
   /**
+   * F1.3.2 AC1 — "employer can view the full commitment statement text ...
+   * before signing". `renderStatementText` falls back to "could not be
+   * loaded. Do not sign until it is available." when `content` is missing,
+   * but that was only ever a message in the text box — the Sign button
+   * stayed enabled, so the warning was advisory, not enforced.
+   */
+  const statementTextAvailable = !loadingText && !!full?.content;
+
+  /**
    * The confirmation checkbox gates *both* paths.
    *
    * It previously applied only to the typed-name tab, so a drawn signature
@@ -150,7 +159,13 @@ export function SignNowModal({ open, onClose, statement }) {
    * anything — on a document the PRD describes as legally binding.
    */
   const hasMark = sigTab === "draw" ? hasDrawing : typedName.trim().length > 0;
-  const canSign = hasMark && agreed && !!statementId && !signing && !uploading;
+  const canSign =
+    hasMark &&
+    agreed &&
+    !!statementId &&
+    statementTextAvailable &&
+    !signing &&
+    !uploading;
 
   const reset = () => {
     setSigTab("draw");
@@ -220,37 +235,29 @@ export function SignNowModal({ open, onClose, statement }) {
     <Modal
       open={open}
       onClose={handleClose}
+      busy={signing || uploading}
       size="lg"
       title="Sign commitment statement"
       description={`For ${apprenticeName}`}
       footer={
-        <>
-          <button
-            type="button"
-            onClick={handleClose}
-            disabled={signing || uploading}
-            className="px-4 py-2 rounded-xl text-sm font-semibold border hover:opacity-75 transition-opacity disabled:opacity-40"
-            style={{ borderColor: T.border, color: T.subtle }}
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleSign}
-            disabled={!canSign}
-            title={
-              !hasMark
+        <button
+          type="button"
+          onClick={handleSign}
+          disabled={!canSign}
+          title={
+            !statementTextAvailable
+              ? "The statement text has to load before you can sign"
+              : !hasMark
                 ? "Draw or type your signature first"
                 : !agreed
                   ? "Confirm you have read the statement"
                   : undefined
-            }
-            className="px-5 py-2 rounded-xl text-sm font-bold hover:opacity-80 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ backgroundColor: T.blue, color: "#fff" }}
-          >
-            {busyLabel}
-          </button>
-        </>
+          }
+          className="px-5 py-2 rounded-xl text-sm font-bold hover:opacity-80 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{ backgroundColor: T.blue, color: "#fff" }}
+        >
+          {busyLabel}
+        </button>
       }
     >
       <div className="space-y-4">

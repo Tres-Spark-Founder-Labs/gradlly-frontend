@@ -32,7 +32,10 @@ export const PORTAL = Object.freeze({
     cooldownSeconds: 300,
   }),
   toastOptions: {
-    position: "top-center",
+    // top-right so a toast never lands on top of a centered modal's title —
+    // Modal.jsx (and every dialog built on it) renders centered, and a
+    // top-center toast collided with the header on open.
+    position: "top-right",
     duration: 4000,
     style: {
       borderRadius: "10px",

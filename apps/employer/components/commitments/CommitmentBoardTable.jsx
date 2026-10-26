@@ -19,10 +19,11 @@ function PartyPill({ status }) {
   );
 }
 
-const TH = ({ children, align = "left" }) => (
+const TH = ({ children, align = "left", muted = false, ...rest }) => (
   <th
-    className={`px-4 py-3 text-${align} text-[10px] font-bold uppercase tracking-wider whitespace-nowrap`}
-    style={{ color: T.muted }}
+    className={`px-4 pb-2.5 pt-1 text-${align} text-xs font-semibold whitespace-nowrap`}
+    style={{ color: muted ? T.muted : T.subtle }}
+    {...rest}
   >
     {children}
   </th>
@@ -57,16 +58,33 @@ export function CommitmentBoardTable({ rows = [], onSign, onView, isLoading }) {
               borderBottom: `1px solid ${T.border}`,
             }}
           >
-            {/* AC1 — name, provider, version, then one column per party. */}
+            {/* AC1 — name, provider, version, then one column per party. The
+                party columns repeat "Apprentice" / "Provider" — already used
+                above for the identity columns — so a group label ties them
+                together as "who has signed" rather than leaving two pairs of
+                identically-named columns to tell apart on their own. */}
             <tr>
-              <TH>Apprentice</TH>
-              <TH>Provider</TH>
-              <TH>Version</TH>
+              <th colSpan={3} />
+              <th
+                colSpan={3}
+                className="px-4 pt-2.5 text-left text-[11px] font-semibold"
+                style={{ color: T.muted }}
+              >
+                Signed by
+              </th>
+              <th colSpan={2} />
+            </tr>
+            <tr>
+              <TH muted>Apprentice</TH>
+              <TH muted>Provider</TH>
+              <TH muted>Version</TH>
               <TH>Employer</TH>
               <TH>Apprentice</TH>
               <TH>Provider</TH>
-              <TH>Statement</TH>
-              <TH align="right">Actions</TH>
+              <TH muted>Statement</TH>
+              <TH align="right" muted>
+                Actions
+              </TH>
             </tr>
           </thead>
           <tbody>

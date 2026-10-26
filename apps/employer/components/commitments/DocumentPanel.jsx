@@ -1,5 +1,5 @@
 "use client";
-import { Download, FileText, X } from "lucide-react";
+import { Clock3, Download, FileText, X } from "lucide-react";
 import { useState } from "react";
 
 import { T } from "@/components/dashboard/levy/tokens";
@@ -219,33 +219,57 @@ export function DocumentPanel({ statement, onClose }) {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5 space-y-3">
-          <p
-            className="text-[10px] font-bold uppercase tracking-widest"
-            style={{ color: T.muted }}
-          >
-            Version history
-          </p>
-
+        <div className="flex-1 overflow-y-auto">
           {isLoading ? (
-            <div
-              className="h-24 rounded-xl animate-pulse"
-              style={{ backgroundColor: T.card }}
-            />
-          ) : versions.length === 0 ? (
-            <p className="text-xs" style={{ color: T.muted }}>
-              No versions to show yet.
-            </p>
-          ) : (
-            versions.map((version) => (
-              <VersionCard
-                key={version.statementId}
-                version={version}
-                isCurrent={version.statementId === currentStatementId}
-                onDownload={download}
-                downloading={downloading}
+            <div className="p-5 space-y-3">
+              <div
+                className="h-5 w-28 rounded animate-pulse"
+                style={{ backgroundColor: T.card }}
               />
-            ))
+              <div
+                className="h-24 rounded-xl animate-pulse"
+                style={{ backgroundColor: T.card }}
+              />
+            </div>
+          ) : versions.length === 0 ? (
+            /* A draft that hasn't gone to signature yet has no versions —
+               that's a normal pre-publication state, not an error, so it
+               gets a direct explanation rather than a bare "nothing here". */
+            <div className="flex h-full flex-col items-center justify-center gap-3 px-8 py-16 text-center">
+              <span
+                className="flex h-11 w-11 items-center justify-center rounded-full"
+                style={{ backgroundColor: T.card, color: T.muted }}
+              >
+                <Clock3 className="h-5 w-5" />
+              </span>
+              <div className="space-y-1">
+                <p className="text-sm font-semibold" style={{ color: T.ink }}>
+                  No versions yet
+                </p>
+                <p
+                  className="text-xs leading-relaxed max-w-[28ch]"
+                  style={{ color: T.muted }}
+                >
+                  This statement hasn&apos;t been sent for signature. It will
+                  appear here once the first version is published.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="p-5 space-y-3">
+              <p className="text-sm font-semibold" style={{ color: T.ink }}>
+                Version history
+              </p>
+              {versions.map((version) => (
+                <VersionCard
+                  key={version.statementId}
+                  version={version}
+                  isCurrent={version.statementId === currentStatementId}
+                  onDownload={download}
+                  downloading={downloading}
+                />
+              ))}
+            </div>
           )}
         </div>
 
