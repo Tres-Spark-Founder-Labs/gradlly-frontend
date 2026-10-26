@@ -2,6 +2,7 @@
 
 import { CalendarDays, CalendarPlus, Eye } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { SingleSelectField } from "@/components/form/SingleSelectField";
@@ -39,6 +40,7 @@ function ReviewCell({ review }) {
 }
 
 export function ReviewsTable() {
+  const router = useRouter();
   const { can } = useRoleAccess();
   const canManage = can("admin");
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -185,6 +187,7 @@ export function ReviewsTable() {
         data={reviews}
         rowKey={(row) => row.id}
         isLoading={isLoading}
+        onRowClick={(row) => router.push(`/reviews/${row.id}`)}
         meta={meta}
         onPageChange={setPage}
         onPerPageChange={changePerPage}

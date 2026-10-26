@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRightLeft, PenTool } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { DataTable } from "@/components/ui/DataTable";
@@ -39,6 +40,7 @@ function signatureSummary(transfer) {
  * until this screen existed FlowPortal had no way to reach it.
  */
 export function LevyTransfersScreen() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const { data, isLoading, isError, error } = useRecipientTransfers({ page });
 
@@ -152,6 +154,10 @@ export function LevyTransfersScreen() {
         isLoading={isLoading}
         meta={meta}
         onPageChange={setPage}
+        onRowClick={(transfer) =>
+          isText(transfer?.id) &&
+          router.push(`/levy-exchange/transfers/${transfer.id}`)
+        }
         empty={{
           icon: ArrowRightLeft,
           title: "No transfers yet",

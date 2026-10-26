@@ -136,6 +136,7 @@ export function FailedPushesTable({ pipeline }) {
         data={pushes}
         rowKey={(row) => row.id}
         isLoading={isLoading}
+        onRowClick={setViewTarget}
         meta={meta}
         onPageChange={setPage}
         onPerPageChange={changePerPage}

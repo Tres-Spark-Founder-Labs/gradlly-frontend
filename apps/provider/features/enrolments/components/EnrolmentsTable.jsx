@@ -2,6 +2,7 @@
 
 import { ClipboardList, Eye, Plus } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import Button from "@/components/ui/Button";
@@ -39,6 +40,7 @@ function ApprenticeCell({ name, standardName }) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function EnrolmentsTable() {
+  const router = useRouter();
   const { can } = useRoleAccess();
   const canManage = can("admin");
 
@@ -155,6 +157,7 @@ export function EnrolmentsTable() {
         data={enrolments}
         rowKey={(row) => row.id}
         isLoading={isLoading}
+        onRowClick={(row) => router.push(`/enrolments/${row.id}`)}
         meta={meta}
         onPageChange={setPage}
         onPerPageChange={handlePerPageChange}

@@ -2,6 +2,7 @@
 
 import { CheckCircle2, Clock, Eye, XCircle } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { SingleSelectField } from "@/components/form/SingleSelectField";
@@ -59,6 +60,7 @@ function SelectBox({ checked, disabled, onChange, label }) {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export function OtjReviewQueue() {
+  const router = useRouter();
   const { can } = useRoleAccess();
   const canReview = can("admin");
 
@@ -148,6 +150,13 @@ export function OtjReviewQueue() {
   };
 
   const showActions = canReview && selectedIds.length > 0;
+
+  // Matches DataTable's row-activation guard: a click on the checkbox or the
+  // "View" link does only that, not also navigate.
+  const goToEntry = (id) => (e) => {
+    if (e.target.closest("button, a, input, select, textarea, label")) return;
+    router.push(`/otj-log-entries/${id}`);
+  };
 
   return (
     <div className="space-y-5">
@@ -283,8 +292,9 @@ export function OtjReviewQueue() {
                     return (
                       <tr
                         key={entry.id}
+                        onClick={goToEntry(entry.id)}
                         className={cn(
-                          "border-b border-neutral-100 transition-colors duration-100 last:border-0 hover:bg-neutral-50/70",
+                          "cursor-pointer border-b border-neutral-100 transition-colors duration-100 last:border-0 hover:bg-neutral-50/70",
                           isChecked && "bg-primary-50/40",
                         )}
                       >
@@ -341,7 +351,11 @@ export function OtjReviewQueue() {
                 const selectable = isActionable(entry);
                 const isChecked = selected.has(entry.id) && selectable;
                 return (
-                  <li key={entry.id} className="space-y-3 p-4">
+                  <li
+                    key={entry.id}
+                    onClick={goToEntry(entry.id)}
+                    className="cursor-pointer space-y-3 p-4"
+                  >
                     <div className="flex items-start gap-3">
                       {canReview ? (
                         <span className="pt-0.5">

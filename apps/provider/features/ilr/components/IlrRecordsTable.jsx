@@ -8,6 +8,7 @@ import {
   Plus,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { InputField } from "@/components/form/InputField";
@@ -42,6 +43,7 @@ function RecordCell({ record }) {
 }
 
 export function IlrRecordsTable() {
+  const router = useRouter();
   const [status, setStatus] = useState("");
   const [collectionPeriod, setCollectionPeriod] = useState("");
   const [page, setPage] = useState(1);
@@ -245,6 +247,7 @@ export function IlrRecordsTable() {
         data={records}
         rowKey={(row) => row.id}
         isLoading={isLoading}
+        onRowClick={(row) => router.push(`/ilr/${row.id}`)}
         meta={meta}
         onPageChange={setPage}
         onPerPageChange={changePerPage}

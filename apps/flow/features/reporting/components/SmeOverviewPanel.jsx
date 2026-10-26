@@ -1,6 +1,7 @@
 "use client";
 
 import { Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { DataTable } from "@/components/ui/DataTable";
@@ -97,6 +98,7 @@ function PipelineSummary({ pipeline }) {
 }
 
 export function SmeOverviewPanel({ showPipeline = true }) {
+  const router = useRouter();
   const { data, isLoading } = useSmeOverview();
   const summary = data?.summary;
   const apprentices = data?.apprentices ?? [];
@@ -131,6 +133,7 @@ export function SmeOverviewPanel({ showPipeline = true }) {
             data={apprentices}
             isLoading={isLoading}
             rowKey={(row) => row.enrolmentId}
+            onRowClick={(row) => router.push(`/learners/${row.enrolmentId}`)}
             empty={{
               icon: Users,
               title: "No active apprentices",

@@ -2,6 +2,7 @@
 
 import { Download, Eye, FileDown, GraduationCap } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { InputField } from "@/components/form/InputField";
@@ -55,6 +56,7 @@ function OtjCell({ percent }) {
 }
 
 export function CohortTable() {
+  const router = useRouter();
   const [statusBadge, setStatusBadge] = useState("");
   const [epaMonth, setEpaMonth] = useState("");
   const [sort, setSort] = useState({
@@ -344,6 +346,7 @@ export function CohortTable() {
         data={entries}
         rowKey={(row) => row.enrolmentId}
         isLoading={isLoading}
+        onRowClick={(row) => router.push(`/learners/${row.enrolmentId}`)}
         meta={meta}
         onPageChange={setPage}
         onPerPageChange={changePerPage}

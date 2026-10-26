@@ -2,6 +2,7 @@
 
 import { Eye, FileSignature } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { SingleSelectField } from "@/components/form/SingleSelectField";
@@ -35,6 +36,7 @@ function VersionCell({ statement }) {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export function CommitmentStatementsTable() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
   const [status, setStatus] = useState("");
@@ -135,6 +137,7 @@ export function CommitmentStatementsTable() {
         data={statements}
         rowKey={(row) => row.id}
         isLoading={isLoading}
+        onRowClick={(row) => router.push(`/enrolments/${row.enrolmentId}`)}
         meta={meta}
         onPageChange={setPage}
         onPerPageChange={handlePerPageChange}

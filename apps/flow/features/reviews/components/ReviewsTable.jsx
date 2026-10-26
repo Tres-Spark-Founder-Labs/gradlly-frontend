@@ -2,6 +2,7 @@
 
 import { CalendarDays, Eye } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { SingleSelectField } from "@/components/form/SingleSelectField";
@@ -36,6 +37,7 @@ function ReviewCell({ review }) {
 }
 
 export function ReviewsTable() {
+  const router = useRouter();
   const [status, setStatus] = useState("");
   const [overdue, setOverdue] = useState("");
   const [page, setPage] = useState(1);
@@ -159,6 +161,7 @@ export function ReviewsTable() {
         data={reviews}
         rowKey={(row) => row.id}
         isLoading={isLoading}
+        onRowClick={(row) => router.push(`/reviews/${row.id}`)}
         meta={meta}
         onPageChange={setPage}
         onPerPageChange={changePerPage}

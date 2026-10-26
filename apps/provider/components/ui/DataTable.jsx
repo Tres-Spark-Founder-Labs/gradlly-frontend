@@ -44,6 +44,9 @@ import { Pagination } from "./Pagination";
  * @param {object}   [props.meta]           API meta for pagination
  * @param {Function} [props.onPageChange]
  * @param {Function} [props.onPerPageChange] enables the rows-per-page selector
+ * @param {Function} [props.onRowClick]      (row) => void — makes the whole row
+ *   (and its mobile card) open details. Clicks on a button/link/input/label
+ *   inside a cell are left alone rather than also triggering navigation.
  * @param {string}   [props.className]
  */
 export function DataTable({
@@ -56,8 +59,19 @@ export function DataTable({
   meta,
   onPageChange,
   onPerPageChange,
+  onRowClick,
   className,
 }) {
+  // A click that started on an interactive element inside a cell (an
+  // action button, a nested Link, a checkbox) should do only that thing,
+  // not also navigate the row. Checking at the row level means column
+  // authors never have to remember stopPropagation in their `cell`
+  // renderers.
+  const handleRowActivate = (row) => (e) => {
+    if (!onRowClick) return;
+    if (e.target.closest("button, a, input, select, textarea, label")) return;
+    onRowClick(row);
+  };
   // ── Sort state ──────────────────────────────────────────────────────────────
   // { key, direction: "asc" | "desc" } | null
   const [sort, setSort] = useState(null);
@@ -156,7 +170,11 @@ export function DataTable({
                   {sortedData.map((row) => (
                     <tr
                       key={rowKey(row)}
-                      className="border-b border-neutral-100 transition-colors duration-100 last:border-0 hover:bg-neutral-50/70"
+                      onClick={handleRowActivate(row)}
+                      className={cn(
+                        "border-b border-neutral-100 transition-colors duration-100 last:border-0 hover:bg-neutral-50/70",
+                        onRowClick && "cursor-pointer",
+                      )}
                     >
                       {columns.map((col) => (
                         <td
@@ -179,7 +197,14 @@ export function DataTable({
             {/* ── Mobile cards ── */}
             <ul className="divide-y divide-neutral-100 md:hidden">
               {sortedData.map((row) => (
-                <li key={rowKey(row)} className="space-y-3 p-4">
+                <li
+                  key={rowKey(row)}
+                  onClick={handleRowActivate(row)}
+                  className={cn(
+                    "space-y-3 p-4",
+                    onRowClick && "cursor-pointer",
+                  )}
+                >
                   {primaryCol ? (
                     <div className="min-w-0">{primaryCol.cell(row)}</div>
                   ) : null}

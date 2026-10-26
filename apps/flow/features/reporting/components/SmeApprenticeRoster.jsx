@@ -2,6 +2,7 @@
 
 import { Users } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { DataTable } from "@/components/ui/DataTable";
@@ -71,6 +72,7 @@ const APPRENTICE_COLUMNS = [
 ];
 
 export function SmeApprenticeRoster({ heading = "Your apprentices" }) {
+  const router = useRouter();
   const { data, isLoading } = useSmeOverview();
   const apprentices = data?.apprentices ?? [];
 
@@ -87,6 +89,7 @@ export function SmeApprenticeRoster({ heading = "Your apprentices" }) {
           data={apprentices}
           isLoading={isLoading}
           rowKey={(row) => row.enrolmentId}
+          onRowClick={(row) => router.push(`/learners/${row.enrolmentId}`)}
           empty={{
             icon: Users,
             title: "No active apprentices",

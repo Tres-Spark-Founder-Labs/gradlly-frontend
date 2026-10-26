@@ -307,6 +307,10 @@ export function QipPanel({ canManage = true, prefillSlug, onPrefillConsumed }) {
           data={actions}
           rowKey={(row) => row.id}
           isLoading={isLoading}
+          // "Progress" — not Edit — because it's open to everyone, the same
+          // set of people a clickable row needs to work for; Edit stays its
+          // own explicit, manager-only button.
+          onRowClick={setProgressTarget}
           meta={meta}
           onPageChange={setPage}
           onPerPageChange={changePerPage}

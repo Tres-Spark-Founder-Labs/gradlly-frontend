@@ -2,6 +2,7 @@
 
 import { Eye, FileText, Link2, Type } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { SingleSelectField } from "@/components/form/SingleSelectField";
@@ -42,6 +43,7 @@ function EvidenceCell({ item }) {
 }
 
 export function EvidenceQueue({ enrolmentId, canManage = true }) {
+  const router = useRouter();
   // Default to the submitted review backlog.
   const [status, setStatus] = useState(EVIDENCE_STATUS.SUBMITTED);
   const [page, setPage] = useState(1);
@@ -134,6 +136,7 @@ export function EvidenceQueue({ enrolmentId, canManage = true }) {
         data={items}
         rowKey={(row) => row.id}
         isLoading={isLoading}
+        onRowClick={(row) => router.push(`/portfolio/evidence/${row.id}`)}
         meta={meta}
         onPageChange={setPage}
         onPerPageChange={changePerPage}

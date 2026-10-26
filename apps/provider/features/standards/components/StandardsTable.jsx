@@ -256,6 +256,10 @@ export function StandardsTable() {
         data={standards}
         rowKey={(row) => row.id}
         isLoading={isLoading}
+        // Members get a read-only table with no Edit button at all today, so
+        // there's nothing yet for a click to open for them — only wire the
+        // row up where that destination already exists.
+        onRowClick={canManage ? openEdit : undefined}
         meta={meta}
         onPageChange={setPage}
         onPerPageChange={handlePerPageChange}
