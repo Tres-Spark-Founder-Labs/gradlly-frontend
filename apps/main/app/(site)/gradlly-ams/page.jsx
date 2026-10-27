@@ -3,7 +3,6 @@ import { useState } from "react";
 
 import CTA from "@/components/Home/CTA";
 import FlowPortal from "@/components/Home/FlowPortal";
-import Footer from "@/components/Home/Footer";
 import Hero from "@/components/Home/Hero";
 import HowItWorks from "@/components/Home/HowItWorks";
 import Marquee from "@/components/Home/Marquee";
@@ -18,7 +17,14 @@ import { Breadcrumbs } from "@/components/site/SectionNav";
  *
  * This is the page that was approved. It is not rebuilt, not restyled and not
  * brought onto the marketing tokens, because it is a standard rather than a
- * draft. It carries its own navigation and footer for the same reason.
+ * draft. It carries its own navigation for the same reason.
+ *
+ * It does not carry its own footer any more. `components/Home/Footer.jsx`
+ * was stacking a second, fabricated-content footer (dead "#" links, an
+ * invented hello@gradlly.com, legal pages that don't exist) underneath the
+ * real one `app/(site)/layout.jsx` already renders around every page in this
+ * route group, including this one. Deleted rather than kept unused — see
+ * git history to restore it.
  *
  * The only change is subtraction. Four sections are gone because their entire
  * content was proof nobody has yet: Stats (four market figures), Results (six
@@ -69,7 +75,6 @@ export default function GradllyAmsPage() {
       <FlowPortal />
       <Why />
       <CTA />
-      <Footer />
     </div>
   );
 }
