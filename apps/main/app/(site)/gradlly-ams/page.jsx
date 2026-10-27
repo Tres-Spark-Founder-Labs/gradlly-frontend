@@ -8,7 +8,11 @@ import HowItWorks from "@/components/Home/HowItWorks";
 import Marquee from "@/components/Home/Marquee";
 import Nav from "@/components/Home/Nav";
 import Portals from "@/components/Home/Portals";
+import Pricing from "@/components/Home/Pricing";
 import Problem from "@/components/Home/Problem";
+import Results from "@/components/Home/Results";
+import Stats from "@/components/Home/Stats";
+import Testimonials from "@/components/Home/Testimonials";
 import Why from "@/components/Home/Why";
 import { Breadcrumbs } from "@/components/site/SectionNav";
 
@@ -26,20 +30,24 @@ import { Breadcrumbs } from "@/components/site/SectionNav";
  * route group, including this one. Deleted rather than kept unused — see
  * git history to restore it.
  *
- * The only change is subtraction. Four sections are gone because their entire
- * content was proof nobody has yet: Stats (four market figures), Results (six
- * measured outcomes under the heading "Early Results"), Testimonials (six
- * attributed quotes from people who do not exist, one a director at an NHS
- * Trust) and Pricing (three prices in no approved copy).
+ * ── STATS, RESULTS, TESTIMONIALS, PRICING: RESTORED ON REQUEST ──────────────
  *
- * Mockups went with them: it drew simulated dashboards whose numbers
- * (£142,400, 94%, £8,000) read as a screenshot of real data. Portals lost its
- * mockup column as a result, which is a visible loss and is recorded as one.
- * The KPI tiles inside Problem, Portals and FlowPortal are gone too, and the
- * layouts closed up rather than keeping an empty slot.
+ * A prior pass on this page removed these four sections (plus the KPI tiles
+ * inside Problem, Portals and FlowPortal, and the Mockups column in Portals)
+ * because every number and quote in them was fabricated: Testimonials quotes
+ * six people who do not exist, one a director at an NHS Trust that was never
+ * a customer; Stats, Results and the KPI tiles carry figures with no source
+ * (£3.5B, 94%, £142,400, "98% vs 62% industry average"); Pricing's three
+ * tiers (£200, £30, £80) match no approved copy anywhere in this repository.
+ * None of that changed — there still isn't a real pilot, logo or figure to
+ * put in their place.
  *
- * Every removal is listed with file and line in
- * docs/marketing/DESIGN-SPEC.md section 9.
+ * Restored anyway, on explicit instruction after being shown exactly what
+ * that means. Replace the content in `constants.js`, `Stats.jsx`,
+ * `Results.jsx`, `Testimonials.jsx` and `Pricing.jsx` with real data the
+ * moment it exists — see `docs/marketing/content-v1.md`'s own "Before
+ * launch" note: "Add proof once available: a pilot provider, employer logos
+ * or a short quote. Use no figures until they are real."
  */
 export default function GradllyAmsPage() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -68,11 +76,15 @@ export default function GradllyAmsPage() {
         </div>
       </div>
       <Hero />
+      <Stats />
       <Marquee />
       <Problem />
       <Portals />
       <HowItWorks />
       <FlowPortal />
+      <Results />
+      <Testimonials />
+      <Pricing />
       <Why />
       <CTA />
     </div>

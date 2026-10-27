@@ -54,17 +54,19 @@ page, so each needs an answer before the copy is final.
 `content-v1.md`: _"Add proof once available: a pilot provider, employer logos or
 a short quote. Use no figures until they are real."_
 
-There is currently **no proof slot on the page at all**, which is deliberate.
-An earlier version carried £142,400, 94%, 2,700, >80%, £3.5bn and £8,000, none
-of which had a source, plus a testimonials section with invented attributions.
-Those were removed rather than replaced with placeholders, because a layout
-holding an empty proof slot invites someone to fill it with an estimate.
+The homepage (`/`) still carries **no proof slot at all**, which remains
+deliberate. The hero's pace chart has no axis and no percentage, the readiness
+list reports states rather than counts, and the record's date column is a
+neutral block, all for this reason. See `apps/main/components/site/HeroStack.jsx`.
 
-When real proof exists, add the slot then. The same rule applies inside the
-product visuals: the hero's pace chart has no axis and no percentage, the
-readiness list reports states rather than counts, and the record's date column
-is a neutral block, all for this reason. See
-`apps/main/components/site/HeroStack.jsx`.
+**`/gradlly-ams` is the exception**, on explicit instruction: Stats, Results,
+Testimonials and Pricing were restored with their original, unsourced figures
+(£142,400, 94%, 2,700, >80%, £3.5bn, £8,000, six invented testimonial
+attributions, three unapproved prices) rather than left out or replaced with
+placeholders. This is a live integrity gap, not a resolved item — replace each
+number and quote with real data the moment it exists; see
+`apps/main/app/(site)/gradlly-ams/page.jsx`'s own header comment for the full
+list of what's fabricated and where.
 
 ---
 

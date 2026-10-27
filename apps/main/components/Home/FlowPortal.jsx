@@ -12,6 +12,10 @@ const CARDS = [
       "ESG impact report for annual social value reporting",
       "Compliance documentation auto-generated for every transfer",
     ],
+    kpis: [
+      { val: "48hrs", label: "Matched, not weeks" },
+      { val: "100%", label: "ESFA compliance" },
+    ],
   },
   {
     tag: "SME Employers",
@@ -23,6 +27,10 @@ const CARDS = [
       "Matched to a levy donor automatically — no relationship required",
       "Choose from 4 AI apprenticeship programmes — 100% online",
       "£0 cost to learner — fully levy-funded from day one",
+    ],
+    kpis: [
+      { val: "£5M", label: "Levy to transfer Year 2" },
+      { val: ">80%", label: "EPA pass rate" },
     ],
   },
 ];
@@ -77,6 +85,19 @@ export default function FlowPortal() {
                     </li>
                   ))}
                 </ul>
+                <div className="flex gap-4 flex-wrap">
+                  {c.kpis.map((k, j) => (
+                    <div
+                      key={j}
+                      className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3"
+                    >
+                      <div className="font-serif text-2xl text-amber-600 leading-none mb-1">
+                        {k.val}
+                      </div>
+                      <div className="text-xs text-stone-400">{k.label}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </Reveal>
           ))}
