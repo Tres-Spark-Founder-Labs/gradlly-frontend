@@ -25,6 +25,21 @@
    across both restyles because it was never about which visual system was on
    top of it.
 
+   ── THE THIRD CHANGE: REPAINTED ONTO /gradlly-ams'S PALETTE ─────────────────
+
+   On instruction, every token below now resolves to the hex /gradlly-ams
+   already uses (Tailwind stone/emerald/amber in components/Home/*), so the
+   two parts of the site read as one palette. Only the hex values moved; the
+   token names, the product-colour rule and every component that consumes them
+   are unchanged. `/gradlly-ams` itself is untouched — it was never wired to
+   these tokens, so it carries on exactly as approved.
+
+   cream→stone-50, linen→white, sand→stone-100, olive→emerald-700,
+   ink→stone-900, terracotta→amber-600, coral→amber-500 (one step lighter,
+   matching the hover direction already used on emerald-700→emerald-600),
+   terracotta-ink→amber-700, chartreuse→amber-200, ink-soft→stone-700,
+   ink-muted→stone-500, hairline→stone-200, hairline-dark→stone-300.
+
    ── CARDS NOW CARRY A SHADOW ──────────────────────────────────────────────
 
    The first system's rule was "surfaces separate tonally, not by elevation",
@@ -40,37 +55,33 @@
 
 @theme {
   /* ── Surfaces ──────────────────────────────────────────────────────────── */
-  --color-cream: #faf5f1;
-  --color-linen: #fefffa;
-  --color-sand: #e5e1d6;
-  --color-olive: #3d4128;
-  --color-ink: #0e0f0a;
+  --color-cream: #fafaf9; /* stone-50, /gradlly-ams's page background */
+  --color-linen: #ffffff; /* white, /gradlly-ams's raised/card surface */
+  --color-sand: #f5f5f4; /* stone-100, /gradlly-ams's subtle panel fill */
+  --color-olive: #047857; /* emerald-700, /gradlly-ams's primary action colour */
+  --color-ink: #1c1917; /* stone-900, /gradlly-ams's body text */
 
   /* ── Accents ───────────────────────────────────────────────────────────────
      Terracotta carries the actions. Chartreuse is now rarer than it was: it
      had a job on the dark hero panel that no longer exists, so what is left is
      a text-selection colour and a single small dot in the social proof strip. */
-  --color-terracotta: #de7653;
-  --color-coral: #e7573d;
-  --color-chartreuse: #e1f079;
+  --color-terracotta: #d97706; /* amber-600, /gradlly-ams's secondary accent */
+  --color-coral: #f59e0b; /* amber-500 */
+  --color-chartreuse: #fde68a; /* amber-200 */
 
-  /* Derived, for text that must not sit at full ink weight. Measured, not
-     estimated: ink-muted at #6B6D61 was 4.03:1 on sand, which fails AA for
-     normal text, and sand is the surface under two whole bands. This is the
-     same grey darkened 8%, at 4.61 on sand and 5.56 on cream. */
-  --color-ink-soft: #4a4c42;
-  --color-ink-muted: #626459;
+  /* Derived, for text that must not sit at full ink weight. */
+  --color-ink-soft: #44403c; /* stone-700 */
+  --color-ink-muted: #78716c; /* stone-500, /gradlly-ams's muted/secondary text */
 
-  /* Terracotta is 2.84:1 on cream, which fails even the 3:1 non-text
-     threshold, so it is a fill and never a text colour. This is terracotta for
-     text: 5.51 on cream, 4.57 on sand. */
-  --color-terracotta-ink: #975038;
+  /* Terracotta is a fill colour, not a text colour (see amber-600's contrast
+     on light surfaces). This is terracotta for text: amber-700. */
+  --color-terracotta-ink: #b45309;
 
-  /* Olive itself passes everywhere (9.77:1 on cream) and is used as text
-     directly — the accent word in the hero, status pills, icons. */
+  /* Olive itself passes everywhere and is used as text directly — the accent
+     word in the hero, status pills, icons. */
 
-  --color-hairline: #e3ddd4;
-  --color-hairline-dark: #d9d2c5;
+  --color-hairline: #e7e5e4; /* stone-200, /gradlly-ams's border colour */
+  --color-hairline-dark: #d6d3d1; /* stone-300 */
 
   /* ── Type ──────────────────────────────────────────────────────────────── */
   --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;

@@ -35,7 +35,7 @@ export const SITE = Object.freeze({
     "Gradlly builds two products for the UK workforce. Continuo gives every worker verified skills and checks, kept verified at every job. Gradlly AMS runs apprenticeships, with a verified Passport for every apprentice.",
   locale: "en_GB",
   lang: "en-GB",
-  themeColor: "#13233a",
+  themeColor: "#fafaf9",
 
   /**
    * The two values the client still has to supply, which are the first two
