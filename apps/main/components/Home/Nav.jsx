@@ -20,9 +20,9 @@ export default function Nav({ menuOpen, setMenuOpen }) {
       >
         <a
           href="#"
-          className="font-serif text-black font-semibold mt-3 text-2xl tracking-tight"
+          className="font-serif text-emerald-700 font-semibold mt-3 text-2xl tracking-tight"
         >
-          Gradl<span className="text-emerald-700">ly</span>
+          Gradlly
         </a>
 
         <ul className="hidden md:flex items-center gap-8 list-none">

@@ -16,10 +16,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
  *
  * So the collage is gone (see the removed HeroStack.jsx) and this card grew a
  * header and a footer to match: a breadcrumb and a status pill above the
- * confirming list, a readiness checklist below it. Both of the new zones are
- * built from data that already existed elsewhere in this codebase —
- * the readiness criteria are the same three HeroStack used to show in its own
- * floating plate — not invented for the new layout.
+ * confirming list, a second product strip below it — Continuo confirming on
+ * top, Gradlly AMS's four portals underneath, so the one card carries both
+ * products the way the rest of the page's spine does. The portal names and
+ * "Four doors onto one apprenticeship." are §6's own words, not invented for
+ * this card.
  *
  * ── WHAT IT CONTAINS, AND DOES NOT ──────────────────────────────────────────
  *
@@ -63,24 +64,21 @@ const LINES = [
   },
 ];
 
-/** The same three gateway criteria the old HeroStack plate showed. Moved here
-    rather than duplicated, now that there is one card instead of three. */
-const READINESS = [
-  { criterion: "Off-the-job hours", met: true },
-  { criterion: "KSB coverage", met: true },
-  { criterion: "Employer sign-off", met: false },
-];
-const READY_COUNT = READINESS.filter((row) => row.met).length;
+/** Named exactly as the portals section on this page names them (§6, "Four
+    doors onto one apprenticeship."). */
+const PORTALS = ["Provider", "Employer", "Apprentice", "Forge"];
 
 const STEP_MS = 900;
 
-function CheckIcon({ met }) {
+function CheckIcon({ met, tone = "olive" }) {
+  const toneClass =
+    tone === "terracotta"
+      ? "border-terracotta bg-terracotta text-linen"
+      : "border-olive bg-olive text-linen";
   return (
     <span
       className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
-        met
-          ? "border-olive bg-olive text-linen"
-          : "border-hairline-dark text-transparent"
+        met ? toneClass : "border-hairline-dark text-transparent"
       }`}
       aria-hidden
     >
@@ -243,39 +241,23 @@ export function VerifyDemo() {
           : `${confirmed} of ${LINES.length} lines confirmed.`}
       </p>
 
-      {/* The readiness strip. Counted from the rows beside it, not written as
-          a separate figure — the same three criteria HeroStack used to carry
-          in its own floating plate, before this became one card instead of
-          three. */}
+      {/* The second product strip: Gradlly AMS's four portals, under
+          Continuo's confirming list above. */}
       <div className="border-t border-hairline bg-sand/30 px-6 py-5">
         <div className="flex items-center justify-between gap-4">
-          <p className="text-caption font-medium text-ink-muted">
-            Gateway readiness
-          </p>
+          <p className="text-caption font-medium text-ink-muted">Gradlly AMS</p>
           <p className="text-caption text-ink-muted">
-            {READY_COUNT} of {READINESS.length} met
+            {PORTALS.length} portals
           </p>
         </div>
-        <span
-          className="mt-3 block h-1.5 overflow-hidden rounded-full bg-sand"
-          aria-hidden
-        >
-          <span
-            className="block h-full rounded-full bg-olive transition-all duration-500 ease-out"
-            style={{
-              width: `${(READY_COUNT / READINESS.length) * 100}%`,
-            }}
-          />
-        </span>
+        <p className="mt-1 text-caption text-ink-muted">
+          Four doors onto one apprenticeship.
+        </p>
         <ul className="mt-4 list-none space-y-2.5">
-          {READINESS.map(({ criterion, met }) => (
-            <li key={criterion} className="flex items-center gap-2.5">
-              <CheckIcon met={met} />
-              <span
-                className={`text-body-sm ${met ? "text-ink" : "text-ink-muted"}`}
-              >
-                {criterion}
-              </span>
+          {PORTALS.map((portal) => (
+            <li key={portal} className="flex items-center gap-2.5">
+              <CheckIcon met tone="terracotta" />
+              <span className="text-body-sm text-ink">{portal}</span>
             </li>
           ))}
         </ul>
