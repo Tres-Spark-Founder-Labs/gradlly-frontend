@@ -138,7 +138,7 @@ export function Header() {
             </a>
             <a
               href="/book-a-demo"
-              className="hidden rounded-full bg-terracotta px-5 py-2.5 text-body-sm font-semibold text-linen transition-colors duration-[140ms] ease-out hover:bg-coral sm:inline-block"
+              className="hidden rounded-full bg-olive px-5 py-2.5 text-body-sm font-semibold text-linen transition-colors duration-[140ms] ease-out hover:bg-olive/90 sm:inline-block"
             >
               Book a demo
             </a>

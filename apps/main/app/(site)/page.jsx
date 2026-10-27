@@ -708,10 +708,15 @@ export default function HomePage() {
       </Band>
 
       {/* ── 10 Book a demo, §9 ──────────────────────────────────────────────── */}
-      <Band id="book-a-demo" labelledBy="book-a-demo-heading">
+      {/* ── 10 Book a demo, §9 ───────────────────────────────────────────────
+          Solid olive band, the same position and purpose /gradlly-ams's own
+          CTA.jsx holds right before its footer. The form keeps a white card
+          so the fields stay legible against the colour behind them. */}
+      <Band id="book-a-demo" tone="olive" labelledBy="book-a-demo-heading">
         <BandHead
           id="book-a-demo-heading"
           eyebrow="Book a demo"
+          tone="linen"
           note="Whether you hire into regulated roles or run apprenticeships, we'll walk you through the parts of Gradlly that matter to you."
         >
           See Gradlly with your own programme.
@@ -723,20 +728,22 @@ export default function HomePage() {
           </Card>
 
           <div>
-            <h3 className="display text-subhead text-ink">
+            <h3 className="display text-subhead text-linen">
               What a demo covers
             </h3>
             <ul className="mt-6 list-none">
               {demoCovers.map(({ name, detail }) => (
-                <li key={name} className="border-t border-hairline py-5">
-                  <Attestation claim={name}>{detail}</Attestation>
+                <li key={name} className="border-t border-linen/15 py-5">
+                  <Attestation claim={name} tone="linen">
+                    {detail}
+                  </Attestation>
                 </li>
               ))}
             </ul>
             {SITE.contactEmail ? (
-              <p className="mt-8 text-body-sm text-ink-soft">
+              <p className="mt-8 text-body-sm text-linen/60">
                 Or email us at{" "}
-                <TextLink href={`mailto:${SITE.contactEmail}`}>
+                <TextLink href={`mailto:${SITE.contactEmail}`} tone="linen">
                   {SITE.contactEmail}
                 </TextLink>
               </p>

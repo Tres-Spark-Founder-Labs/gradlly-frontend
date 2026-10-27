@@ -297,7 +297,7 @@ export function DemoForm() {
                   value={value}
                   checked={values.interest === value}
                   onChange={set("interest")}
-                  className="mt-1 accent-[var(--color-terracotta)]"
+                  className="mt-1 accent-[var(--color-olive)]"
                 />
                 {label}
               </label>
@@ -365,7 +365,7 @@ export function DemoForm() {
         <button
           type="submit"
           disabled={state === "sending"}
-          className="rounded-full bg-terracotta px-7 py-3 text-body-sm font-medium text-linen transition-colors duration-200 ease-out hover:bg-coral disabled:opacity-60"
+          className="rounded-full bg-olive px-7 py-3 text-body-sm font-medium text-linen transition-colors duration-200 ease-out hover:bg-olive/90 disabled:opacity-60"
         >
           {isLast
             ? state === "sending"

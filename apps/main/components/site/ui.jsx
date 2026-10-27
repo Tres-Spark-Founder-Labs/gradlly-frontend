@@ -4,10 +4,10 @@
  * ── RULES THIS FILE HOLDS TO, FROM THE REBUILD BRIEF ─────────────────────────
  *
  *   The serif carries display type only, never body, labels or controls.
- *   Terracotta carries the actions. Outlined is the secondary.
- *   Olive is the accent colour: headline emphasis, icons, status, links.
- *     It is text and border now, not a panel fill — nothing on this page
- *     sits on a solid olive surface any more.
+ *   Olive carries the actions, matching /gradlly-ams's own buttons. Outlined
+ *     is the secondary. Terracotta stays the Gradlly AMS / Passport product
+ *     mark — it identifies a section, it doesn't drive a click.
+ *   Olive is also the accent colour: headline emphasis, icons, status, links.
  *   Cards carry a shadow (.shadow-card), not just a hairline. See globals.css
  *     for why: the previous system separated surfaces tonally on purpose, and
  *     this rebuild's reference visibly lifts its cards off the page instead.
@@ -80,6 +80,7 @@ export function Band({
  * scale, note on the right as sans body.
  */
 export function BandHead({ id, eyebrow, children, note, tone = "ink" }) {
+  const dark = tone === "linen";
   return (
     <div
       className={
@@ -92,14 +93,18 @@ export function BandHead({ id, eyebrow, children, note, tone = "ink" }) {
         {eyebrow ? <Ref tone={tone}>{eyebrow}</Ref> : null}
         <h2
           id={id}
-          className={`display measure-display text-section text-ink ${eyebrow ? "mt-5" : ""}`}
+          className={`display measure-display text-section ${dark ? "text-linen" : "text-ink"} ${eyebrow ? "mt-5" : ""}`}
         >
           {children}
         </h2>
       </Reveal>
       {note ? (
         <Reveal stagger={0}>
-          <p className="measure text-lead text-ink-soft">{note}</p>
+          <p
+            className={`measure text-lead ${dark ? "text-linen/60" : "text-ink-soft"}`}
+          >
+            {note}
+          </p>
         </Reveal>
       ) : null}
     </div>
@@ -115,8 +120,7 @@ export function Button({
   className = "",
 }) {
   const style = {
-    primary:
-      "bg-terracotta text-linen hover:bg-coral border border-transparent",
+    primary: "bg-olive text-linen hover:bg-olive/90 border border-transparent",
     outline: "border border-ink text-ink hover:bg-ink hover:text-linen",
     "outline-coral":
       "border border-coral text-coral hover:bg-coral hover:text-linen",
@@ -132,11 +136,15 @@ export function Button({
   );
 }
 
-export function TextLink({ href, children, className = "" }) {
+export function TextLink({ href, children, tone = "ink", className = "" }) {
+  const style =
+    tone === "linen"
+      ? "text-linen underline decoration-linen/40 hover:decoration-linen"
+      : "text-ink underline decoration-ink/30 hover:decoration-ink";
   return (
     <a
       href={href}
-      className={`text-body-sm font-medium text-ink underline decoration-ink/30 decoration-1 underline-offset-[5px] transition-colors duration-200 ease-out hover:decoration-ink ${className}`}
+      className={`text-body-sm font-medium decoration-1 underline-offset-[5px] transition-colors duration-200 ease-out ${style} ${className}`}
     >
       {children}
     </a>
@@ -182,15 +190,32 @@ export function Accent({ children }) {
  * proposition is not that something is true but that somebody confirmed it,
  * so a promise carries who stands behind it.
  */
-export function Attestation({ claim, by, mark = "olive", children }) {
+export function Attestation({
+  claim,
+  by,
+  mark = "olive",
+  tone = "ink",
+  children,
+}) {
+  const dark = tone === "linen";
   return (
     <div>
-      <h3 className="text-subhead font-medium text-ink">{claim}</h3>
+      <h3
+        className={`text-subhead font-medium ${dark ? "text-linen" : "text-ink"}`}
+      >
+        {claim}
+      </h3>
       {children ? (
-        <p className="measure mt-3 text-body-sm text-ink-soft">{children}</p>
+        <p
+          className={`measure mt-3 text-body-sm ${dark ? "text-linen/60" : "text-ink-soft"}`}
+        >
+          {children}
+        </p>
       ) : null}
       {by ? (
-        <p className="mt-4 flex items-start gap-3 text-caption text-ink-muted">
+        <p
+          className={`mt-4 flex items-start gap-3 text-caption ${dark ? "text-linen/50" : "text-ink-muted"}`}
+        >
           <span
             className="mark mt-1 h-3"
             style={{ "--mark": MARK[mark] }}
