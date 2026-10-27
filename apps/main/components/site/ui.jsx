@@ -59,6 +59,7 @@ export function Band({
     linen: "bg-linen",
     sand: "bg-sand",
     olive: "bg-olive text-linen",
+    ink: "bg-ink text-linen",
   }[tone];
 
   return (

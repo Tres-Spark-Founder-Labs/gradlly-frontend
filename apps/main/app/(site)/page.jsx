@@ -1,7 +1,6 @@
 import { DemoForm } from "@/components/site/DemoForm";
 import {
   EvidenceCompare,
-  FlowPath,
   LevyFlow,
   PortalMap,
   ShareDiagram,
@@ -563,63 +562,102 @@ export default function HomePage() {
         </div>
       </Band>
 
-      {/* ── 08 How it works, §7 ─────────────────────────────────────────────── */}
-      <Band id="how-it-works" labelledBy="how-it-works-heading">
-        <BandHead
-          id="how-it-works-heading"
-          note="Two products, two flows. Each works on its own."
-        >
-          How it works
-        </BandHead>
+      {/* ── 08 How it works, §7 ──────────────────────────────────────────────
+          Dark band, numbered-card grids: the structure /gradlly-ams's own
+          "How it works" uses (components/Home/HowItWorks.jsx), carried onto
+          the homepage's two flows. Product colour stays on the hover
+          underline and the mark bars, never on body text, because olive and
+          terracotta text both fall under AA contrast against --color-ink. */}
+      <Band id="how-it-works" tone="ink" labelledBy="how-it-works-heading">
+        <Reveal>
+          <Ref tone="linen">How it works</Ref>
+          <h2
+            id="how-it-works-heading"
+            className="display measure-display mt-5 text-section text-linen"
+          >
+            Two products. <em className="italic">Each works on its own.</em>
+          </h2>
+          <p className="measure mt-5 text-lead text-linen/60">
+            Two products, two flows. Each works on its own.
+          </p>
+        </Reveal>
 
-        <div className="mt-16 grid gap-16 lg:grid-cols-2 lg:gap-20">
+        <div className="mt-20 space-y-20">
           <div>
             <span
-              className="mark mb-6 h-3.5"
+              className="mark h-3.5"
               style={{ "--mark": "var(--color-olive)" }}
               aria-hidden
             />
-            <h3 className="display text-section text-ink">
+            <h3 className="display mt-4 text-subhead text-linen">
               How Continuo works
             </h3>
-            <div className="mt-8">
-              <FlowPath
-                steps={continuoFlow}
-                tone="olive"
-                label="How Continuo works"
-              />
-            </div>
+
+            <Reveal className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-card border border-linen/10 bg-linen/10 md:grid-cols-2 lg:grid-cols-4">
+              {continuoFlow.map(({ claim, detail }, index) => (
+                <div
+                  key={claim}
+                  className="group relative h-full bg-ink p-8 transition-colors hover:bg-linen/5"
+                >
+                  <span className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-olive transition-transform duration-300 group-hover:scale-x-100" />
+                  <div className="display text-6xl leading-none text-linen/10">
+                    {index + 1}
+                  </div>
+                  <h4 className="display mt-4 text-subhead text-linen">
+                    {claim}
+                  </h4>
+                  <p className="mt-3 text-body-sm leading-relaxed text-linen/50">
+                    {detail}
+                  </p>
+                </div>
+              ))}
+            </Reveal>
           </div>
 
           <div>
             <span
-              className="mark mb-6 h-3.5"
+              className="mark h-3.5"
               style={{ "--mark": "var(--color-terracotta)" }}
               aria-hidden
             />
-            <h3 className="display text-section text-ink">How AMS works</h3>
-            <div className="mt-8">
-              <FlowPath
-                steps={amsFlow}
-                tone="terracotta"
-                label="How Gradlly AMS works"
-              />
-            </div>
+            <h3 className="display mt-4 text-subhead text-linen">
+              How Gradlly AMS works
+            </h3>
+
+            <Reveal className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-card border border-linen/10 bg-linen/10 md:grid-cols-2 lg:grid-cols-4">
+              {amsFlow.map(({ claim, detail }, index) => (
+                <div
+                  key={claim}
+                  className="group relative h-full bg-ink p-8 transition-colors hover:bg-linen/5"
+                >
+                  <span className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-terracotta transition-transform duration-300 group-hover:scale-x-100" />
+                  <div className="display text-6xl leading-none text-linen/10">
+                    {index + 1}
+                  </div>
+                  <h4 className="display mt-4 text-subhead text-linen">
+                    {claim}
+                  </h4>
+                  <p className="mt-3 text-body-sm leading-relaxed text-linen/50">
+                    {detail}
+                  </p>
+                </div>
+              ))}
+            </Reveal>
           </div>
         </div>
 
-        <div className="mt-20 grid gap-8 border-t border-hairline pt-12 lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)] lg:gap-20">
+        <div className="mt-20 grid gap-8 border-t border-linen/10 pt-12 lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)] lg:gap-20">
           <div>
             <p className="flex items-center gap-2" aria-hidden>
               <span className="block h-1 w-9 rounded-full bg-olive" />
               <span className="block h-1 w-9 rounded-full bg-terracotta" />
             </p>
-            <h3 className="display mt-6 text-section text-ink">
+            <h3 className="display mt-6 text-section text-linen">
               Better together
             </h3>
           </div>
           <div className="self-end">
-            <p className="measure text-body text-ink-soft">
+            <p className="measure text-body text-linen/60">
               When an apprentice finishes, they can carry their Passport&rsquo;s
               verified achievements into Continuo, with their consent. Their
               first employer onboards from proof on day one.
